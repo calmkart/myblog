@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Github on cAlm的个人Blog</title>
+        <link>http://localhost:1313/tags/github/</link>
+        <description>Recent content in Github on cAlm的个人Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Wed, 25 Sep 2019 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/github/index.xml" rel="self" type="application/rss+xml" /><item>
+            <title>kubetnetes contribution github workflow</title>
+            <link>http://localhost:1313/posts/2019/09/2019-09-25-kubetnetes-contribution-github-workflow/</link>
+            <pubDate>Wed, 25 Sep 2019 00:00:00 +0000</pubDate>
+            <guid>http://localhost:1313/posts/2019/09/2019-09-25-kubetnetes-contribution-github-workflow/</guid>
+            <description>&lt;p&gt;转一下kubernetes contribution的github workflow，不仅用在k8s里，也可以用在其他各个开源项目上，贴图备忘，无内容&lt;/p&gt;&#xA;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.calmkart.com/wp-content/uploads/2019/09/git_workflow.png&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;&lt;img src=&#34;images/git_workflow.png&#34; alt=&#34;&#34; /&gt;&#xA;&lt;/a&gt;&lt;/p&gt;&#xA;</description>
+        </item><item>
+            <title>修改github项目所属语言</title>
+            <link>http://localhost:1313/posts/2018/09/2018-09-25-%E4%BF%AE%E6%94%B9nginx%E9%A1%B9%E7%9B%AE%E6%89%80%E5%B1%9E%E8%AF%AD%E8%A8%80/</link>
+            <pubDate>Tue, 25 Sep 2018 00:00:00 +0000</pubDate>
+            <guid>http://localhost:1313/posts/2018/09/2018-09-25-%E4%BF%AE%E6%94%B9nginx%E9%A1%B9%E7%9B%AE%E6%89%80%E5%B1%9E%E8%AF%AD%E8%A8%80/</guid>
+            <description>&lt;p&gt;github上项目统计是以最多的语言作为项目语言,有时候有点为难强迫症. 以下方法可以改变统计的语言,一点小笔记&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;#创建.gitattributes文件在项目根目录,内容如下&#xA;*.css linguist-language=Python&#xA;*.less linguist-language=Python&#xA;*.js linguist-language=Python&#xA;*.html linguist-language=Python&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;搞定!&lt;/p&gt;&#xA;</description>
+        </item></channel>
+</rss>

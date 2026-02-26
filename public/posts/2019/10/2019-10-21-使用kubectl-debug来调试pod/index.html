@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="在k8s环境中,我们经常会碰到各种疑难杂症.比如下面这个例子: 某pod无法启动,查看日志显示原来是init时容器无法拉取某个外部网络上的包.我们exec登陆容器后试图调试下产生这个问题的原因,我们输入ping xxx.xxx.xxx,但sh直接提示&quot;找不到ping命令&quot;,甚至直接无法exec到一个没有sh的容器中. 这样的情况我们该怎么办呢？这里有一个解决类似问题的调试工具kubectl-debug\n">
+<title>使用kubectl-debug来调试pod</title>
+
+
+<link rel="canonical" href="http://localhost:1313/posts/2019/10/2019-10-21-%E4%BD%BF%E7%94%A8kubectl-debug%E6%9D%A5%E8%B0%83%E8%AF%95pod/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="使用kubectl-debug来调试pod">
+<meta property='og:description' content="在k8s环境中,我们经常会碰到各种疑难杂症.比如下面这个例子: 某pod无法启动,查看日志显示原来是init时容器无法拉取某个外部网络上的包.我们exec登陆容器后试图调试下产生这个问题的原因,我们输入ping xxx.xxx.xxx,但sh直接提示&quot;找不到ping命令&quot;,甚至直接无法exec到一个没有sh的容器中. 这样的情况我们该怎么办呢？这里有一个解决类似问题的调试工具kubectl-debug\n">
+<meta property='og:url' content='http://localhost:1313/posts/2019/10/2019-10-21-%E4%BD%BF%E7%94%A8kubectl-debug%E6%9D%A5%E8%B0%83%E8%AF%95pod/'>
+<meta property='og:site_name' content='cAlm的个人Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='golang' /><meta property='article:tag' content='k8s' /><meta property='article:tag' content='kubectl-debug' /><meta property='article:tag' content='kubernetes' /><meta property='article:tag' content='sidecar' /><meta property='article:tag' content='云原生' /><meta property='article:tag' content='容器' /><meta property='article:tag' content='调试' /><meta property='article:published_time' content='2019-10-21T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2019-10-21T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="使用kubectl-debug来调试pod">
+<meta name="twitter:description" content="在k8s环境中,我们经常会碰到各种疑难杂症.比如下面这个例子: 某pod无法启动,查看日志显示原来是init时容器无法拉取某个外部网络上的包.我们exec登陆容器后试图调试下产生这个问题的原因,我们输入ping xxx.xxx.xxx,但sh直接提示&quot;找不到ping命令&quot;,甚至直接无法exec到一个没有sh的容器中. 这样的情况我们该怎么办呢？这里有一个解决类似问题的调试工具kubectl-debug\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">cAlm的个人Blog</a></h1>
+            <h2 class="site-description">随手记录些东西</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives' >
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/categories' >
+                
+                <span>分类</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about' >
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/" style="background-color: hsl(208, 60%, 84%); color: hsl(208, 60%, 15%);">
+                计算机
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/posts/2019/10/2019-10-21-%E4%BD%BF%E7%94%A8kubectl-debug%E6%9D%A5%E8%B0%83%E8%AF%95pod/">使用kubectl-debug来调试pod</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2019-10-21T00:00:00Z'>Monday, October 21, 2019</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+
+    <section class="article-content">
+    
+    
+    <p>在k8s环境中,我们经常会碰到各种疑难杂症.比如下面这个例子: 某pod无法启动,查看日志显示原来是init时容器无法拉取某个外部网络上的包.我们exec登陆容器后试图调试下产生这个问题的原因,我们输入ping xxx.xxx.xxx,但sh直接提示&quot;找不到ping命令&quot;,甚至直接无法exec到一个没有sh的容器中. 这样的情况我们该怎么办呢？这里有一个解决类似问题的调试工具<a class="link" href="https://github.com/aylei/kubectl-debug"  target="_blank" rel="noopener"
+    >kubectl-debug</a></p>
+<p>kubectl-debug的原理也很简单,因为docker容器是基于namespace做的隔离,所以可以创建一个新的预装好了各种调试工具的容器,直接加入待调试容器的namespace中,这样就可以与待调试pod共享各类栈,实现方便调试.(有点类似于k8s中的sidecar设计模式,但是使用的是一个用后既销的独立容器)</p>
+<p>这里介绍一下简单的使用方式 我们可以直接下载编译好的二进制文件包 <a class="link" href="https://github.com/aylei/kubectl-debug/releases"  target="_blank" rel="noopener"
+    >https://github.com/aylei/kubectl-debug/releases</a> 也可以clone源代码自己做编译(可以获得更多最新修复和更新)</p>
+<pre tabindex="0"><code># 这里要开启docker,因为是通过docker编译的
+git clone https://github.com/aylei/kubectl-debug.git
+cd kubectl-debug
+make
+</code></pre><p>最简单的使用方式</p>
+<pre tabindex="0"><code>kubectl-debug POD_NAME
+</code></pre><p>kubectl-debug将拉取nicolaka/netshoot镜像作为默认的debug镜像. 过一小会拉取镜像的功夫,我们创建好了一个插入待调试pod namespace中的调试容器,并且已经获取了stdin和stdout,我们就可以进行调试了. 调试完成后exit退出,kubectl-debug将完成相关的清理工作.</p>
+<p>当然,如果觉得默认的nicolaka/netshoot调试镜像不好用,也可以使用自己的私有镜像进行调试</p>
+<pre tabindex="0"><code># 使用私有仓库镜像,并设置私有仓库使用的kubernetes secret
+# secret data原文请设置为 {Username: , Password: }
+# 默认secret_name为kubectl-debug-registry-secret,默认namspace为default
+kubectl-debug POD_NAME --image calmkart/netshoot:latest --registry-secret-name  --registry-secret-namespace 
+</code></pre><p>甚至如果原pod已经无法启动了,我们可以使用fork模式fork出一个新的待调试pod用于调试(自动替换掉entry-point)</p>
+<pre tabindex="0"><code>kubectl debug POD_NAME --fork
+</code></pre><p>更多功能可以参考<a class="link" href="https://github.com/aylei/kubectl-debug/blob/master/docs/zh-cn.md"  target="_blank" rel="noopener"
+    >kubectl-debug官方文档</a></p>
+<p>总之这个工具还是非常实用的,我也参与添加了一些增强功能和bug修复.k8s官方据说也将在未来版本增加<a class="link" href="https://github.com/kubernetes/enhancements/issues/277"  target="_blank" rel="noopener"
+    >临时容器</a>功能以支持调试,虽然不知道啥时候能用上,但还是期待的.</p>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/golang/">Golang</a>
+        
+            <a href="/tags/k8s/">K8s</a>
+        
+            <a href="/tags/kubectl-debug/">Kubectl-Debug</a>
+        
+            <a href="/tags/kubernetes/">Kubernetes</a>
+        
+            <a href="/tags/sidecar/">Sidecar</a>
+        
+            <a href="/tags/%E4%BA%91%E5%8E%9F%E7%94%9F/">云原生</a>
+        
+            <a href="/tags/%E5%AE%B9%E5%99%A8/">容器</a>
+        
+            <a href="/tags/%E8%B0%83%E8%AF%95/">调试</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/posts/2019/08/2019-08-22-%E9%85%8D%E7%BD%AE%E5%92%8C%E4%BD%BF%E7%94%A8kube-prometheus/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">配置和使用kube-prometheus</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2019/09/2019-09-18-kubernetes-scheduler%E6%B5%81%E7%A8%8B%E5%9B%BE/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">kubernetes scheduler流程图</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2019/08/2019-08-14-helm-chart%E7%9A%84%E5%88%B6%E4%BD%9C%E5%8F%8A%E4%BD%BF%E7%94%A8%E9%A1%BA%E4%BE%BF%E6%8B%89%E4%B8%AA%E7%A5%A8/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">helm chart的制作及使用(顺便拉个票)</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2019/06/2019-06-13-kubernetesjenkins%E5%AE%9E%E7%8E%B0%E7%8E%B0%E4%BB%A3cicd%E6%B5%81%E6%B0%B4%E7%BA%BF%E4%B8%80/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">kubernetes&#43;jenkins实现现代cicd流水线(一)</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2019/05/2019-05-25-kubernetes%E9%9B%86%E7%BE%A4%E4%B8%AD%E6%9C%8D%E5%8A%A1%E7%9A%84%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%92%8C%E5%A4%96%E9%83%A8%E5%8F%91%E7%8E%B0/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">kubernetes集群中服务的负载均衡和外部发现</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
+<div id="tcomment"></div>
+<style>
+    .twikoo {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+    :root[data-scheme="dark"] {
+        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
+        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
+    }
+    .twikoo .el-input-group__prepend,
+    .twikoo .tk-action-icon,
+    .twikoo .tk-submit-action-icon,
+    .twikoo .tk-time,
+    .twikoo .tk-comments-no,
+    .twikoo .tk-comments-count {
+        color: var(--twikoo-body-text-color);
+    }
+    .twikoo .el-input__inner,
+    .twikoo .el-textarea__inner,
+    .twikoo .tk-preview-container,
+    .twikoo .tk-content,
+    .twikoo .tk-nick,
+    .twikoo .tk-send,
+    .twikoo .tk-comments-no,
+    .twikoo .el-input__count,
+    .twikoo .tk-submit-action-icon {
+        color: var(--twikoo-body-text-color-main)!important;
+    }
+    .twikoo .el-button{
+        color: var(--twikoo-body-text-color)!important;
+    }
+    .twikoo .el-input__count {
+        color: var(--twikoo-body-text-color) !important;
+    }
+    .OwO .OwO-body {
+        background-color: var(--body-background) !important;
+        color: var(--body-text-color) !important;
+    }
+</style><script>
+    twikoo.init({
+        envId: '',
+        el: '#tcomment',})
+</script>
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 cAlm的个人Blog
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.2d3f4e9dd7b2453cd71ff8971f18724ef8b4f783f2e8c70b9a281707db74e8a5.js" defer></script>
+
+
+    </body>
+</html>

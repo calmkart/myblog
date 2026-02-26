@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="首先拉个票 [阿里云开发者社区-云原生应用大赛] https://developer.aliyun.com/hub 麻烦不反感拉票的,有兴趣有空的,给我提交的下面三个应用点个星星，多谢了。(阿里云普通账号即可投票,支付宝登录亦可) ">
+<title>helm chart的制作及使用(顺便拉个票)</title>
+
+
+<link rel="canonical" href="http://localhost:1313/posts/2019/08/2019-08-14-helm-chart%E7%9A%84%E5%88%B6%E4%BD%9C%E5%8F%8A%E4%BD%BF%E7%94%A8%E9%A1%BA%E4%BE%BF%E6%8B%89%E4%B8%AA%E7%A5%A8/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="helm chart的制作及使用(顺便拉个票)">
+<meta property='og:description' content="首先拉个票 [阿里云开发者社区-云原生应用大赛] https://developer.aliyun.com/hub 麻烦不反感拉票的,有兴趣有空的,给我提交的下面三个应用点个星星，多谢了。(阿里云普通账号即可投票,支付宝登录亦可) ">
+<meta property='og:url' content='http://localhost:1313/posts/2019/08/2019-08-14-helm-chart%E7%9A%84%E5%88%B6%E4%BD%9C%E5%8F%8A%E4%BD%BF%E7%94%A8%E9%A1%BA%E4%BE%BF%E6%8B%89%E4%B8%AA%E7%A5%A8/'>
+<meta property='og:site_name' content='cAlm的个人Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='chart' /><meta property='article:tag' content='golang' /><meta property='article:tag' content='helm' /><meta property='article:tag' content='k8s' /><meta property='article:tag' content='template' /><meta property='article:published_time' content='2019-08-14T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2019-08-14T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="helm chart的制作及使用(顺便拉个票)">
+<meta name="twitter:description" content="首先拉个票 [阿里云开发者社区-云原生应用大赛] https://developer.aliyun.com/hub 麻烦不反感拉票的,有兴趣有空的,给我提交的下面三个应用点个星星，多谢了。(阿里云普通账号即可投票,支付宝登录亦可) ">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">cAlm的个人Blog</a></h1>
+            <h2 class="site-description">随手记录些东西</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives' >
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/categories' >
+                
+                <span>分类</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about' >
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/" style="background-color: hsl(208, 60%, 84%); color: hsl(208, 60%, 15%);">
+                计算机
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/posts/2019/08/2019-08-14-helm-chart%E7%9A%84%E5%88%B6%E4%BD%9C%E5%8F%8A%E4%BD%BF%E7%94%A8%E9%A1%BA%E4%BE%BF%E6%8B%89%E4%B8%AA%E7%A5%A8/">helm chart的制作及使用(顺便拉个票)</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2019-08-14T00:00:00Z'>Wednesday, August 14, 2019</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+
+    <section class="article-content">
+    
+    
+    <p>首先拉个票 [阿里云开发者社区-云原生应用大赛] <a class="link" href="https://developer.aliyun.com/hub"  target="_blank" rel="noopener"
+    >https://developer.aliyun.com/hub</a> 麻烦不反感拉票的,有兴趣有空的,给我提交的下面三个应用点个星星，多谢了。(阿里云普通账号即可投票,支付宝登录亦可) <a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/08/C0B4B70807593CFFFD06C612FCE18009.jpg"  target="_blank" rel="noopener"
+    ><img src="images/C0B4B70807593CFFFD06C612FCE18009.jpg" alt="" />
+</a></p>
+<p>在k8s的容器云环境中,应用的部署方式通常是编写对应的api对象申明文件来完成. 比如比较简单的应用,如简单的django应用,我们通常就需要首先编写deployment用于控制replicaset-&gt;pod，然后编写service控制deployment，最后编写ingress做服务暴露. 而比较复杂的应用,如prometheus,我们通常就要用到用户定义api对象crd,然后编写对应的循环和控制,最后完成上面的那一套部署方式.</p>
+<p>显然,这挺复杂的,而且特别多的东西感觉都可以用模板传变量来代替.那么我们是否需要自己编写一个系统用以根据参数自动生成这些复杂的yaml文件呢?答案基本上是没必要的(当然一切特殊情况还是需要),我们有helm来帮我们做这一切.</p>
+<p>你可以将helm与k8s的关系看作yum之于centos的关系.helm将应用进行打包,我们就可以通过填写必要的参数，自动生成和部署批量的yaml文件，从而实现一键部署复杂的系统. 比如promethues在k8s中的部署,如果我们用编写Yaml的方法来部署,很可能就要编写数十个yaml文件(包括promethues,alertmanager,grafana,push-gateway等等),但我们如果使用helm，我们就只需要一行命令</p>
+<pre tabindex="0"><code>helm install stable/prometheus-operator
+</code></pre><p>那么，我们应该怎样才能制作helm中的chart软件包用于给用户自动安装呢?首先,我们需要安装helm,下载二进制文件即可. <a class="link" href="https://github.com/helm/helm/releases"  target="_blank" rel="noopener"
+    >https://github.com/helm/helm/releases</a></p>
+<p>然后我们开始创建一个helm软件包(project-name可替换)</p>
+<pre tabindex="0"><code>helm create &lt;project-name&gt;
+</code></pre><p>我们可以看到，创建了如下文件夹 <a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/08/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_86ed0736-bdd6-4486-83a6-a6dedf0d876d.png"  target="_blank" rel="noopener"
+    ><img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_86ed0736-bdd6-4486-83a6-a6dedf0d876d.png" alt="" />
+</a></p>
+<p>其中template下就是各个yaml文件的模板,而values.yaml则是可以填充进各个yaml文件模板的参数(用户可调节). 我们要做的就是对values.yaml和template下各模板做修改,以适应实际应用的需求.</p>
+<p>其中,template的模板语法用的是golang的template语法，再加上sprig模板库函数(<a class="link" href="https://github.com/Masterminds/sprig"  target="_blank" rel="noopener"
+    >https://github.com/Masterminds/sprig</a>)</p>
+<p>当我们设计好了一个chart之后,我们可以通过如下命令测试生成的yaml文件是否符合预期</p>
+<pre tabindex="0"><code>helm install  --dry-run --debug ../&lt;project-name&gt;                                                
+</code></pre><p>我们可以通过-f values.yaml统一设置参数,也可以通过&ndash;set 单一设置参数</p>
+<p>如果符合预期,我们就可以直接安装了</p>
+<pre tabindex="0"><code>helm install  ../&lt;project-name&gt;
+</code></pre><p>更多的helm相关的资料可以参考 <a class="link" href="https://whmzsu.github.io/helm-doc-zh-cn/"  target="_blank" rel="noopener"
+    >helm用户与开发者指南(中文版)</a></p>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/chart/">Chart</a>
+        
+            <a href="/tags/golang/">Golang</a>
+        
+            <a href="/tags/helm/">Helm</a>
+        
+            <a href="/tags/k8s/">K8s</a>
+        
+            <a href="/tags/template/">Template</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/posts/2019/06/2019-06-13-kubernetesjenkins%E5%AE%9E%E7%8E%B0%E7%8E%B0%E4%BB%A3cicd%E6%B5%81%E6%B0%B4%E7%BA%BF%E4%B8%80/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">kubernetes&#43;jenkins实现现代cicd流水线(一)</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2019/05/2019-05-25-kubernetes%E9%9B%86%E7%BE%A4%E4%B8%AD%E6%9C%8D%E5%8A%A1%E7%9A%84%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%92%8C%E5%A4%96%E9%83%A8%E5%8F%91%E7%8E%B0/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">kubernetes集群中服务的负载均衡和外部发现</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2019/05/2019-05-24-kubernetes%E6%90%AD%E5%BB%BA%E5%B9%B6%E4%BD%BF%E7%94%A8rook-ceph%E7%9A%84pv%E5%AD%98%E5%82%A8/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">kubernetes搭建并使用rook/ceph的pv存储</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
+<div id="tcomment"></div>
+<style>
+    .twikoo {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+    :root[data-scheme="dark"] {
+        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
+        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
+    }
+    .twikoo .el-input-group__prepend,
+    .twikoo .tk-action-icon,
+    .twikoo .tk-submit-action-icon,
+    .twikoo .tk-time,
+    .twikoo .tk-comments-no,
+    .twikoo .tk-comments-count {
+        color: var(--twikoo-body-text-color);
+    }
+    .twikoo .el-input__inner,
+    .twikoo .el-textarea__inner,
+    .twikoo .tk-preview-container,
+    .twikoo .tk-content,
+    .twikoo .tk-nick,
+    .twikoo .tk-send,
+    .twikoo .tk-comments-no,
+    .twikoo .el-input__count,
+    .twikoo .tk-submit-action-icon {
+        color: var(--twikoo-body-text-color-main)!important;
+    }
+    .twikoo .el-button{
+        color: var(--twikoo-body-text-color)!important;
+    }
+    .twikoo .el-input__count {
+        color: var(--twikoo-body-text-color) !important;
+    }
+    .OwO .OwO-body {
+        background-color: var(--body-background) !important;
+        color: var(--body-text-color) !important;
+    }
+</style><script>
+    twikoo.init({
+        envId: '',
+        el: '#tcomment',})
+</script>
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 cAlm的个人Blog
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.2d3f4e9dd7b2453cd71ff8971f18724ef8b4f783f2e8c70b9a281707db74e8a5.js" defer></script>
+
+
+    </body>
+</html>

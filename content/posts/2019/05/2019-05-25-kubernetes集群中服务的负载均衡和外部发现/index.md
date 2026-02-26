@@ -1,0 +1,164 @@
+---
+title: "kubernetes集群中服务的负载均衡和外部发现"
+date: 2019-05-25
+categories: 
+  - "计算机"
+tags: 
+  - "dns"
+  - "externalip"
+  - "ingress"
+  - "k8s"
+  - "kubernetes"
+  - "nginx"
+  - "服务发现"
+  - "负载均衡"
+---
+
+传统的负载均衡策略一般是:
+
+**客户端 -> dns -> 4层库在均衡(HA) -> 7层负载均衡 -> 具体的后端服务**
+
+这种方式处理服务发现和动态配置比较难搞,比如后端服务动态扩缩容什么的。 一开始的做法肯定是OP人工维护7层负载均衡集群配置，以nginx为例，用git仓库之类的做人工服务发现和变更。这样很显然是不科学的。然后就会开始希望用种种自动化的手段去处理服务发现，比如微博的nginx-upsync-module,比如nginx-lua，比如openresty，比如etcd+confd等种种手段实现服务发现和自动化配置，但还是有很多瑕疵，比如etcd+confd每次修改upstream的服务后端就要reload nginx，nginx的策略会新开x个worker，容易造成性能问题甚至机器顶不住。而且vm服务机器的逻辑和upstream挂钩也有问题，总之，麻烦的很。
+
+而kubernetes处理这一套服务发现和负载均衡的方法就挺好用的，比如接下来会实践的这一套nginx-ingress+externalIP+dns的方式就很直观而且方便自动化流程，大致策略如下:
+
+**客户端 -> dns -> k8s-nginx-ingress-service(in ExternalIP) -> ingress-obj -> service -> pod**
+
+<!--more--> kubernetes集群中具体工作的pod是由service做负载均衡和服务发现的，而service的外部发现策略通常有NodePort，Kube-proxy以及Ingress。对于内部服务暴露给外部，NodePort基本上是不好用的，因为本来Port就有限，而且如果是web服务(80,443)，需要接dns的，开在30000+端口以上，还得在外部做一个四层负载均衡，这样就很烦。Kube-proxy用在调试环境还行，同样有以上问题，所以Ingress是更好的选择。
+
+nginx-ingress采用了nginx-lua模块实现upstream动态修正，无需reload nginx，可以解决上述提到的2x worker导致性能下降问题。且结合了service的pods自动发现(coredns)，轻松简单的完成很多过去很麻烦的任务。
+
+首先在上篇blog里我们已经有了一个k8s集群，然后我们创建ingress-nginx相关的api对象
+
+```
+wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
+kubectl apply -f mandatory.yaml
+
+#会创建好相应的ingress-nginx controller和rbac相关api
+[root@xxxxxxxx ingress-nginx]# kubectl get pods -n ingress-nginx
+NAME                                        READY   STATUS    RESTARTS   AGE
+nginx-ingress-controller-5694ccb578-hwj2j   1/1     Running   0          3h11m
+
+```
+
+然后我们创建一个ingress的service，用ExternalIP的方式暴露给集群外部
+
+```
+vim externalIp-ingress-service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-nginx
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+    - name: https
+      port: 443
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+  externalIPs:
+    #这里填写你的k8s masterip
+    - 10.1.33.159
+
+#将创建出如下服务
+[root@xxxxxxxxxxxx ingress-nginx]# kubectl get service -n ingress-nginx
+NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+ingress-nginx   ClusterIP   10.96.139.222   10.1.33.159   80/TCP,443/TCP   3h12m
+
+```
+
+接下来我们就可以创建具体的ingress对象了
+
+```
+vim rook-ceph-ingress.yaml
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: rook-ceph-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  #要暴露的service对应的命名空间  
+  namespace: rook-ceph
+spec:
+  rules:
+  #这里按需配置,就是nginx的配置方法,具体查下ingress-nginx的项目文档
+  - host: k8s-ceph-dashboard.calmkart.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: rook-ceph-mgr-dashboard
+          servicePort: 8443
+
+kubectl apply -f rook-ceph-ingress.yaml
+#这个ingress将自动发现rook-ceph命名空间中的rook-ceph-mgr-dashboard服务，并将之作负载均衡对外暴露
+[root@xxxxxxxxxxx ingress]# kubectl get service -n rook-ceph
+NAME                      TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
+rook-ceph-mgr             ClusterIP   10.99.37.148             9283/TCP            3h48m
+rook-ceph-mgr-dashboard   ClusterIP   10.110.163.110           8443/TCP            3h48m
+rook-ceph-mon-a           ClusterIP   10.103.5.55              6789/TCP,3300/TCP   3h49m
+rook-ceph-mon-b           ClusterIP   10.104.22.199            6789/TCP,3300/TCP   3h49m
+rook-ceph-mon-c           ClusterIP   10.110.80.82             6789/TCP,3300/TCP   3h49m
+
+```
+
+然后我们查看一下ingress状态
+
+```
+[root@xxxxxxxxxx ingress]# kubectl get ingress -n rook-ceph
+NAME                HOSTS                                ADDRESS       PORTS   AGE
+rook-ceph-ingress   k8s-ceph-dashboard.calmkart.com   10.1.33.159   80      170m
+
+```
+
+这样就没问题了 最后我们把dns记录k8s-ceph-dashboard.calmkart.com指向10.1.33.159
+
+搞定。
+
+---
+
+## 历史评论 (8 条)
+
+*以下评论来自原 WordPress 站点，仅作存档展示。*
+
+> **duboops** (2019-05-25 18:19)
+>
+> 楼主采用的K8s负载均衡策略在性能上会优于传统的均衡策略么？
+
+  > ↳ **calmkart** (2019-05-29 17:05)
+  >
+  > 我这个例子里基本上不会，因为实际上都是用的nginx作负载均衡.但在内部coredns的性能上可能会有一些提升.不过网络环境中的性能瓶颈一般不会出在负载均衡层.
+
+> **hukerlet** (2019-06-10 20:50)
+>
+> 看了楼主的文章，感觉您从事的工作是做基础架构么，好些文章写的真好，感觉您对k8s研究的很透彻。小弟刚从事运维工作没多久，最近工作中用到了容器，但对这方面是一知半解，不知道您能否抽空写些docker方面的文章呢，感激不尽。
+
+  > ↳ **calmkart** (2019-06-11 11:05)
+  >
+  > 读书吧，入门《每天5分钟玩转docker》，进阶《Docker容器与容器云(第二版)》
+
+> **linda_zhang** (2019-06-27 16:20)
+>
+> 博主好，我是互动出版的约稿编辑，有幸阅读到您博客上的文章，感觉您的文章内容偏向入记录整理在工作中碰到的案例，内容质量上挺不错的，要是加以整理想必质量会更胜一筹，不知道您有没有考虑过将博客文章再次归纳整理下，并新增相关章节，集结出版呢，互动出版社主要是面向广大互联网读者推出相关技术书籍，目前年发行册数超过百万，在互联网读者中有较大的影响力。期待博主拨冗回复，详叙具体事宜。我的邮箱：329647550#qq.com  (注：发送邮件时请将#号转为@)
+
+> **xiaohua** (2019-07-09 19:55)
+>
+> 楼主，我有个问题想向您请教下，我个人想往某一个技术方向去发展，比如成为k8s专家、或者mysql专家，但是感觉只钻研一个方向会不会以后的路会很窄，不知道您怎么看。
+
+  > ↳ **calmkart** (2019-07-16 11:11)
+  >
+  > 看是哪种钻研了.讲道理一个某单方面的专家,其他方面也不会说完全不会.面学片精吧.
+
+    > ↳ **xiaohua** (2019-07-17 11:43)
+    >
+    > 嗯嗯，您说的对，我也觉得往专家发展应该触类旁通，精通一点，也要了解其他的，要不然就是空中楼阁了，谢谢您的建议

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>杂感 on cAlm的个人Blog</title>
+        <link>http://localhost:1313/tags/%E6%9D%82%E6%84%9F/</link>
+        <description>Recent content in 杂感 on cAlm的个人Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Tue, 24 Dec 2019 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/%E6%9D%82%E6%84%9F/index.xml" rel="self" type="application/rss+xml" /><item>
+            <title>什么是一流的技术文章？</title>
+            <link>http://localhost:1313/posts/2019/12/2019-12-24-%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%80%E6%B5%81%E7%9A%84%E6%8A%80%E6%9C%AF%E6%96%87%E7%AB%A0/</link>
+            <pubDate>Tue, 24 Dec 2019 00:00:00 +0000</pubDate>
+            <guid>http://localhost:1313/posts/2019/12/2019-12-24-%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%80%E6%B5%81%E7%9A%84%E6%8A%80%E6%9C%AF%E6%96%87%E7%AB%A0/</guid>
+            <description>&lt;p&gt;这两天读Google的《SRE》时看到一段话&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;今天，我们能感受到整个行业都在鼓吹厚颜无耻的&amp;quot;代码拿来主义&amp;quot;(just show me the code)。开源社区内部正在形成一种&amp;quot;不要问我问题&amp;quot;的风气&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;.这本书中没有万能药，没有什么东西能解决一切问题，但是这恰恰是本书的宗旨：相比最后的软件结果，架构设计而言，真实的设计过程，作者本身的思考经历更有价值。实现细节永远只是短暂存在的，但是文档化的设计过程却是****无价之宝。   &amp;ndash; 《Google SRE 运维解秘》&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;深以为然，不禁让我想到了过去学习张磊老师《深入剖析Kubernetes》时曾看到张磊老师回复课后留言时说过的一句话&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;直接讲源码是不负责任也是逃避困难的做法。（大意）&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;什么是一流的技术文章？绝不是一上来就开始贴源码画流程图深入到每一个函数。&lt;/p&gt;&#xA;&lt;p&gt;相比具体的实现，掌握其思想，掌握其设计理念&amp;mdash;为什么这样设计？架构为什么这样演进？更为重要。当然，要能将这些理念和演进历程传授给读者，更需要扎实的技术和文字功底。这远比上来就连篇累牍贴源码更困难也更有意义。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;Talk is not cheap.&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;向每一个真诚分享的技术人致谢。&lt;/p&gt;&#xA;</description>
+        </item></channel>
+</rss>

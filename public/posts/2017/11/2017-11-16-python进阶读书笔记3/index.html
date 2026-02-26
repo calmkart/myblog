@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="16.异常处理 捕获所有异常：\nexcept Exception as e: print e ">
+<title>《Python进阶》读书笔记(3)</title>
+
+
+<link rel="canonical" href="http://localhost:1313/posts/2017/11/2017-11-16-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="《Python进阶》读书笔记(3)">
+<meta property='og:description' content="16.异常处理 捕获所有异常：\nexcept Exception as e: print e ">
+<meta property='og:url' content='http://localhost:1313/posts/2017/11/2017-11-16-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03/'>
+<meta property='og:site_name' content='cAlm的个人Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='python' /><meta property='article:published_time' content='2017-11-16T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2017-11-16T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="《Python进阶》读书笔记(3)">
+<meta name="twitter:description" content="16.异常处理 捕获所有异常：\nexcept Exception as e: print e ">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">cAlm的个人Blog</a></h1>
+            <h2 class="site-description">随手记录些东西</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives' >
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/categories' >
+                
+                <span>分类</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about' >
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/" style="background-color: hsl(208, 60%, 84%); color: hsl(208, 60%, 15%);">
+                计算机
+            </a>
+        
+            
+            
+            
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: hsl(93, 60%, 84%); color: hsl(93, 60%, 15%);">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/posts/2017/11/2017-11-16-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03/">《Python进阶》读书笔记(3)</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2017-11-16T00:00:00Z'>Thursday, November 16, 2017</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+
+    <section class="article-content">
+    
+    
+    <h4 id="16异常处理">16.异常处理
+</h4><p>捕获所有异常：</p>
+<pre tabindex="0"><code>except Exception as e:
+    print e
+</code></pre><p>try/except/finally语句:</p>
+<pre tabindex="0"><code>try:
+    #首先执行
+    pass
+except:
+    #异常的话执行
+    pass
+finally:
+    #无论是否异常，在最后都执行
+    pass
+</code></pre><p>try/else语句：</p>
+<pre tabindex="0"><code>try:
+    #首先执行
+    pass
+else:
+    #异常的话执行,且不被捕获异常
+    pass
+finally:
+    #无论是否异常，在最后都执行
+    pass
+</code></pre><h4 id="17简易webserver">17.简易webserver
+</h4><p>python2:</p>
+<pre tabindex="0"><code>python -m SimpleHTTPServer 8888
+#在当前文件夹建立简易http服务器，端口为8888
+</code></pre><p>python3:</p>
+<pre tabindex="0"><code>python -m http.server 8888
+#在当前文件夹建立简易http服务器，端口为8888
+</code></pre><p>注意，在python2中SimpleHTTPServer是处理GET和HEAD请求的，而CGIHTTPServer处理POST请求。</p>
+<h4 id="18pprint">18.pprint
+</h4><p>可以用于打印dict等数据结构，比较漂亮</p>
+<pre tabindex="0"><code>from pprint import pprint
+    pprint({a:1,b:2})
+</code></pre><h4 id="19forelse从句">19.for/else从句
+</h4><p>else仅在for循环正常结束时才会执行，当for循环被break时，不执行else</p>
+<p>举例说明：</p>
+<pre tabindex="0"><code>for item in container:
+    if search_something(item):
+        # Found it!
+        process(item)
+        break
+else:
+    # Didn&#39;t find anything..
+    not_found_in_container()
+</code></pre><h4 id="20用with块自动释放句柄">20.用with块自动释放句柄
+</h4><p>with块可在有异常时，自动释放句柄</p>
+<pre tabindex="0"><code>with open(&#39;a.txt&#39;,&#39;r+&#39;) as f:
+#打开成功才会获得句柄，有异常则自动释放
+    file = f.read()
+</code></pre><p>用io.open可制定编码方式：</p>
+<pre tabindex="0"><code>import io 
+with io.open(&#39;a.txt&#39;, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+    f.write(.......)
+</code></pre><p>而直接使用open(),do,close()的方式，可能因为各种error而导致没有释放资源。</p>
+<h4 id="21协程">21.协程
+</h4><p>与生成器有点像，但生成器是返回可迭代对象的生产者，而携程是接受参数的消费者。</p>
+<pre tabindex="0"><code>def grep(pattern):
+    print(&#34;Searching for&#34;, pattern)
+    while True:
+        line = (yield)
+        if pattern in line:
+            print(line)
+</code></pre><p>我们通过send方法传送给协程数据，然后用close()方法来关闭</p>
+<pre tabindex="0"><code>search = grep(&#39;coroutine&#39;)
+next(search)
+#output: Searching for coroutine
+search.send(&#34;I love you&#34;)
+search.send(&#34;Don&#39;t you love me?&#34;)
+search.send(&#34;I love coroutine instead!&#34;)
+#output: I love coroutine instead!
+search = grep(&#39;coroutine&#39;)
+search.close()
+</code></pre><p> </p>
+<p><a class="link" href="http://www.calmkart.com/?p=124"  target="_blank" rel="noopener"
+    >《Python进阶》读书笔记(1)</a> <a class="link" href="http://www.calmkart.com/?p=139"  target="_blank" rel="noopener"
+    >《Python进阶》读书笔记(2)</a></p>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">《Python进阶》读书笔记(1)</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">《Python进阶》读书笔记(2)</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2017/09/2017-09-05-%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%92%8C%E7%BC%96%E7%A0%81/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">(转)字符串和编码</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2017/09/2017-09-04-%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E6%94%AF%E6%8C%81%E8%87%AA%E5%BB%BA%E8%AF%8D%E5%BA%93%E7%9A%84%E8%83%8C%E8%8B%B1%E8%AF%AD%E5%8D%95%E8%AF%8D%E7%BD%91%E7%AB%99/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">一个简单的，支持自建词库的背英语单词网站</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2017/08/2017-08-23-zabbix%E6%8A%A5%E8%AD%A6%E6%94%B6%E6%95%9B/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">zabbix报警收敛</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
+<div id="tcomment"></div>
+<style>
+    .twikoo {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+    :root[data-scheme="dark"] {
+        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
+        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
+    }
+    .twikoo .el-input-group__prepend,
+    .twikoo .tk-action-icon,
+    .twikoo .tk-submit-action-icon,
+    .twikoo .tk-time,
+    .twikoo .tk-comments-no,
+    .twikoo .tk-comments-count {
+        color: var(--twikoo-body-text-color);
+    }
+    .twikoo .el-input__inner,
+    .twikoo .el-textarea__inner,
+    .twikoo .tk-preview-container,
+    .twikoo .tk-content,
+    .twikoo .tk-nick,
+    .twikoo .tk-send,
+    .twikoo .tk-comments-no,
+    .twikoo .el-input__count,
+    .twikoo .tk-submit-action-icon {
+        color: var(--twikoo-body-text-color-main)!important;
+    }
+    .twikoo .el-button{
+        color: var(--twikoo-body-text-color)!important;
+    }
+    .twikoo .el-input__count {
+        color: var(--twikoo-body-text-color) !important;
+    }
+    .OwO .OwO-body {
+        background-color: var(--body-background) !important;
+        color: var(--body-text-color) !important;
+    }
+</style><script>
+    twikoo.init({
+        envId: '',
+        el: '#tcomment',})
+</script>
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 cAlm的个人Blog
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.2d3f4e9dd7b2453cd71ff8971f18724ef8b4f783f2e8c70b9a281707db74e8a5.js" defer></script>
+
+
+    </body>
+</html>

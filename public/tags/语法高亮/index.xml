@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>语法高亮 on cAlm的个人Blog</title>
+        <link>http://localhost:1313/tags/%E8%AF%AD%E6%B3%95%E9%AB%98%E4%BA%AE/</link>
+        <description>Recent content in 语法高亮 on cAlm的个人Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Mon, 20 Nov 2017 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/%E8%AF%AD%E6%B3%95%E9%AB%98%E4%BA%AE/index.xml" rel="self" type="application/rss+xml" /><item>
+            <title>vim/nginx语法高亮插件</title>
+            <link>http://localhost:1313/posts/2017/11/2017-11-20-vim-nginx%E8%AF%AD%E6%B3%95%E9%AB%98%E4%BA%AE%E6%8F%92%E4%BB%B6/</link>
+            <pubDate>Mon, 20 Nov 2017 00:00:00 +0000</pubDate>
+            <guid>http://localhost:1313/posts/2017/11/2017-11-20-vim-nginx%E8%AF%AD%E6%B3%95%E9%AB%98%E4%BA%AE%E6%8F%92%E4%BB%B6/</guid>
+            <description>&lt;p&gt;1.vim语法高亮插件molokai&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;cd ~/.vim/&#xA;mkdir ./colors&#xA;cd ./colos&#xA;wget https://raw.githubusercontent.com/tomasr/molokai/master/colors/molokai.vim&#xA;echo colorscheme molokai  &amp;gt;&amp;gt; ~/.vimrc&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.nginx语法高亮插件nginx.vim&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mkdir -pv  ~/.vim/syntax&#xA;cd ~/.vim/syntax&#xA;wget -O nginx.vim  http://www.vim.org/scripts/download_script.php?src_id=19394&#xA;echo &amp;#34;au BufRead,BufNewFile /etc/nginx/*,/usr/local/nginx/conf/* if &amp;amp;ft == &amp;#39;&amp;#39; | setfiletype nginx | endif &amp;#34; &amp;gt;&amp;gt; ~/.vim/filetype.vim&#xA;&lt;/code&gt;&lt;/pre&gt;</description>
+        </item></channel>
+</rss>

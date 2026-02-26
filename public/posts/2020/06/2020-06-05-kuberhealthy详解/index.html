@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="是什么 官方的介绍中是这样说的\nAn operator for synthetic monitoring on Kubernetes\n一个用于合成监控的operator\n也就是一个用于在k8s集群中运行各种健康检查并上报集群巡检状态的operator\n流程逻辑 大致运行流程图如下所示\n">
+<title>kuberhealthy详解</title>
+
+
+<link rel="canonical" href="http://localhost:1313/posts/2020/06/2020-06-05-kuberhealthy%E8%AF%A6%E8%A7%A3/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="kuberhealthy详解">
+<meta property='og:description' content="是什么 官方的介绍中是这样说的\nAn operator for synthetic monitoring on Kubernetes\n一个用于合成监控的operator\n也就是一个用于在k8s集群中运行各种健康检查并上报集群巡检状态的operator\n流程逻辑 大致运行流程图如下所示\n">
+<meta property='og:url' content='http://localhost:1313/posts/2020/06/2020-06-05-kuberhealthy%E8%AF%A6%E8%A7%A3/'>
+<meta property='og:site_name' content='cAlm的个人Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:published_time' content='2020-06-05T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2020-06-05T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="kuberhealthy详解">
+<meta name="twitter:description" content="是什么 官方的介绍中是这样说的\nAn operator for synthetic monitoring on Kubernetes\n一个用于合成监控的operator\n也就是一个用于在k8s集群中运行各种健康检查并上报集群巡检状态的operator\n流程逻辑 大致运行流程图如下所示\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">cAlm的个人Blog</a></h1>
+            <h2 class="site-description">随手记录些东西</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives' >
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/categories' >
+                
+                <span>分类</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about' >
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/posts/2020/06/2020-06-05-kuberhealthy%E8%AF%A6%E8%A7%A3/">kuberhealthy详解</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2020-06-05T00:00:00Z'>Friday, June 5, 2020</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+
+    <section class="article-content">
+    
+    
+    <h2 id="是什么">是什么
+</h2><p>官方的介绍中是这样说的</p>
+
+    <blockquote>
+        <p>An operator for synthetic monitoring on Kubernetes</p>
+
+    </blockquote>
+<p><em><code>一个用于合成监控的operator</code></em></p>
+<p>也就是一个用于在k8s集群中运行各种健康检查并上报集群巡检状态的operator</p>
+<h2 id="流程逻辑">流程逻辑
+</h2><p>大致运行流程图如下所示</p>
+<p><img src="images/kh-ds-check.gif" alt="gif" />
+</p>
+<p>kuberhealthy将创建两个crd，分别为</p>
+<ul>
+<li>khchecks</li>
+<li>khstates</li>
+</ul>
+<p>其中 <code>khchecks</code> cr用来描述我们需要在集群中创建并持续运行的巡检详情</p>
+<p>而<code>khstate</code> cr用来记录每一个巡检的当前巡检结果</p>
+<p>kuberhealthy operator运行在集群中，会实时监听<code>khchecks</code> custom resource的变化。当我们创建一个<code>khcheck</code> cr时，kuberhealthy会根据cr中的各种描述字段创建对应的巡检checked pod， checked pod执行巡检逻辑，并将结果返回给kuberhealthy deployment pod。</p>
+<p>kuberhealthy支持多种巡检结果输出，如<code>khstate</code> cr对象就是用来保存某khcheck巡检当前结果的。同时也支持json/prometheus等多种结果输出。</p>
+<h2 id="简单使用">简单使用
+</h2><ol>
+<li>
+<p>部署 kuberhealthy</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/Comcast/kuberhealthy.git
+</span></span><span style="display:flex;"><span>cd kuberhealthy
+</span></span><span style="display:flex;"><span>kubectl apply -f deploy/kuberhealthy.yaml
+</span></span></code></pre></div></li>
+</ol>
+<p>我们将创建一个replicas为2的kuberhealthy deployment。(实际工作的只有一个pod，另一个为保证高可用，kuberhealthy会进行选主操作，但过程实际上有bug)</p>
+<p>同时kuberhealthy还将为我们创建一堆khcheck巡检全家桶(其实很多都是我们不需要的)，我们可以通过</p>
+<pre tabindex="0"><code>kubectl get khchecks -n kuberhealthy
+</code></pre><p>进行查询，不需要的可以删除</p>
+<ol start="2">
+<li>部署一个简单的巡检khcheck</li>
+</ol>
+<p>http-check为官方提供的若干巡检用例之一，主要功能是向一个指定的url发送get请求，成功则巡检成功，失败则巡检失败.</p>
+<p>样例yaml如下</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">comcast.github.io/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">KuberhealthyCheck</span> <span style="color:#75715e"># cr类型为kuberhealthyCheck</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">http</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">kuberhealthy</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">runInterval</span>: <span style="color:#ae81ff">2m</span> <span style="color:#75715e"># 巡检周期</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">timeout</span>: <span style="color:#ae81ff">6m</span> <span style="color:#75715e"># 巡检超时时间</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">podSpec</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">containers</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">http</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">image</span>: <span style="color:#ae81ff">kuberhealthy/http-check:v1.1.1</span> <span style="color:#75715e"># 这里为实现巡检逻辑的镜像</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">imagePullPolicy</span>: <span style="color:#ae81ff">IfNotPresent</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">env</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">CHECK_URL</span> <span style="color:#75715e"># 我们通过env注入，控制http-check所发送get请求的url地址，实现同一个巡检镜像但又灵活的巡检</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;http://google.com&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">resources</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">requests</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">cpu</span>: <span style="color:#ae81ff">15m</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">memory</span>: <span style="color:#ae81ff">15Mi</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">limits</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">cpu</span>: <span style="color:#ae81ff">25m</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">restartPolicy</span>: <span style="color:#ae81ff">Always</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">terminationGracePeriodSeconds</span>: <span style="color:#ae81ff">5</span>
+</span></span></code></pre></div><p>我们apply之后，会创建一个khcheck对象，同时kuberhealthy deployment pod会根据khcheck cr中的描述，创建出巡检pod。</p>
+<ol start="3">
+<li>查看巡检pod状态，查询巡检结果</li>
+</ol>
+<p>我们可以直接在kuberhealthy namespace中查看巡检pod状态</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl get pod -n kuberhealthy
+</span></span></code></pre></div><p>我们也可以通过查看khstate自定义资源对象查询当前巡检结果</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl get khstate -n kuberhealthy
+</span></span><span style="display:flex;"><span>kubectl get khstate -n kuberhealthy &lt;example&gt; -o yaml
+</span></span></code></pre></div><p>我们还可以通过kuberhealthy service/pod提供的http接口查询巡检结果 <em>访问kuberhealthy service 80端口或 kuberhealthy master pod 8080端口</em></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;OK&#34;</span>: <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;Errors&#34;</span>: [],
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;CheckDetails&#34;</span>: {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;kuberhealthy/daemonset&#34;</span>: {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;OK&#34;</span>: <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;Errors&#34;</span>: [],
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;RunDuration&#34;</span>: <span style="color:#e6db74">&#34;22.512278967s&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;Namespace&#34;</span>: <span style="color:#e6db74">&#34;kuberhealthy&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;LastRun&#34;</span>: <span style="color:#e6db74">&#34;2019-11-14T23:24:16.7718171Z&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;AuthoritativePod&#34;</span>: <span style="color:#e6db74">&#34;kuberhealthy-67bf8c4686-mbl2j&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;uuid&#34;</span>: <span style="color:#e6db74">&#34;9abd3ec0-b82f-44f0-b8a7-fa6709f759cd&#34;</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;kuberhealthy/deployment&#34;</span>: {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;OK&#34;</span>: <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;Errors&#34;</span>: [],
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;RunDuration&#34;</span>: <span style="color:#e6db74">&#34;29.142295647s&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;Namespace&#34;</span>: <span style="color:#e6db74">&#34;kuberhealthy&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;LastRun&#34;</span>: <span style="color:#e6db74">&#34;2019-11-14T23:26:40.7444659Z&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;AuthoritativePod&#34;</span>: <span style="color:#e6db74">&#34;kuberhealthy-67bf8c4686-mbl2j&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;uuid&#34;</span>: <span style="color:#e6db74">&#34;5f0d2765-60c9-47e8-b2c9-8bc6e61727b2&#34;</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;kuberhealthy/dns-status-internal&#34;</span>: {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;OK&#34;</span>: <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;Errors&#34;</span>: [],
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;RunDuration&#34;</span>: <span style="color:#e6db74">&#34;2.43940936s&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;Namespace&#34;</span>: <span style="color:#e6db74">&#34;kuberhealthy&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;LastRun&#34;</span>: <span style="color:#e6db74">&#34;2019-11-14T23:34:04.8927434Z&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;AuthoritativePod&#34;</span>: <span style="color:#e6db74">&#34;kuberhealthy-67bf8c4686-mbl2j&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;uuid&#34;</span>: <span style="color:#e6db74">&#34;c85f95cb-87e2-4ff5-b513-e02b3d25973a&#34;</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;kuberhealthy/pod-restarts&#34;</span>: {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;OK&#34;</span>: <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;Errors&#34;</span>: [],
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;RunDuration&#34;</span>: <span style="color:#e6db74">&#34;2.979083775s&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;Namespace&#34;</span>: <span style="color:#e6db74">&#34;kuberhealthy&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;LastRun&#34;</span>: <span style="color:#e6db74">&#34;2019-11-14T23:34:06.1938491Z&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;AuthoritativePod&#34;</span>: <span style="color:#e6db74">&#34;kuberhealthy-67bf8c4686-mbl2j&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;uuid&#34;</span>: <span style="color:#e6db74">&#34;a718b969-421c-47a8-a379-106d234ad9d8&#34;</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;CurrentMaster&#34;</span>: <span style="color:#e6db74">&#34;kuberhealthy-7cf79bdc86-m78qr&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="编写自定义巡检">编写自定义巡检
+</h2><p>我们以http-check为例，说明如何编写一个自定义巡检</p>
+<p>首先我们来查看一下http-check的main.go核心代码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;net/http&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;os&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;strconv&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;strings&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">kh</span> <span style="color:#e6db74">&#34;github.com/Comcast/kuberhealthy/v2/pkg/checks/external/checkclient&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">log</span> <span style="color:#e6db74">&#34;github.com/sirupsen/logrus&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// HTTP endpoint to send a request to.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">checkURL</span> = <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Getenv</span>(<span style="color:#e6db74">&#34;CHECK_URL&#34;</span>)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">init</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Check that the URL environment variable is valid.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> len(<span style="color:#a6e22e">checkURL</span>) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalln</span>(<span style="color:#e6db74">&#34;Empty URL. Please update your CHECK_URL environment variable.&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// If the URL does not begin with HTTP, exit.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> !<span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">HasPrefix</span>(<span style="color:#a6e22e">checkURL</span>, <span style="color:#e6db74">&#34;http&#34;</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalln</span>(<span style="color:#e6db74">&#34;Given URL does not declare a supported protocol. (http | https)&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Infoln</span>(<span style="color:#e6db74">&#34;Beginning check.&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Make a GET request.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">r</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Get</span>(<span style="color:#a6e22e">checkURL</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">reportErr</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;error occurred performing a &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">MethodGet</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; to &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">checkURL</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;: &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">Error</span>())
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Errorln</span>(<span style="color:#a6e22e">reportErr</span>.<span style="color:#a6e22e">Error</span>())
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">reportFailureErr</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">kh</span>.<span style="color:#a6e22e">ReportFailure</span>([]<span style="color:#66d9ef">string</span>{<span style="color:#a6e22e">reportErr</span>.<span style="color:#a6e22e">Error</span>()})
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">reportFailureErr</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalln</span>(<span style="color:#e6db74">&#34;error when reporting to kuberhealthy:&#34;</span>, <span style="color:#a6e22e">reportFailureErr</span>.<span style="color:#a6e22e">Error</span>())
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Exit</span>(<span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Check if the response status code is a 200.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">StatusCode</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">StatusOK</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Infoln</span>(<span style="color:#e6db74">&#34;Got a&#34;</span>, <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">StatusCode</span>, <span style="color:#e6db74">&#34;with a&#34;</span>, <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">MethodGet</span>, <span style="color:#e6db74">&#34;to&#34;</span>, <span style="color:#a6e22e">checkURL</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">reportSuccessErr</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">kh</span>.<span style="color:#a6e22e">ReportSuccess</span>()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalln</span>(<span style="color:#e6db74">&#34;error when reporting to kuberhealthy:&#34;</span>, <span style="color:#a6e22e">reportSuccessErr</span>.<span style="color:#a6e22e">Error</span>())
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Exit</span>(<span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">reportErr</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;unable to retrieve a &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">strconv</span>.<span style="color:#a6e22e">Itoa</span>(<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">StatusOK</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; from &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">checkURL</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; got a &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">strconv</span>.<span style="color:#a6e22e">Itoa</span>(<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">StatusCode</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; instead&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Errorln</span>(<span style="color:#a6e22e">reportErr</span>.<span style="color:#a6e22e">Error</span>())
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">reportFailureErr</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">kh</span>.<span style="color:#a6e22e">ReportFailure</span>([]<span style="color:#66d9ef">string</span>{<span style="color:#a6e22e">reportErr</span>.<span style="color:#a6e22e">Error</span>()})
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">reportFailureErr</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalln</span>(<span style="color:#e6db74">&#34;error when reporting to kuberhealthy:&#34;</span>, <span style="color:#a6e22e">reportFailureErr</span>.<span style="color:#a6e22e">Error</span>())
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Exit</span>(<span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>其实其中除了巡检逻辑，和kuberhealthy相关的方法只有两个</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// 导入kuberhealthy自定义巡检client库</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span>  <span style="color:#a6e22e">kh</span> <span style="color:#e6db74">&#34;github.com/Comcast/kuberhealthy/v2/pkg/checks/external/checkclient&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 如果巡检成功，调用ReportSuccess方法上报成功</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">kh</span>.<span style="color:#a6e22e">ReportSuccess</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 如果巡检失败，调用ReportFailure方法上报失败</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">kh</span>.<span style="color:#a6e22e">ReportFailure</span>([]<span style="color:#66d9ef">string</span>{})
+</span></span></code></pre></div><p>然后将其build成一个镜像</p>
+<p><em>Dockerfile</em></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">golang:1.13</span> <span style="color:#66d9ef">AS</span> <span style="color:#e6db74">builder</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">WORKDIR</span> <span style="color:#e6db74">/build</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> go.mod go.sum /build/<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">RUN</span> go mod download<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> . /build<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">WORKDIR</span> <span style="color:#e6db74">/build/cmd/http-check</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">ENV</span> CGO_ENABLED<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">RUN</span> go build -v<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">RUN</span> groupadd -g <span style="color:#ae81ff">999</span> user <span style="color:#f92672">&amp;&amp;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    useradd -r -u <span style="color:#ae81ff">999</span> -g user user<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">scratch</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> --from<span style="color:#f92672">=</span>builder /etc/passwd /etc/passwd<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">USER</span> <span style="color:#e6db74">user</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> --from<span style="color:#f92672">=</span>builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> --from<span style="color:#f92672">=</span>builder /build/cmd/http-check/http-check /app/http-check<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;/app/http-check&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p><em>Makefile</em></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-Makefile" data-lang="Makefile"><span style="display:flex;"><span><span style="color:#a6e22e">build</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    docker build -t kuberhealthy/http-check:v1.2.2 -f Dockerfile ../../
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">push</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    docker push kuberhealthy/http-check:v1.2.2
+</span></span></code></pre></div><p>这样就完成了一个自定义巡检用例的全部编写和打包</p>
+<h4 id="使用非go语言怎么办">使用非go语言怎么办？
+</h4><p>如果使用的是非golang编写巡检用例，无法调用官方外部巡检client库，也是很简单的。</p>
+<ol>
+<li>
+<p>读取<code>KH_REPORTING_URL</code>环境变量</p>
+</li>
+<li>
+<p>将如下<code>JSON巡检结果</code>通过<code>POST方法</code>发送到<code>KH_REPORTING_URL</code>地址上</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&#34;Errors&#34;: </span>[
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;Error 1 here&#34;</span>,
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;Error 2 here&#34;</span>
+</span></span><span style="display:flex;"><span>],
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&#34;OK&#34;: </span><span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></li>
+</ol>
+<h2 id="kuberhealthy代码详解">kuberhealthy代码详解
+</h2><h3 id="首先概览一下kuberhealthy的代码组织结构">首先概览一下kuberhealthy的代码组织结构
+</h3><p><em>不重要的目录和文件已省略</em></p>
+<pre tabindex="0"><code>./
+├── clients # 这里存放其他语言编写自定义巡检的client库(目前只有js)
+├── cmd # 存放若干巡检用例代码，其中kuberhealthy子目录为核心代码主目录
+│   ├── kuberhealthy # kuberhealthy代码主目录
+│   │   ├── Dockerfile
+│   │   ├── Makefile
+│   │   ├── crd.go
+│   │   ├── fakecheck_test.go
+│   │   ├── influx.go
+│   │   ├── kuberhealthy.go
+│   │   ├── kuberhealthyCheck.go
+│   │   ├── main.go
+│   │   ├── main_test.go
+│   │   ├── reflector.go
+│   │   ├── test
+│   │   │   └── basicCheckerPod.yaml
+│   │   ├── util.go
+│   │   ├── util_test.go
+│   │   └── webserver_test.go
+├── deploy # 存放一些部署Yaml
+├── docs # 存放文档
+└── pkg # 存放一些需要使用到的包
+    ├── aws
+    ├── checks #这里比较核心，存放了大量巡检生命周期逻辑
+    │   └── external
+    │       ├── checkclient
+    │       │   └── main.go
+    │       ├── checker_test.go
+    │       ├── main.go
+    │       ├── main_test.go
+    │       ├── status
+    │       │   └── main.go
+    │       ├── test
+    │       │   └── basicCheckerPod.yaml
+    │       ├── util
+    │       │   └── main.go
+    │       └── whitelist_test.go
+    ├── health
+    ├── khcheckcrd # khcheck cr对象相关定义代码
+    ├── khstatecrd # khstate cr对象相关定义代码
+    ├── kubeClient
+    ├── masterCalculation
+    └── metrics
+</code></pre><p>其实最核心的只有两个目录</p>
+<ul>
+<li>cmd/kuberhealthy
+<ul>
+<li>实现了kuberhealthy deployment master pod中的核心逻辑，包括如何监听khcheck对象的变化，如何周期性的运行巡检用例，如何判断超时，如何写入巡检状态</li>
+<li>还包括了influx/prometheus上游的支持，以及http服务器(用于接收巡检结果和提供巡检结果查询)</li>
+</ul>
+</li>
+<li>pkg/checks
+<ul>
+<li>实现了某一个巡检任务的全部逻辑，通过一个interface暴露，包括 运行检查/结束检查/获取当前巡检结果 等若干方法</li>
+<li>包括了编写自定义巡检所使用的client库，位于<code>pkg/checks/external/checkclient</code>中</li>
+</ul>
+</li>
+</ul>
+<h3 id="核心逻辑">核心逻辑
+</h3><p>核心逻辑从<code>cmd/kuberhealthy/main.go</code>开始</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Create a new Kuberhealthy struct</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">kuberhealthy</span> = <span style="color:#a6e22e">NewKuberhealthy</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">kuberhealthy</span>.<span style="color:#a6e22e">ListenAddr</span> = <span style="color:#a6e22e">listenAddress</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// create run context and start listening for shutdown interrupts</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">khRunCtx</span>, <span style="color:#a6e22e">khRunCtxCancelFunc</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">WithCancel</span>(<span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>())
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">kuberhealthy</span>.<span style="color:#a6e22e">shutdownCtxFunc</span> = <span style="color:#a6e22e">khRunCtxCancelFunc</span> <span style="color:#75715e">// load the KH struct with a func to shutdown its control system</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">go</span> <span style="color:#a6e22e">listenForInterrupts</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// tell Kuberhealthy to start all checks and master change monitoring</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">kuberhealthy</span>.<span style="color:#a6e22e">Start</span>(<span style="color:#a6e22e">khRunCtx</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">90</span>) <span style="color:#75715e">// give the interrupt handler a period of time to call exit before we shutdown</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">After</span>(<span style="color:#a6e22e">terminationGracePeriod</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">10</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Errorln</span>(<span style="color:#e6db74">&#34;shutdown: main loop was ready for shutdown for too long. exiting.&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Exit</span>(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这里新建了一个Kuberhealthy对象，并调用Start方法。</p>
+<p>我们来看看Start方法做了哪些事情</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// Start inits Kuberhealthy checks and master monitoring</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">k</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Kuberhealthy</span>) <span style="color:#a6e22e">Start</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>) {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// start the khState reflector</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">go</span> <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">stateReflector</span>.<span style="color:#a6e22e">Start</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// if influxdb is enabled, configure it</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">enableInflux</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">configureInfluxForwarding</span>()
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Start the web server and restart it if it crashes</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">go</span> <span style="color:#a6e22e">kuberhealthy</span>.<span style="color:#a6e22e">StartWebServer</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// find all the external checks from the khcheckcrd resources on the cluster and keep them in sync.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// use rate limiting to avoid reconfiguration spam</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">maxUpdateInterval</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">externalChecksUpdateChan</span> <span style="color:#f92672">:=</span> make(<span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">struct</span>{}, <span style="color:#ae81ff">50</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">externalChecksUpdateChanLimited</span> <span style="color:#f92672">:=</span> make(<span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">struct</span>{}, <span style="color:#ae81ff">50</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">go</span> <span style="color:#a6e22e">notifyChanLimiter</span>(<span style="color:#a6e22e">maxUpdateInterval</span>, <span style="color:#a6e22e">externalChecksUpdateChan</span>, <span style="color:#a6e22e">externalChecksUpdateChanLimited</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">go</span> <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">monitorExternalChecks</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">externalChecksUpdateChan</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// we use two channels to indicate when we gain or lose master status. use rate limiting to avoid</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// reconfiguration spam</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">becameMasterChan</span> <span style="color:#f92672">:=</span> make(<span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">struct</span>{}, <span style="color:#ae81ff">10</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">lostMasterChan</span> <span style="color:#f92672">:=</span> make(<span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">struct</span>{}, <span style="color:#ae81ff">10</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">go</span> <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">masterMonitor</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">becameMasterChan</span>, <span style="color:#a6e22e">lostMasterChan</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// loop and select channels to do appropriate thing when master changes</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">select</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> <span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">ctx</span>.<span style="color:#a6e22e">Done</span>(): <span style="color:#75715e">// we are shutting down</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Infoln</span>(<span style="color:#e6db74">&#34;control: shutting down from context abort...&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> <span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">becameMasterChan</span>: <span style="color:#75715e">// we have become the current master instance and should run checks</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// reset checks and re-add from configuration settings</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Infoln</span>(<span style="color:#e6db74">&#34;control: Became master. Reconfiguring and starting checks.&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">StartChecks</span>()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> <span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">lostMasterChan</span>: <span style="color:#75715e">// we are no longer master</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Infoln</span>(<span style="color:#e6db74">&#34;control: Lost master. Stopping checks.&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">StopChecks</span>()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> <span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">externalChecksUpdateChanLimited</span>: <span style="color:#75715e">// external check change detected</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Infoln</span>(<span style="color:#e6db74">&#34;control: Witnessed a khcheck resource change...&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// if we are master, stop, reconfigure our khchecks, and start again with the new configuration</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">isMaster</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Infoln</span>(<span style="color:#e6db74">&#34;control: Reloading external check configurations due to khcheck update&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">RestartChecks</span>()
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这里的流程大概如下</p>
+<ul>
+<li>开启khstate的监听</li>
+<li>开启http server接收巡检pod的返回和暴露巡检结果</li>
+<li>通过<code>k.monitorExternalChecks()</code>监听khcheck cr的变化，并通过externalChecksUpdateChan channel返回</li>
+<li>通过<code>notifyChanLimiter()</code>对监听到khcheck cr变化的消息做限流</li>
+<li>通过<code>k.masterMonitor()</code>进行选择master pod工作实现高可用</li>
+<li>最后的一个<code>for-select</code>循环中，当接收到外部巡检变化channel消息时，重启所有巡检。当本实例成为master时，启动所有巡检，当本实例失去master身份时，停止所有巡检.</li>
+</ul>
+<h3 id="细节">细节
+</h3><h4 id="1-startwebserver方法">1. StartWebServer方法
+</h4><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// StartWebServer starts a JSON status web server at the specified listener.</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">k</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Kuberhealthy</span>) <span style="color:#a6e22e">StartWebServer</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Infoln</span>(<span style="color:#e6db74">&#34;Configuring web server&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/metrics&#34;</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">prometheusMetricsHandler</span>(<span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">r</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Errorln</span>(<span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Accept status reports coming from external checker pods</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/externalCheckStatus&#34;</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">externalCheckReportHandler</span>(<span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">r</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Errorln</span>(<span style="color:#e6db74">&#34;externalCheckStatus endpoint error:&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Assign all requests to be handled by the healthCheckHandler function</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">healthCheckHandler</span>(<span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">r</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Errorln</span>(<span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// start web server any time it exits</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Infoln</span>(<span style="color:#e6db74">&#34;Starting web services on port&#34;</span>, <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">ListenAddr</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">ListenAddr</span>, <span style="color:#66d9ef">nil</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Errorln</span>(<span style="color:#e6db74">&#34;Web server ERROR:&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>我们可以看到，http server共有三个api</p>
+<ul>
+<li>
+<p>/metrics</p>
+<p>为prometheus暴露监控数据</p>
+</li>
+<li>
+<p>/externalCheckStatus</p>
+<p>接收巡检pod的巡检结果返回(巡检pod会往这个api里post json数据)</p>
+</li>
+<li>
+<p>/</p>
+<p>为我们查看当前集群巡检结果提供接口(返回json数据)</p>
+</li>
+</ul>
+<h4 id="2-monitorexternalchecks方法">2. monitorExternalChecks方法
+</h4><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// monitorExternalChecks watches for changes to the external check CRDs</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">k</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Kuberhealthy</span>) <span style="color:#a6e22e">monitorExternalChecks</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">notify</span> <span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">struct</span>{}) {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">go</span> <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">watchForKHCheckChanges</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">c</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>核心是一个<code>watchForKHCheckChanges</code>方法</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// watchForKHCheckChanges watches for changes to khcheck objects and returns them through the specified channel</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">k</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Kuberhealthy</span>) <span style="color:#a6e22e">watchForKHCheckChanges</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">c</span> <span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">struct</span>{}) {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Debugln</span>(<span style="color:#e6db74">&#34;Spawned watcher for KH check changes&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Debugln</span>(<span style="color:#e6db74">&#34;Starting a watch for khcheck object changes&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// wait a second so we don&#39;t retry too quickly on error</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// start a watch on khcheck resources</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">watcher</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">khCheckClient</span>.<span style="color:#a6e22e">Watch</span>(<span style="color:#a6e22e">metav1</span>.<span style="color:#a6e22e">ListOptions</span>{}, <span style="color:#a6e22e">checkCRDResource</span>, <span style="color:#a6e22e">listenNamespace</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Errorln</span>(<span style="color:#e6db74">&#34;error watching khcheck objects:&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// watch for context expiration and close watcher if it happens</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">go</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">watcher</span> <span style="color:#a6e22e">watch</span>.<span style="color:#a6e22e">Interface</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">ctx</span>.<span style="color:#a6e22e">Done</span>()
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">watcher</span>.<span style="color:#a6e22e">Stop</span>()
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Debugln</span>(<span style="color:#e6db74">&#34;khcheck monitor watch stopping due to context cancellation&#34;</span>)
+</span></span><span style="display:flex;"><span>        }(<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">watcher</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// loop over results and return them to the calling channel until we hit an error, then close and restart</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">khc</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">watcher</span>.<span style="color:#a6e22e">ResultChan</span>() {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">khc</span>.<span style="color:#a6e22e">Type</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">case</span> <span style="color:#a6e22e">watch</span>.<span style="color:#a6e22e">Added</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Debugln</span>(<span style="color:#e6db74">&#34;khcheck monitor saw an added event&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">c</span> <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">struct</span>{}{}
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">case</span> <span style="color:#a6e22e">watch</span>.<span style="color:#a6e22e">Modified</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Debugln</span>(<span style="color:#e6db74">&#34;khcheck monitor saw a modified event&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">c</span> <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">struct</span>{}{}
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">case</span> <span style="color:#a6e22e">watch</span>.<span style="color:#a6e22e">Deleted</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Debugln</span>(<span style="color:#e6db74">&#34;khcheck monitor saw a deleted event&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">c</span> <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">struct</span>{}{}
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">case</span> <span style="color:#a6e22e">watch</span>.<span style="color:#a6e22e">Error</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Debugln</span>(<span style="color:#e6db74">&#34;khcheck monitor saw an error event&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">e</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">khc</span>.<span style="color:#a6e22e">Object</span>.(<span style="color:#f92672">*</span><span style="color:#a6e22e">metav1</span>.<span style="color:#a6e22e">Status</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Errorln</span>(<span style="color:#e6db74">&#34;Error when watching for khcheck changes:&#34;</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">Reason</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">default</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Warningln</span>(<span style="color:#e6db74">&#34;khcheck monitor saw an unknown event type and ignored it:&#34;</span>, <span style="color:#a6e22e">khc</span>.<span style="color:#a6e22e">Type</span>)
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// if the context has expired, don&#39;t start the watch again. just exit</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">watcher</span>.<span style="color:#a6e22e">Stop</span>() <span style="color:#75715e">// TODO - does calling stop twice crash this?  I am assuming not.</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">select</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> <span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">ctx</span>.<span style="color:#a6e22e">Done</span>():
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Debugln</span>(<span style="color:#e6db74">&#34;khcheck monitor closing due to context cancellation&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">default</span>:
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>watchForKHCheckChanges</code>将监听khcheck cr的 Added/Modified/Deleted等事件，如果监听到有任何事件，则无差别的通知<code>monitorExternalChecks</code>方法中的for循环。在for循环中将List所有khcheck对象，与内存中已保存的<code>knownSettings</code>做对比，只要发现有任意变化，就会通过channel通知<code>Start</code>方法中的<code>notifyChanLimiter</code>方法，如果没有触发<code>notifyChanLimiter</code>中的流速限制，就会通知<code>Start</code>方法中的for循环,触发以下执行巡检逻辑</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">select</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> <span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">externalChecksUpdateChanLimited</span>: <span style="color:#75715e">// external check change detected</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Infoln</span>(<span style="color:#e6db74">&#34;control: Witnessed a khcheck resource change...&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// if we are master, stop, reconfigure our khchecks, and start again with the new configuration</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">isMaster</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Infoln</span>(<span style="color:#e6db74">&#34;control: Reloading external check configurations due to khcheck update&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">RestartChecks</span>()
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><h4 id="3-restartchecks方法">3. RestartChecks方法
+</h4><p>当发现有任意khcheck cr变化就会调用<code>RestartChecks</code>方法</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// RestartChecks does a stop and start on all kuberhealthy checks</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">k</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Kuberhealthy</span>) <span style="color:#a6e22e">RestartChecks</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">StopChecks</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">StartChecks</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>我们发现，kuberhealthy会先停掉所有正在运行的巡检，然后重新开启所有正在运行的巡检。</p>
+<p>在<code>StopChecks</code>方法中，kuberhealthy会遍历所有存储在内存中的check struct，并分别调用其shutdown()方法，并等待关闭完成</p>
+<p>在<code>StartChecks</code>方法中，kuberhealthy会先找api-server拉取全部khcheck对象，并生成check struct存于内存中，然后遍历调用runCheck()方法，并等待启动巡检完成</p>
+<p><code>runCheck()</code>方法会读取khcheck对象中所保存的周期等信息，启一个goroutine，通过定时器的方式定期调用check struct的Run()方法发起一次检查，并将结果写入checkStates cr中。</p>
+<p><em>注意，这里的RestartChecks流程是同步逻辑，所以如果在这个流程中因为某些原因卡住，kuberhealthy主流程会直接卡死，只能重启解决。</em></p>
+<h4 id="4-external-checker的run方法">4. external checker的Run方法
+</h4><p>kuberhealthy主流程中，<code>StartChecks()</code>方法会运行每一个external checker的<code>Run()</code>方法</p>
+<p>我们打开文件<code>pkg/checks/external/main.go</code>中看到checker的<code>Run()</code>方法内容如下</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// Run executes the checker.  This is ran on each &#34;tick&#34; of</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// the RunInterval and is executed by the Kuberhealthy checker</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">ext</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Checker</span>) <span style="color:#a6e22e">Run</span>(<span style="color:#a6e22e">client</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">kubernetes</span>.<span style="color:#a6e22e">Clientset</span>) <span style="color:#66d9ef">error</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// store the client in the checker</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ext</span>.<span style="color:#a6e22e">KubeClient</span> = <span style="color:#a6e22e">client</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// generate a new UUID for each run</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ext</span>.<span style="color:#a6e22e">setNewCheckUUID</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">err</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// run a check iteration</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ext</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Running external check iteration&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">ext</span>.<span style="color:#a6e22e">RunOnce</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// if the pod was removed, we skip this run gracefully</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">Error</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">ErrPodRemovedExpectedly</span>.<span style="color:#a6e22e">Error</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ext</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;pod was removed during check expectedly.  skipping this run&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ErrPodRemovedExpectedly</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// if the pod had an error, we set the error</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ext</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Error with running external check:&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">err</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>我们会发现调用了<code>RunOnce()</code>方法，而<code>RunOnce()</code>方法非常长，内部逻辑非常复杂，大致流程是先等待当前巡检pod结束，然后运行一个巡检pod，接着等待这个创建出来的pod返回巡检结果。</p>
+<p><em>这里用了waitgroup等待pod创建和结束完毕，却因为逻辑复杂，wg.Add过多，经常出现卡死的情况</em></p>
+<h3 id="流程图">流程图
+</h3><p><img src="images/%e6%b5%81%e7%a8%8b%e5%9b%be.png" alt="流程图" />
+</p>
+<h2 id="kuberhealthy的缺点">Kuberhealthy的缺点
+</h2><p>总结以下kuberhealthy的缺点主要是以下几点</p>
+<h4 id="1-监听khcheck的变化但不区分变化类型">1. 监听khcheck的变化但不区分变化类型
+</h4><p>这种设计导致了，任何一个khcheck对象发生变化，哪怕是修改，也会让所有巡检全部Shutdown再Start，从而使得khcheck的周期设置形同虚设。(例如：当你修改了a巡检的配置，会发现bcdef巡检都重启并运行了一次)</p>
+<h4 id="2-同步流程重启全部khchecks有可能导致主流程卡死">2. 同步流程重启全部khchecks有可能导致主流程卡死
+</h4><p>因为监听khcheck不区分变化类型的设计，所以带来了所谓的流控策略，专门编写了一个方法用于对变化信号控流，并且主流程的重启全部khchecks是同步流程，如果在重启过程中因为种种原因无法实现shutdown或者run就会主流程卡死，不再响应任何后续指令。出了删pod重建别无他法。</p>
+<p>这个问题带来的bug是很多的，并且为了配合这个流程，在khcheck的run流程中使用了极多的信号传递和waitgroup等待，非常容易出问题。我已经修了一些严重的主流程卡死bug但发现只是治标不治本，这种无区分事件监听和全量重启机制不改，这里的主流程卡死bug几乎是不可避免的。无非是触发bug难易程度有差别。</p>
+<h4 id="3-不支持单次触发型巡检">3. 不支持单次触发型巡检
+</h4><p>kuberhealthy在设计上天生就不支持单次触发型巡检，甚至对巡检配置做改动都不应该频繁。</p>
+<h4 id="4-khstate自定义对象设计冗余巡检历史无记录">4. khstate自定义对象设计冗余,巡检历史无记录
+</h4><p>kuberhealthy的khstate自定义资源对象用于记录当前巡检结果，但无法查询历史巡检记录。并且khstate这个cr的设计是比较冗余而无意义的，反而平添了很多复杂度。</p>
+<h4 id="5-废弃的巡检podkhcheckskhstate无法得到正确的清理">5. 废弃的巡检pod/khchecks/khstate/无法得到正确的清理
+</h4><p>原生的kuberhealthy创建的巡检pod完成任务后不会被正确删除，所以运行一次检查就会增加一个pod。官方的处理方式是增加一个新cr对象对废弃的巡检pod做cronjob删除。这本身就不是一个非常良好的解决方案。并且khstate其实和khcheck是绑定关系，但并没有采用ownerreferences的方式集联删除，反而在kuberhealhty master pod中启了一个goroutine不停轮询khchecks对象和内存中保存的状态做对比并删除khstate，容易经常性的导致bug。</p>
+<h4 id="6-高可用选主不稳定">6. 高可用选主不稳定
+</h4><p>还是因为缺点1中的不区分khcheck对象变化类型重启全部巡检的设计，所以容易导致选主流程中出现主流程卡死的问题。根因在缺点1，基本上改变不了。</p>
+<h4 id="7不支持多集群统一上报">7.不支持多集群统一上报
+</h4><p>kuberhealthy处理的还是单集群的情况，如果需要多集群统一控制就比较麻烦。也可以通过在client中增加第三方上报的功能，但显得不够优雅。</p>
+<p>我曾经试着在不改变设计的前提下对以上一些严重影响使用的问题和bug做修复，经过了几次修复之后发现仅仅是治标不治本。(有兴趣的同学可以关注一下这套同步restart流程，bug多的很。)这些问题的核心还是回到了 不区分变化事件类型 简单粗暴重启全部巡检的设计上。尝试和官方沟通是否能通过改变这个核心设计来重构代码，得到了否定的回答。</p>
+<p>其实本质上巡检要实现的功能并不复杂，所以其实与其对kuberhealthy做改动还不如重新实现一个比较简单。</p>
+<p>这也是为什么最终我没有采用kuberhealthy为原型的原因，我们的设计参考了kuberhealthy的功能设计，增加了单次触发功能和多集群统一上报功能，解决了废弃的巡检pod的清理问题，增加了巡检历史记录以及监控报警能力，支持白屏化多集群巡检配置部署和巡检结果/巡检pod日志/巡检pod事件查询功能。</p>
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
+<div id="tcomment"></div>
+<style>
+    .twikoo {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+    :root[data-scheme="dark"] {
+        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
+        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
+    }
+    .twikoo .el-input-group__prepend,
+    .twikoo .tk-action-icon,
+    .twikoo .tk-submit-action-icon,
+    .twikoo .tk-time,
+    .twikoo .tk-comments-no,
+    .twikoo .tk-comments-count {
+        color: var(--twikoo-body-text-color);
+    }
+    .twikoo .el-input__inner,
+    .twikoo .el-textarea__inner,
+    .twikoo .tk-preview-container,
+    .twikoo .tk-content,
+    .twikoo .tk-nick,
+    .twikoo .tk-send,
+    .twikoo .tk-comments-no,
+    .twikoo .el-input__count,
+    .twikoo .tk-submit-action-icon {
+        color: var(--twikoo-body-text-color-main)!important;
+    }
+    .twikoo .el-button{
+        color: var(--twikoo-body-text-color)!important;
+    }
+    .twikoo .el-input__count {
+        color: var(--twikoo-body-text-color) !important;
+    }
+    .OwO .OwO-body {
+        background-color: var(--body-background) !important;
+        color: var(--body-text-color) !important;
+    }
+</style><script>
+    twikoo.init({
+        envId: '',
+        el: '#tcomment',})
+</script>
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 cAlm的个人Blog
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.2d3f4e9dd7b2453cd71ff8971f18724ef8b4f783f2e8c70b9a281707db74e8a5.js" defer></script>
+
+
+    </body>
+</html>

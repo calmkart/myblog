@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Gunicorn on cAlm的个人Blog</title>
+        <link>http://localhost:1313/tags/gunicorn/</link>
+        <description>Recent content in Gunicorn on cAlm的个人Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Fri, 15 Jun 2018 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/gunicorn/index.xml" rel="self" type="application/rss+xml" /><item>
+            <title>gunicorn中一个同步任务的坑</title>
+            <link>http://localhost:1313/posts/2018/06/2018-06-15-gunicorn%E4%B8%AD%E4%B8%80%E4%B8%AA%E5%90%8C%E6%AD%A5%E4%BB%BB%E5%8A%A1%E7%9A%84%E5%9D%91/</link>
+            <pubDate>Fri, 15 Jun 2018 00:00:00 +0000</pubDate>
+            <guid>http://localhost:1313/posts/2018/06/2018-06-15-gunicorn%E4%B8%AD%E4%B8%80%E4%B8%AA%E5%90%8C%E6%AD%A5%E4%BB%BB%E5%8A%A1%E7%9A%84%E5%9D%91/</guid>
+            <description>&lt;p&gt;最近有些django定时任务要跑，又懒的做异步celery worker tasks了，就是普通的同步任务，用的django crontab，其中django用的是gunicorn-&amp;gt;nginx的部署方式。但几天下来，发现任务总是执行到一半就停了，排错发现一个偶尔会出现的坑&lt;/p&gt;&#xA;&lt;p&gt; &lt;/p&gt;&#xA;&lt;p&gt;&amp;hellip;&lt;/p&gt;&#xA;&lt;p&gt;检测到用curl请求接口，每到31秒就停止，后续同步任务不再继续&lt;/p&gt;&#xA;&lt;p&gt;检查gonicorn参数，发现默认的timeout值为30s，既客户端请求30s后超时&lt;/p&gt;&#xA;&lt;p&gt;gunicorn启动参数加上     -t 120&lt;/p&gt;&#xA;&lt;p&gt;问题解决&lt;/p&gt;&#xA;&lt;p&gt;&amp;hellip;&lt;/p&gt;</description>
+        </item></channel>
+</rss>

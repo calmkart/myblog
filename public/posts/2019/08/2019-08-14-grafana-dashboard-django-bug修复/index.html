@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="grafana的官方有很多用户提供的dashboard样本,其中关于django的有\nhttps://grafana.com/grafana/dashboards/9528\n对应的django-metric是https://github.com/korfuri/django-prometheus/\n但是这个dashboard的页面是有问题的。页面的选择器选择的label是app，但是prometheus采集到的metric label是service和job。所以我们需要把dashboard json做一下修改。\n">
+<title>grafana dashboard django bug修复</title>
+
+
+<link rel="canonical" href="http://localhost:1313/posts/2019/08/2019-08-14-grafana-dashboard-django-bug%E4%BF%AE%E5%A4%8D/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="grafana dashboard django bug修复">
+<meta property='og:description' content="grafana的官方有很多用户提供的dashboard样本,其中关于django的有\nhttps://grafana.com/grafana/dashboards/9528\n对应的django-metric是https://github.com/korfuri/django-prometheus/\n但是这个dashboard的页面是有问题的。页面的选择器选择的label是app，但是prometheus采集到的metric label是service和job。所以我们需要把dashboard json做一下修改。\n">
+<meta property='og:url' content='http://localhost:1313/posts/2019/08/2019-08-14-grafana-dashboard-django-bug%E4%BF%AE%E5%A4%8D/'>
+<meta property='og:site_name' content='cAlm的个人Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='grafana' /><meta property='article:tag' content='prometheus' /><meta property='article:tag' content='监控' /><meta property='article:published_time' content='2019-08-14T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2019-08-14T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="grafana dashboard django bug修复">
+<meta name="twitter:description" content="grafana的官方有很多用户提供的dashboard样本,其中关于django的有\nhttps://grafana.com/grafana/dashboards/9528\n对应的django-metric是https://github.com/korfuri/django-prometheus/\n但是这个dashboard的页面是有问题的。页面的选择器选择的label是app，但是prometheus采集到的metric label是service和job。所以我们需要把dashboard json做一下修改。\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">cAlm的个人Blog</a></h1>
+            <h2 class="site-description">随手记录些东西</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives' >
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/categories' >
+                
+                <span>分类</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about' >
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/" style="background-color: hsl(208, 60%, 84%); color: hsl(208, 60%, 15%);">
+                计算机
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/posts/2019/08/2019-08-14-grafana-dashboard-django-bug%E4%BF%AE%E5%A4%8D/">grafana dashboard django bug修复</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2019-08-14T00:00:00Z'>Wednesday, August 14, 2019</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+
+    <section class="article-content">
+    
+    
+    <p>grafana的官方有很多用户提供的dashboard样本,其中关于django的有</p>
+<p><a class="link" href="https://grafana.com/grafana/dashboards/9528"  target="_blank" rel="noopener"
+    >https://grafana.com/grafana/dashboards/9528</a></p>
+<p>对应的django-metric是<a class="link" href="https://github.com/korfuri/django-prometheus/"  target="_blank" rel="noopener"
+    >https://github.com/korfuri/django-prometheus/</a></p>
+<p>但是这个dashboard的页面是有问题的。页面的选择器选择的label是app，但是prometheus采集到的metric label是service和job。所以我们需要把dashboard json做一下修改。</p>
+<p>修改后的dashboard json如下</p>
+<pre tabindex="0"><code>{
+  &#34;annotations&#34;: {
+    &#34;list&#34;: [
+      {
+        &#34;builtIn&#34;: 1,
+        &#34;datasource&#34;: &#34;-- Grafana --&#34;,
+        &#34;enable&#34;: true,
+        &#34;hide&#34;: true,
+        &#34;iconColor&#34;: &#34;rgba(0, 211, 255, 1)&#34;,
+        &#34;name&#34;: &#34;Annotations &amp; Alerts&#34;,
+        &#34;type&#34;: &#34;dashboard&#34;
+      }
+    ]
+  },
+  &#34;description&#34;: &#34;Django metrics dashboard using korfuri/django-prometheus Prometheus metrics exporter&#34;,
+  &#34;editable&#34;: true,
+  &#34;gnetId&#34;: 9528,
+  &#34;graphTooltip&#34;: 0,
+  &#34;id&#34;: 21,
+  &#34;iteration&#34;: 1565764572579,
+  &#34;links&#34;: [],
+  &#34;panels&#34;: [
+    {
+      &#34;cacheTimeout&#34;: null,
+      &#34;colorBackground&#34;: false,
+      &#34;colorValue&#34;: false,
+      &#34;colors&#34;: [
+        &#34;#299c46&#34;,
+        &#34;rgba(237, 129, 40, 0.89)&#34;,
+        &#34;#d44a3a&#34;
+      ],
+      &#34;datasource&#34;: &#34;$datasource&#34;,
+      &#34;description&#34;: &#34;increase(v range-vector) calculates the increase in the time series in the range vector. Breaks in monotonicity (such as counter resets due to target restarts) are automatically adjusted for. The increase is extrapolated to cover the full time range as specified in the range vector selector, so that it is possible to get a non-integer result even if a counter increases only by integer increments.&#34;,
+      &#34;format&#34;: &#34;none&#34;,
+      &#34;gauge&#34;: {
+        &#34;maxValue&#34;: 100,
+        &#34;minValue&#34;: 0,
+        &#34;show&#34;: false,
+        &#34;thresholdLabels&#34;: false,
+        &#34;thresholdMarkers&#34;: true
+      },
+      &#34;gridPos&#34;: {
+        &#34;h&#34;: 2,
+        &#34;w&#34;: 12,
+        &#34;x&#34;: 0,
+        &#34;y&#34;: 0
+      },
+      &#34;id&#34;: 13,
+      &#34;interval&#34;: null,
+      &#34;links&#34;: [],
+      &#34;mappingType&#34;: 1,
+      &#34;mappingTypes&#34;: [
+        {
+          &#34;name&#34;: &#34;value to text&#34;,
+          &#34;value&#34;: 1
+        },
+        {
+          &#34;name&#34;: &#34;range to text&#34;,
+          &#34;value&#34;: 2
+        }
+      ],
+      &#34;maxDataPoints&#34;: 100,
+      &#34;nullPointMode&#34;: &#34;connected&#34;,
+      &#34;nullText&#34;: null,
+      &#34;options&#34;: {},
+      &#34;postfix&#34;: &#34;&#34;,
+      &#34;postfixFontSize&#34;: &#34;50%&#34;,
+      &#34;prefix&#34;: &#34;&#34;,
+      &#34;prefixFontSize&#34;: &#34;50%&#34;,
+      &#34;rangeMaps&#34;: [
+        {
+          &#34;from&#34;: &#34;null&#34;,
+          &#34;text&#34;: &#34;N/A&#34;,
+          &#34;to&#34;: &#34;null&#34;
+        }
+      ],
+      &#34;sparkline&#34;: {
+        &#34;fillColor&#34;: &#34;rgba(31, 118, 189, 0.18)&#34;,
+        &#34;full&#34;: false,
+        &#34;lineColor&#34;: &#34;rgb(31, 120, 193)&#34;,
+        &#34;show&#34;: false
+      },
+      &#34;tableColumn&#34;: &#34;&#34;,
+      &#34;targets&#34;: [
+        {
+          &#34;expr&#34;: &#34;sum(irate(django_http_requests_total_by_transport_total{namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;}[1m]))&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;intervalFactor&#34;: 1,
+          &#34;refId&#34;: &#34;A&#34;
+        }
+      ],
+      &#34;thresholds&#34;: &#34;&#34;,
+      &#34;title&#34;: &#34;Total Requests&#34;,
+      &#34;type&#34;: &#34;singlestat&#34;,
+      &#34;valueFontSize&#34;: &#34;80%&#34;,
+      &#34;valueMaps&#34;: [
+        {
+          &#34;op&#34;: &#34;=&#34;,
+          &#34;text&#34;: &#34;N/A&#34;,
+          &#34;value&#34;: &#34;null&#34;
+        }
+      ],
+      &#34;valueName&#34;: &#34;avg&#34;
+    },
+    {
+      &#34;cacheTimeout&#34;: null,
+      &#34;colorBackground&#34;: false,
+      &#34;colorValue&#34;: false,
+      &#34;colors&#34;: [
+        &#34;#629e51&#34;,
+        &#34;rgba(237, 129, 40, 0.89)&#34;,
+        &#34;#d44a3a&#34;
+      ],
+      &#34;datasource&#34;: &#34;$datasource&#34;,
+      &#34;format&#34;: &#34;none&#34;,
+      &#34;gauge&#34;: {
+        &#34;maxValue&#34;: 100,
+        &#34;minValue&#34;: 0,
+        &#34;show&#34;: false,
+        &#34;thresholdLabels&#34;: false,
+        &#34;thresholdMarkers&#34;: true
+      },
+      &#34;gridPos&#34;: {
+        &#34;h&#34;: 2,
+        &#34;w&#34;: 4,
+        &#34;x&#34;: 12,
+        &#34;y&#34;: 0
+      },
+      &#34;id&#34;: 15,
+      &#34;interval&#34;: null,
+      &#34;links&#34;: [],
+      &#34;mappingType&#34;: 1,
+      &#34;mappingTypes&#34;: [
+        {
+          &#34;name&#34;: &#34;value to text&#34;,
+          &#34;value&#34;: 1
+        },
+        {
+          &#34;name&#34;: &#34;range to text&#34;,
+          &#34;value&#34;: 2
+        }
+      ],
+      &#34;maxDataPoints&#34;: 100,
+      &#34;nullPointMode&#34;: &#34;connected&#34;,
+      &#34;nullText&#34;: null,
+      &#34;options&#34;: {},
+      &#34;postfix&#34;: &#34;&#34;,
+      &#34;postfixFontSize&#34;: &#34;50%&#34;,
+      &#34;prefix&#34;: &#34;&#34;,
+      &#34;prefixFontSize&#34;: &#34;50%&#34;,
+      &#34;rangeMaps&#34;: [
+        {
+          &#34;from&#34;: &#34;null&#34;,
+          &#34;text&#34;: &#34;N/A&#34;,
+          &#34;to&#34;: &#34;null&#34;
+        }
+      ],
+      &#34;sparkline&#34;: {
+        &#34;fillColor&#34;: &#34;rgba(31, 118, 189, 0.18)&#34;,
+        &#34;full&#34;: false,
+        &#34;lineColor&#34;: &#34;rgb(31, 120, 193)&#34;,
+        &#34;show&#34;: false
+      },
+      &#34;tableColumn&#34;: &#34;&#34;,
+      &#34;targets&#34;: [
+        {
+          &#34;expr&#34;: &#34;sum(irate(django_http_responses_total_by_status_total{status=~\&#34;2.+\&#34;,namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;}[1m]))&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;intervalFactor&#34;: 1,
+          &#34;legendFormat&#34;: &#34;&#34;,
+          &#34;refId&#34;: &#34;A&#34;
+        }
+      ],
+      &#34;thresholds&#34;: &#34;&#34;,
+      &#34;title&#34;: &#34;2XX Responses&#34;,
+      &#34;type&#34;: &#34;singlestat&#34;,
+      &#34;valueFontSize&#34;: &#34;80%&#34;,
+      &#34;valueMaps&#34;: [
+        {
+          &#34;op&#34;: &#34;=&#34;,
+          &#34;text&#34;: &#34;N/A&#34;,
+          &#34;value&#34;: &#34;null&#34;
+        }
+      ],
+      &#34;valueName&#34;: &#34;avg&#34;
+    },
+    {
+      &#34;cacheTimeout&#34;: null,
+      &#34;colorBackground&#34;: false,
+      &#34;colorValue&#34;: false,
+      &#34;colors&#34;: [
+        &#34;#299c46&#34;,
+        &#34;rgba(237, 129, 40, 0.89)&#34;,
+        &#34;#d44a3a&#34;
+      ],
+      &#34;datasource&#34;: &#34;$datasource&#34;,
+      &#34;format&#34;: &#34;none&#34;,
+      &#34;gauge&#34;: {
+        &#34;maxValue&#34;: 100,
+        &#34;minValue&#34;: 0,
+        &#34;show&#34;: false,
+        &#34;thresholdLabels&#34;: false,
+        &#34;thresholdMarkers&#34;: true
+      },
+      &#34;gridPos&#34;: {
+        &#34;h&#34;: 2,
+        &#34;w&#34;: 4,
+        &#34;x&#34;: 16,
+        &#34;y&#34;: 0
+      },
+      &#34;id&#34;: 16,
+      &#34;interval&#34;: null,
+      &#34;links&#34;: [],
+      &#34;mappingType&#34;: 1,
+      &#34;mappingTypes&#34;: [
+        {
+          &#34;name&#34;: &#34;value to text&#34;,
+          &#34;value&#34;: 1
+        },
+        {
+          &#34;name&#34;: &#34;range to text&#34;,
+          &#34;value&#34;: 2
+        }
+      ],
+      &#34;maxDataPoints&#34;: 100,
+      &#34;nullPointMode&#34;: &#34;connected&#34;,
+      &#34;nullText&#34;: null,
+      &#34;options&#34;: {},
+      &#34;postfix&#34;: &#34;&#34;,
+      &#34;postfixFontSize&#34;: &#34;50%&#34;,
+      &#34;prefix&#34;: &#34;&#34;,
+      &#34;prefixFontSize&#34;: &#34;50%&#34;,
+      &#34;rangeMaps&#34;: [
+        {
+          &#34;from&#34;: &#34;null&#34;,
+          &#34;text&#34;: &#34;N/A&#34;,
+          &#34;to&#34;: &#34;null&#34;
+        }
+      ],
+      &#34;sparkline&#34;: {
+        &#34;fillColor&#34;: &#34;rgba(31, 118, 189, 0.18)&#34;,
+        &#34;full&#34;: false,
+        &#34;lineColor&#34;: &#34;rgb(31, 120, 193)&#34;,
+        &#34;show&#34;: false
+      },
+      &#34;tableColumn&#34;: &#34;&#34;,
+      &#34;targets&#34;: [
+        {
+          &#34;expr&#34;: &#34;sum(irate(django_http_responses_total_by_status_total{status=~\&#34;4.+\&#34;,namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;}[1m]))&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;intervalFactor&#34;: 1,
+          &#34;legendFormat&#34;: &#34;&#34;,
+          &#34;refId&#34;: &#34;A&#34;
+        }
+      ],
+      &#34;thresholds&#34;: &#34;&#34;,
+      &#34;title&#34;: &#34;4XX Responses&#34;,
+      &#34;type&#34;: &#34;singlestat&#34;,
+      &#34;valueFontSize&#34;: &#34;80%&#34;,
+      &#34;valueMaps&#34;: [
+        {
+          &#34;op&#34;: &#34;=&#34;,
+          &#34;text&#34;: &#34;N/A&#34;,
+          &#34;value&#34;: &#34;null&#34;
+        }
+      ],
+      &#34;valueName&#34;: &#34;avg&#34;
+    },
+    {
+      &#34;cacheTimeout&#34;: null,
+      &#34;colorBackground&#34;: false,
+      &#34;colorValue&#34;: false,
+      &#34;colors&#34;: [
+        &#34;#299c46&#34;,
+        &#34;rgba(237, 129, 40, 0.89)&#34;,
+        &#34;#d44a3a&#34;
+      ],
+      &#34;datasource&#34;: &#34;$datasource&#34;,
+      &#34;format&#34;: &#34;none&#34;,
+      &#34;gauge&#34;: {
+        &#34;maxValue&#34;: 100,
+        &#34;minValue&#34;: 0,
+        &#34;show&#34;: false,
+        &#34;thresholdLabels&#34;: false,
+        &#34;thresholdMarkers&#34;: true
+      },
+      &#34;gridPos&#34;: {
+        &#34;h&#34;: 2,
+        &#34;w&#34;: 4,
+        &#34;x&#34;: 20,
+        &#34;y&#34;: 0
+      },
+      &#34;id&#34;: 17,
+      &#34;interval&#34;: null,
+      &#34;links&#34;: [],
+      &#34;mappingType&#34;: 1,
+      &#34;mappingTypes&#34;: [
+        {
+          &#34;name&#34;: &#34;value to text&#34;,
+          &#34;value&#34;: 1
+        },
+        {
+          &#34;name&#34;: &#34;range to text&#34;,
+          &#34;value&#34;: 2
+        }
+      ],
+      &#34;maxDataPoints&#34;: 100,
+      &#34;nullPointMode&#34;: &#34;connected&#34;,
+      &#34;nullText&#34;: null,
+      &#34;options&#34;: {},
+      &#34;postfix&#34;: &#34;&#34;,
+      &#34;postfixFontSize&#34;: &#34;50%&#34;,
+      &#34;prefix&#34;: &#34;&#34;,
+      &#34;prefixFontSize&#34;: &#34;50%&#34;,
+      &#34;rangeMaps&#34;: [
+        {
+          &#34;from&#34;: &#34;null&#34;,
+          &#34;text&#34;: &#34;N/A&#34;,
+          &#34;to&#34;: &#34;null&#34;
+        }
+      ],
+      &#34;sparkline&#34;: {
+        &#34;fillColor&#34;: &#34;rgba(31, 118, 189, 0.18)&#34;,
+        &#34;full&#34;: false,
+        &#34;lineColor&#34;: &#34;rgb(31, 120, 193)&#34;,
+        &#34;show&#34;: false
+      },
+      &#34;tableColumn&#34;: &#34;&#34;,
+      &#34;targets&#34;: [
+        {
+          &#34;expr&#34;: &#34;sum(irate(django_http_responses_total_by_status_total{status=~\&#34;5.+\&#34;,namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;}[1m]))&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;intervalFactor&#34;: 1,
+          &#34;legendFormat&#34;: &#34;&#34;,
+          &#34;refId&#34;: &#34;A&#34;
+        }
+      ],
+      &#34;thresholds&#34;: &#34;&#34;,
+      &#34;title&#34;: &#34;5XX Responses&#34;,
+      &#34;type&#34;: &#34;singlestat&#34;,
+      &#34;valueFontSize&#34;: &#34;80%&#34;,
+      &#34;valueMaps&#34;: [
+        {
+          &#34;op&#34;: &#34;=&#34;,
+          &#34;text&#34;: &#34;N/A&#34;,
+          &#34;value&#34;: &#34;null&#34;
+        }
+      ],
+      &#34;valueName&#34;: &#34;avg&#34;
+    },
+    {
+      &#34;aliasColors&#34;: {},
+      &#34;bars&#34;: false,
+      &#34;dashLength&#34;: 10,
+      &#34;dashes&#34;: false,
+      &#34;datasource&#34;: &#34;$datasource&#34;,
+      &#34;fill&#34;: 1,
+      &#34;gridPos&#34;: {
+        &#34;h&#34;: 9,
+        &#34;w&#34;: 12,
+        &#34;x&#34;: 0,
+        &#34;y&#34;: 2
+      },
+      &#34;id&#34;: 2,
+      &#34;legend&#34;: {
+        &#34;avg&#34;: false,
+        &#34;current&#34;: false,
+        &#34;max&#34;: false,
+        &#34;min&#34;: false,
+        &#34;show&#34;: true,
+        &#34;total&#34;: false,
+        &#34;values&#34;: false
+      },
+      &#34;lines&#34;: true,
+      &#34;linewidth&#34;: 1,
+      &#34;links&#34;: [],
+      &#34;nullPointMode&#34;: &#34;null&#34;,
+      &#34;options&#34;: {},
+      &#34;percentage&#34;: false,
+      &#34;pointradius&#34;: 5,
+      &#34;points&#34;: false,
+      &#34;renderer&#34;: &#34;flot&#34;,
+      &#34;seriesOverrides&#34;: [],
+      &#34;spaceLength&#34;: 10,
+      &#34;stack&#34;: false,
+      &#34;steppedLine&#34;: false,
+      &#34;targets&#34;: [
+        {
+          &#34;expr&#34;: &#34;sum(irate(django_http_requests_total_by_view_transport_method_total{namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;,view!~\&#34;prometheus-django-metrics|healthcheck\&#34;}[1m])) by(method, view)&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;hide&#34;: false,
+          &#34;intervalFactor&#34;: 1,
+          &#34;legendFormat&#34;: &#34;{{method}} /{{view}}&#34;,
+          &#34;refId&#34;: &#34;A&#34;
+        }
+      ],
+      &#34;thresholds&#34;: [],
+      &#34;timeFrom&#34;: null,
+      &#34;timeRegions&#34;: [],
+      &#34;timeShift&#34;: null,
+      &#34;title&#34;: &#34;Requests&#34;,
+      &#34;tooltip&#34;: {
+        &#34;shared&#34;: true,
+        &#34;sort&#34;: 0,
+        &#34;value_type&#34;: &#34;individual&#34;
+      },
+      &#34;type&#34;: &#34;graph&#34;,
+      &#34;xaxis&#34;: {
+        &#34;buckets&#34;: null,
+        &#34;mode&#34;: &#34;time&#34;,
+        &#34;name&#34;: null,
+        &#34;show&#34;: true,
+        &#34;values&#34;: []
+      },
+      &#34;yaxes&#34;: [
+        {
+          &#34;format&#34;: &#34;short&#34;,
+          &#34;label&#34;: null,
+          &#34;logBase&#34;: 1,
+          &#34;max&#34;: null,
+          &#34;min&#34;: null,
+          &#34;show&#34;: true
+        },
+        {
+          &#34;format&#34;: &#34;short&#34;,
+          &#34;label&#34;: null,
+          &#34;logBase&#34;: 1,
+          &#34;max&#34;: null,
+          &#34;min&#34;: null,
+          &#34;show&#34;: true
+        }
+      ],
+      &#34;yaxis&#34;: {
+        &#34;align&#34;: false,
+        &#34;alignLevel&#34;: null
+      }
+    },
+    {
+      &#34;aliasColors&#34;: {},
+      &#34;bars&#34;: false,
+      &#34;dashLength&#34;: 10,
+      &#34;dashes&#34;: false,
+      &#34;datasource&#34;: &#34;$datasource&#34;,
+      &#34;fill&#34;: 1,
+      &#34;gridPos&#34;: {
+        &#34;h&#34;: 9,
+        &#34;w&#34;: 12,
+        &#34;x&#34;: 12,
+        &#34;y&#34;: 2
+      },
+      &#34;id&#34;: 4,
+      &#34;legend&#34;: {
+        &#34;avg&#34;: false,
+        &#34;current&#34;: false,
+        &#34;max&#34;: false,
+        &#34;min&#34;: false,
+        &#34;show&#34;: true,
+        &#34;total&#34;: false,
+        &#34;values&#34;: false
+      },
+      &#34;lines&#34;: true,
+      &#34;linewidth&#34;: 1,
+      &#34;links&#34;: [],
+      &#34;nullPointMode&#34;: &#34;null&#34;,
+      &#34;options&#34;: {},
+      &#34;percentage&#34;: false,
+      &#34;pointradius&#34;: 5,
+      &#34;points&#34;: false,
+      &#34;renderer&#34;: &#34;flot&#34;,
+      &#34;seriesOverrides&#34;: [],
+      &#34;spaceLength&#34;: 10,
+      &#34;stack&#34;: false,
+      &#34;steppedLine&#34;: false,
+      &#34;targets&#34;: [
+        {
+          &#34;expr&#34;: &#34;histogram_quantile(0.50, sum(rate(django_http_requests_latency_seconds_by_view_method_bucket{namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;,view!~\&#34;prometheus-django-metrics|healthcheck\&#34;}[5m])) by (job, le))&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;interval&#34;: &#34;&#34;,
+          &#34;intervalFactor&#34;: 1,
+          &#34;legendFormat&#34;: &#34;quantile=50&#34;,
+          &#34;refId&#34;: &#34;A&#34;
+        },
+        {
+          &#34;expr&#34;: &#34;histogram_quantile(0.95, sum(rate(django_http_requests_latency_seconds_by_view_method_bucket{namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;,view!~\&#34;prometheus-django-metrics|healthcheck\&#34;}[5m])) by (job, le))&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;hide&#34;: false,
+          &#34;interval&#34;: &#34;&#34;,
+          &#34;intervalFactor&#34;: 1,
+          &#34;legendFormat&#34;: &#34;quantile=95&#34;,
+          &#34;refId&#34;: &#34;B&#34;
+        },
+        {
+          &#34;expr&#34;: &#34;histogram_quantile(0.99, sum(rate(django_http_requests_latency_seconds_by_view_method_bucket{namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;,view!~\&#34;prometheus-django-metrics|healthcheck\&#34;}[5m])) by (job, le))&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;hide&#34;: false,
+          &#34;interval&#34;: &#34;&#34;,
+          &#34;intervalFactor&#34;: 1,
+          &#34;legendFormat&#34;: &#34;quantile=99&#34;,
+          &#34;refId&#34;: &#34;C&#34;
+        },
+        {
+          &#34;expr&#34;: &#34;histogram_quantile(0.999, sum(rate(django_http_requests_latency_seconds_by_view_method_bucket{namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;,view!~\&#34;prometheus-django-metrics|healthcheck\&#34;}[5m])) by (job, le))&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;hide&#34;: false,
+          &#34;interval&#34;: &#34;&#34;,
+          &#34;intervalFactor&#34;: 1,
+          &#34;legendFormat&#34;: &#34;quantile=99.9&#34;,
+          &#34;refId&#34;: &#34;D&#34;
+        }
+      ],
+      &#34;thresholds&#34;: [],
+      &#34;timeFrom&#34;: null,
+      &#34;timeRegions&#34;: [],
+      &#34;timeShift&#34;: null,
+      &#34;title&#34;: &#34;Request Latency&#34;,
+      &#34;tooltip&#34;: {
+        &#34;shared&#34;: true,
+        &#34;sort&#34;: 0,
+        &#34;value_type&#34;: &#34;individual&#34;
+      },
+      &#34;type&#34;: &#34;graph&#34;,
+      &#34;xaxis&#34;: {
+        &#34;buckets&#34;: null,
+        &#34;mode&#34;: &#34;time&#34;,
+        &#34;name&#34;: null,
+        &#34;show&#34;: true,
+        &#34;values&#34;: []
+      },
+      &#34;yaxes&#34;: [
+        {
+          &#34;format&#34;: &#34;dtdurations&#34;,
+          &#34;label&#34;: &#34;&#34;,
+          &#34;logBase&#34;: 1,
+          &#34;max&#34;: null,
+          &#34;min&#34;: null,
+          &#34;show&#34;: true
+        },
+        {
+          &#34;format&#34;: &#34;short&#34;,
+          &#34;label&#34;: null,
+          &#34;logBase&#34;: 1,
+          &#34;max&#34;: null,
+          &#34;min&#34;: null,
+          &#34;show&#34;: true
+        }
+      ],
+      &#34;yaxis&#34;: {
+        &#34;align&#34;: false,
+        &#34;alignLevel&#34;: null
+      }
+    },
+    {
+      &#34;aliasColors&#34;: {
+        &#34;api-beatstream-api&#34;: &#34;#1f78c1&#34;
+      },
+      &#34;bars&#34;: false,
+      &#34;dashLength&#34;: 10,
+      &#34;dashes&#34;: false,
+      &#34;datasource&#34;: &#34;$datasource&#34;,
+      &#34;fill&#34;: 1,
+      &#34;gridPos&#34;: {
+        &#34;h&#34;: 9,
+        &#34;w&#34;: 12,
+        &#34;x&#34;: 0,
+        &#34;y&#34;: 11
+      },
+      &#34;id&#34;: 7,
+      &#34;legend&#34;: {
+        &#34;avg&#34;: false,
+        &#34;current&#34;: false,
+        &#34;max&#34;: false,
+        &#34;min&#34;: false,
+        &#34;show&#34;: true,
+        &#34;total&#34;: false,
+        &#34;values&#34;: false
+      },
+      &#34;lines&#34;: true,
+      &#34;linewidth&#34;: 1,
+      &#34;links&#34;: [],
+      &#34;nullPointMode&#34;: &#34;null&#34;,
+      &#34;options&#34;: {},
+      &#34;percentage&#34;: false,
+      &#34;pointradius&#34;: 5,
+      &#34;points&#34;: false,
+      &#34;renderer&#34;: &#34;flot&#34;,
+      &#34;seriesOverrides&#34;: [
+        {}
+      ],
+      &#34;spaceLength&#34;: 10,
+      &#34;stack&#34;: false,
+      &#34;steppedLine&#34;: false,
+      &#34;targets&#34;: [
+        {
+          &#34;expr&#34;: &#34;sum(irate(django_http_responses_before_middlewares_total{namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;, view!~\&#34;prometheus-django-metrics|healthcheck\&#34;}[1m])) by(job)&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;interval&#34;: &#34;&#34;,
+          &#34;intervalFactor&#34;: 1,
+          &#34;legendFormat&#34;: &#34;{{job}}&#34;,
+          &#34;refId&#34;: &#34;A&#34;
+        }
+      ],
+      &#34;thresholds&#34;: [],
+      &#34;timeFrom&#34;: null,
+      &#34;timeRegions&#34;: [],
+      &#34;timeShift&#34;: null,
+      &#34;title&#34;: &#34;Responses&#34;,
+      &#34;tooltip&#34;: {
+        &#34;shared&#34;: true,
+        &#34;sort&#34;: 0,
+        &#34;value_type&#34;: &#34;individual&#34;
+      },
+      &#34;type&#34;: &#34;graph&#34;,
+      &#34;xaxis&#34;: {
+        &#34;buckets&#34;: null,
+        &#34;mode&#34;: &#34;time&#34;,
+        &#34;name&#34;: null,
+        &#34;show&#34;: true,
+        &#34;values&#34;: []
+      },
+      &#34;yaxes&#34;: [
+        {
+          &#34;format&#34;: &#34;short&#34;,
+          &#34;label&#34;: null,
+          &#34;logBase&#34;: 1,
+          &#34;max&#34;: null,
+          &#34;min&#34;: null,
+          &#34;show&#34;: true
+        },
+        {
+          &#34;format&#34;: &#34;short&#34;,
+          &#34;label&#34;: null,
+          &#34;logBase&#34;: 1,
+          &#34;max&#34;: null,
+          &#34;min&#34;: null,
+          &#34;show&#34;: true
+        }
+      ],
+      &#34;yaxis&#34;: {
+        &#34;align&#34;: false,
+        &#34;alignLevel&#34;: null
+      }
+    },
+    {
+      &#34;aliasColors&#34;: {},
+      &#34;bars&#34;: false,
+      &#34;dashLength&#34;: 10,
+      &#34;dashes&#34;: false,
+      &#34;datasource&#34;: &#34;$datasource&#34;,
+      &#34;fill&#34;: 1,
+      &#34;gridPos&#34;: {
+        &#34;h&#34;: 9,
+        &#34;w&#34;: 12,
+        &#34;x&#34;: 12,
+        &#34;y&#34;: 11
+      },
+      &#34;id&#34;: 11,
+      &#34;legend&#34;: {
+        &#34;avg&#34;: false,
+        &#34;current&#34;: false,
+        &#34;max&#34;: false,
+        &#34;min&#34;: false,
+        &#34;show&#34;: true,
+        &#34;total&#34;: false,
+        &#34;values&#34;: false
+      },
+      &#34;lines&#34;: true,
+      &#34;linewidth&#34;: 1,
+      &#34;links&#34;: [],
+      &#34;nullPointMode&#34;: &#34;null&#34;,
+      &#34;options&#34;: {},
+      &#34;percentage&#34;: false,
+      &#34;pointradius&#34;: 5,
+      &#34;points&#34;: false,
+      &#34;renderer&#34;: &#34;flot&#34;,
+      &#34;seriesOverrides&#34;: [],
+      &#34;spaceLength&#34;: 10,
+      &#34;stack&#34;: false,
+      &#34;steppedLine&#34;: false,
+      &#34;targets&#34;: [
+        {
+          &#34;expr&#34;: &#34;sum(irate(django_http_responses_total_by_status_total{namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;, view!~\&#34;prometheus-django-metrics|healthcheck\&#34;}[1m])) by(status)&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;intervalFactor&#34;: 1,
+          &#34;legendFormat&#34;: &#34;{{status}}&#34;,
+          &#34;refId&#34;: &#34;A&#34;
+        }
+      ],
+      &#34;thresholds&#34;: [],
+      &#34;timeFrom&#34;: null,
+      &#34;timeRegions&#34;: [],
+      &#34;timeShift&#34;: null,
+      &#34;title&#34;: &#34;Response Status&#34;,
+      &#34;tooltip&#34;: {
+        &#34;shared&#34;: true,
+        &#34;sort&#34;: 0,
+        &#34;value_type&#34;: &#34;individual&#34;
+      },
+      &#34;type&#34;: &#34;graph&#34;,
+      &#34;xaxis&#34;: {
+        &#34;buckets&#34;: null,
+        &#34;mode&#34;: &#34;time&#34;,
+        &#34;name&#34;: null,
+        &#34;show&#34;: true,
+        &#34;values&#34;: []
+      },
+      &#34;yaxes&#34;: [
+        {
+          &#34;format&#34;: &#34;short&#34;,
+          &#34;label&#34;: null,
+          &#34;logBase&#34;: 1,
+          &#34;max&#34;: null,
+          &#34;min&#34;: null,
+          &#34;show&#34;: true
+        },
+        {
+          &#34;format&#34;: &#34;short&#34;,
+          &#34;label&#34;: null,
+          &#34;logBase&#34;: 1,
+          &#34;max&#34;: null,
+          &#34;min&#34;: null,
+          &#34;show&#34;: true
+        }
+      ],
+      &#34;yaxis&#34;: {
+        &#34;align&#34;: false,
+        &#34;alignLevel&#34;: null
+      }
+    },
+    {
+      &#34;aliasColors&#34;: {
+        &#34;mysql&#34;: &#34;#584477&#34;,
+        &#34;postgresql&#34;: &#34;#0064a5&#34;
+      },
+      &#34;bars&#34;: false,
+      &#34;dashLength&#34;: 10,
+      &#34;dashes&#34;: false,
+      &#34;datasource&#34;: &#34;$datasource&#34;,
+      &#34;fill&#34;: 1,
+      &#34;gridPos&#34;: {
+        &#34;h&#34;: 5,
+        &#34;w&#34;: 24,
+        &#34;x&#34;: 0,
+        &#34;y&#34;: 20
+      },
+      &#34;id&#34;: 9,
+      &#34;legend&#34;: {
+        &#34;avg&#34;: false,
+        &#34;current&#34;: false,
+        &#34;max&#34;: false,
+        &#34;min&#34;: false,
+        &#34;show&#34;: true,
+        &#34;total&#34;: false,
+        &#34;values&#34;: false
+      },
+      &#34;lines&#34;: true,
+      &#34;linewidth&#34;: 1,
+      &#34;links&#34;: [],
+      &#34;nullPointMode&#34;: &#34;null&#34;,
+      &#34;options&#34;: {},
+      &#34;percentage&#34;: false,
+      &#34;pointradius&#34;: 5,
+      &#34;points&#34;: false,
+      &#34;renderer&#34;: &#34;flot&#34;,
+      &#34;seriesOverrides&#34;: [],
+      &#34;spaceLength&#34;: 10,
+      &#34;stack&#34;: false,
+      &#34;steppedLine&#34;: false,
+      &#34;targets&#34;: [
+        {
+          &#34;expr&#34;: &#34;sum(irate(django_db_execute_total{namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;}[1m])) by (vendor)&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;intervalFactor&#34;: 1,
+          &#34;legendFormat&#34;: &#34;{{vendor}}&#34;,
+          &#34;refId&#34;: &#34;A&#34;
+        }
+      ],
+      &#34;thresholds&#34;: [],
+      &#34;timeFrom&#34;: null,
+      &#34;timeRegions&#34;: [],
+      &#34;timeShift&#34;: null,
+      &#34;title&#34;: &#34;Database Ops&#34;,
+      &#34;tooltip&#34;: {
+        &#34;shared&#34;: true,
+        &#34;sort&#34;: 0,
+        &#34;value_type&#34;: &#34;individual&#34;
+      },
+      &#34;type&#34;: &#34;graph&#34;,
+      &#34;xaxis&#34;: {
+        &#34;buckets&#34;: null,
+        &#34;mode&#34;: &#34;time&#34;,
+        &#34;name&#34;: null,
+        &#34;show&#34;: true,
+        &#34;values&#34;: []
+      },
+      &#34;yaxes&#34;: [
+        {
+          &#34;format&#34;: &#34;short&#34;,
+          &#34;label&#34;: null,
+          &#34;logBase&#34;: 1,
+          &#34;max&#34;: null,
+          &#34;min&#34;: null,
+          &#34;show&#34;: true
+        },
+        {
+          &#34;format&#34;: &#34;short&#34;,
+          &#34;label&#34;: null,
+          &#34;logBase&#34;: 1,
+          &#34;max&#34;: null,
+          &#34;min&#34;: null,
+          &#34;show&#34;: true
+        }
+      ],
+      &#34;yaxis&#34;: {
+        &#34;align&#34;: false,
+        &#34;alignLevel&#34;: null
+      }
+    },
+    {
+      &#34;aliasColors&#34;: {},
+      &#34;bars&#34;: false,
+      &#34;dashLength&#34;: 10,
+      &#34;dashes&#34;: false,
+      &#34;datasource&#34;: &#34;$datasource&#34;,
+      &#34;fill&#34;: 1,
+      &#34;gridPos&#34;: {
+        &#34;h&#34;: 5,
+        &#34;w&#34;: 24,
+        &#34;x&#34;: 0,
+        &#34;y&#34;: 25
+      },
+      &#34;id&#34;: 18,
+      &#34;legend&#34;: {
+        &#34;alignAsTable&#34;: true,
+        &#34;avg&#34;: true,
+        &#34;current&#34;: true,
+        &#34;hideEmpty&#34;: false,
+        &#34;hideZero&#34;: true,
+        &#34;max&#34;: true,
+        &#34;min&#34;: false,
+        &#34;rightSide&#34;: true,
+        &#34;show&#34;: true,
+        &#34;total&#34;: false,
+        &#34;values&#34;: true
+      },
+      &#34;lines&#34;: true,
+      &#34;linewidth&#34;: 1,
+      &#34;links&#34;: [],
+      &#34;nullPointMode&#34;: &#34;null&#34;,
+      &#34;options&#34;: {},
+      &#34;percentage&#34;: false,
+      &#34;pointradius&#34;: 5,
+      &#34;points&#34;: false,
+      &#34;renderer&#34;: &#34;flot&#34;,
+      &#34;seriesOverrides&#34;: [],
+      &#34;spaceLength&#34;: 10,
+      &#34;stack&#34;: false,
+      &#34;steppedLine&#34;: false,
+      &#34;targets&#34;: [
+        {
+          &#34;expr&#34;: &#34;sum(irate(django_model_deletes_total{namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;}[1m])) by (model)&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;intervalFactor&#34;: 1,
+          &#34;legendFormat&#34;: &#34;[{{model}}] deletes&#34;,
+          &#34;refId&#34;: &#34;A&#34;
+        },
+        {
+          &#34;expr&#34;: &#34;sum(irate(django_model_inserts_total{namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;}[1m])) by (model)&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;intervalFactor&#34;: 1,
+          &#34;legendFormat&#34;: &#34;[{{model}}] inserts&#34;,
+          &#34;refId&#34;: &#34;B&#34;
+        },
+        {
+          &#34;expr&#34;: &#34;sum(irate(django_model_updates_total{namespace=~\&#34;$namespace\&#34;, service=~\&#34;^$service$\&#34;}[1m])) by (model)&#34;,
+          &#34;format&#34;: &#34;time_series&#34;,
+          &#34;intervalFactor&#34;: 1,
+          &#34;legendFormat&#34;: &#34;[{{model}}] updates&#34;,
+          &#34;refId&#34;: &#34;C&#34;
+        }
+      ],
+      &#34;thresholds&#34;: [],
+      &#34;timeFrom&#34;: null,
+      &#34;timeRegions&#34;: [],
+      &#34;timeShift&#34;: null,
+      &#34;title&#34;: &#34;Models stats&#34;,
+      &#34;tooltip&#34;: {
+        &#34;shared&#34;: true,
+        &#34;sort&#34;: 0,
+        &#34;value_type&#34;: &#34;individual&#34;
+      },
+      &#34;type&#34;: &#34;graph&#34;,
+      &#34;xaxis&#34;: {
+        &#34;buckets&#34;: null,
+        &#34;mode&#34;: &#34;time&#34;,
+        &#34;name&#34;: null,
+        &#34;show&#34;: true,
+        &#34;values&#34;: []
+      },
+      &#34;yaxes&#34;: [
+        {
+          &#34;format&#34;: &#34;short&#34;,
+          &#34;label&#34;: null,
+          &#34;logBase&#34;: 1,
+          &#34;max&#34;: null,
+          &#34;min&#34;: null,
+          &#34;show&#34;: true
+        },
+        {
+          &#34;format&#34;: &#34;short&#34;,
+          &#34;label&#34;: null,
+          &#34;logBase&#34;: 1,
+          &#34;max&#34;: null,
+          &#34;min&#34;: null,
+          &#34;show&#34;: true
+        }
+      ],
+      &#34;yaxis&#34;: {
+        &#34;align&#34;: false,
+        &#34;alignLevel&#34;: null
+      }
+    }
+  ],
+  &#34;refresh&#34;: &#34;10s&#34;,
+  &#34;schemaVersion&#34;: 18,
+  &#34;style&#34;: &#34;dark&#34;,
+  &#34;tags&#34;: [],
+  &#34;templating&#34;: {
+    &#34;list&#34;: [
+      {
+        &#34;current&#34;: {
+          &#34;text&#34;: &#34;prometheus&#34;,
+          &#34;value&#34;: &#34;prometheus&#34;
+        },
+        &#34;hide&#34;: 0,
+        &#34;includeAll&#34;: false,
+        &#34;label&#34;: null,
+        &#34;multi&#34;: false,
+        &#34;name&#34;: &#34;datasource&#34;,
+        &#34;options&#34;: [],
+        &#34;query&#34;: &#34;prometheus&#34;,
+        &#34;refresh&#34;: 1,
+        &#34;regex&#34;: &#34;&#34;,
+        &#34;skipUrlSync&#34;: false,
+        &#34;type&#34;: &#34;datasource&#34;
+      },
+      {
+        &#34;allValue&#34;: &#34;.*&#34;,
+        &#34;current&#34;: {
+          &#34;text&#34;: &#34;default&#34;,
+          &#34;value&#34;: &#34;default&#34;
+        },
+        &#34;datasource&#34;: &#34;$datasource&#34;,
+        &#34;definition&#34;: &#34;&#34;,
+        &#34;hide&#34;: 0,
+        &#34;includeAll&#34;: false,
+        &#34;label&#34;: &#34;&#34;,
+        &#34;multi&#34;: false,
+        &#34;name&#34;: &#34;namespace&#34;,
+        &#34;options&#34;: [],
+        &#34;query&#34;: &#34;label_values(django_db_new_connections_total, namespace)&#34;,
+        &#34;refresh&#34;: 1,
+        &#34;regex&#34;: &#34;&#34;,
+        &#34;skipUrlSync&#34;: false,
+        &#34;sort&#34;: 1,
+        &#34;tagValuesQuery&#34;: &#34;&#34;,
+        &#34;tags&#34;: [],
+        &#34;tagsQuery&#34;: &#34;&#34;,
+        &#34;type&#34;: &#34;query&#34;,
+        &#34;useTags&#34;: false
+      },
+      {
+        &#34;allValue&#34;: null,
+        &#34;current&#34;: {
+          &#34;text&#34;: &#34;All&#34;,
+          &#34;value&#34;: &#34;$__all&#34;
+        },
+        &#34;datasource&#34;: &#34;$datasource&#34;,
+        &#34;definition&#34;: &#34;&#34;,
+        &#34;hide&#34;: 0,
+        &#34;includeAll&#34;: true,
+        &#34;label&#34;: &#34;app&#34;,
+        &#34;multi&#34;: false,
+        &#34;name&#34;: &#34;service&#34;,
+        &#34;options&#34;: [],
+        &#34;query&#34;: &#34;label_values(django_db_new_connections_total{namespace=~\&#34;$namespace\&#34;}, service)&#34;,
+        &#34;refresh&#34;: 1,
+        &#34;regex&#34;: &#34;&#34;,
+        &#34;skipUrlSync&#34;: false,
+        &#34;sort&#34;: 0,
+        &#34;tagValuesQuery&#34;: &#34;&#34;,
+        &#34;tags&#34;: [],
+        &#34;tagsQuery&#34;: &#34;&#34;,
+        &#34;type&#34;: &#34;query&#34;,
+        &#34;useTags&#34;: false
+      }
+    ]
+  },
+  &#34;time&#34;: {
+    &#34;from&#34;: &#34;now-15m&#34;,
+    &#34;to&#34;: &#34;now&#34;
+  },
+  &#34;timepicker&#34;: {
+    &#34;refresh_intervals&#34;: [
+      &#34;5s&#34;,
+      &#34;10s&#34;,
+      &#34;30s&#34;,
+      &#34;1m&#34;,
+      &#34;5m&#34;,
+      &#34;15m&#34;,
+      &#34;30m&#34;,
+      &#34;1h&#34;,
+      &#34;2h&#34;,
+      &#34;1d&#34;
+    ],
+    &#34;time_options&#34;: [
+      &#34;5m&#34;,
+      &#34;15m&#34;,
+      &#34;1h&#34;,
+      &#34;6h&#34;,
+      &#34;12h&#34;,
+      &#34;24h&#34;,
+      &#34;2d&#34;,
+      &#34;7d&#34;,
+      &#34;30d&#34;
+    ]
+  },
+  &#34;timezone&#34;: &#34;&#34;,
+  &#34;title&#34;: &#34;a Django Prometheus&#34;,
+  &#34;uid&#34;: &#34;O6v4rMpizda&#34;,
+  &#34;version&#34;: 1
+}
+</code></pre>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/grafana/">Grafana</a>
+        
+            <a href="/tags/prometheus/">Prometheus</a>
+        
+            <a href="/tags/%E7%9B%91%E6%8E%A7/">监控</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/posts/2017/11/2017-11-08-%E4%B8%A4%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84linux%E7%9B%91%E6%8E%A7%E8%BD%AF%E4%BB%B6/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">两个简单的linux监控软件</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2017/08/2017-08-10-windows%E9%85%8D%E7%BD%AEsnmp-v3%E7%9B%91%E6%8E%A7net-snmp/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">windows配置snmp v3监控(net-snmp)</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
+<div id="tcomment"></div>
+<style>
+    .twikoo {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+    :root[data-scheme="dark"] {
+        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
+        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
+    }
+    .twikoo .el-input-group__prepend,
+    .twikoo .tk-action-icon,
+    .twikoo .tk-submit-action-icon,
+    .twikoo .tk-time,
+    .twikoo .tk-comments-no,
+    .twikoo .tk-comments-count {
+        color: var(--twikoo-body-text-color);
+    }
+    .twikoo .el-input__inner,
+    .twikoo .el-textarea__inner,
+    .twikoo .tk-preview-container,
+    .twikoo .tk-content,
+    .twikoo .tk-nick,
+    .twikoo .tk-send,
+    .twikoo .tk-comments-no,
+    .twikoo .el-input__count,
+    .twikoo .tk-submit-action-icon {
+        color: var(--twikoo-body-text-color-main)!important;
+    }
+    .twikoo .el-button{
+        color: var(--twikoo-body-text-color)!important;
+    }
+    .twikoo .el-input__count {
+        color: var(--twikoo-body-text-color) !important;
+    }
+    .OwO .OwO-body {
+        background-color: var(--body-background) !important;
+        color: var(--body-text-color) !important;
+    }
+</style><script>
+    twikoo.init({
+        envId: '',
+        el: '#tcomment',})
+</script>
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 cAlm的个人Blog
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.2d3f4e9dd7b2453cd71ff8971f18724ef8b4f783f2e8c70b9a281707db74e8a5.js" defer></script>
+
+
+    </body>
+</html>

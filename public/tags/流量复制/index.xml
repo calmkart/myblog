@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>流量复制 on cAlm的个人Blog</title>
+        <link>http://localhost:1313/tags/%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6/</link>
+        <description>Recent content in 流量复制 on cAlm的个人Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Thu, 09 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6/index.xml" rel="self" type="application/rss+xml" /><item>
+            <title>goreplay实现流量复制的AB测试</title>
+            <link>http://localhost:1313/posts/2019/05/2019-05-09-goreplay%E5%AE%9E%E7%8E%B0%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6%E7%9A%84ab%E6%B5%8B%E8%AF%95/</link>
+            <pubDate>Thu, 09 May 2019 00:00:00 +0000</pubDate>
+            <guid>http://localhost:1313/posts/2019/05/2019-05-09-goreplay%E5%AE%9E%E7%8E%B0%E6%B5%81%E9%87%8F%E5%A4%8D%E5%88%B6%E7%9A%84ab%E6%B5%8B%E8%AF%95/</guid>
+            <description>&lt;p&gt;AB测试的流量复制工具以前有tcpdump啥的，讲道理不好用，啰里八嗦的，不高明，懂得都懂。所以用一款好用的新货，goreplay。&lt;a class=&#34;link&#34; href=&#34;http://www.calmkart.com/wp-content/uploads/2019/05/0E969B1EE4076B3AE46A718E8EC14C48.jpg&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;&lt;img src=&#34;images/0E969B1EE4076B3AE46A718E8EC14C48.jpg&#34; alt=&#34;&#34; /&gt;&#xA;&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;github地址:&lt;/p&gt;&#xA;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/buger/goreplay&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;https://github.com/buger/goreplay&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;先下载二进制文件到机器上，使用方法及其简单&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;#假设有两台机器,机器名是vm1和vm2,需要将vm1的8900上的请求流量复制到vm2的8900上,并且限制为get请求,然后将流量缩小为原来的10%，并将vm2的8900上收到的请求和返回输出到文件里，如下操作即可&#xA;&#xA;#vm1&#xA;./gor --input-raw :8900 --output-http=&amp;#34;http://vm2:8900|10%&amp;#34; --http-allow-method GET&#xA;&#xA;#vm2&#xA;./gor --input-raw :8900 --output-http-track-response --input-raw-track-response --output-file=goreplay_response.log&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;以上流程是用goreplay将vm1中8900端口上的请求流量捕获，筛选出GET请求，缩小到10%流量转发给vm2 然后再vm2上用goreplay将vm2中8900端口上的请求流量和返回流量捕获，输出进文件goreplay_response.log中&lt;/p&gt;&#xA;&lt;p&gt;从而实现AB测试&lt;/p&gt;&#xA;&lt;p&gt;操作流程非常简单轻松，还有更多详细的配置参数配置项，有需要可以查查文档，随手记录下。&lt;/p&gt;</description>
+        </item></channel>
+</rss>

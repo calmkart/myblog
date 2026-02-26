@@ -1,0 +1,37 @@
+baseURL: "https://www.calmkart.com/"
+languageCode: zh-cn
+title: cAlm的个人Blog
+theme: hugo-theme-stack
+
+pagination:
+  pagerSize: 10
+
+params:
+  mainSections:
+    - posts
+  sidebar:
+    emoji: ""
+    subtitle: 随手记录些东西
+  comments:
+    enabled: true
+    provider: twikoo
+  twikoo:
+    envId: "calmblog.vercel.app"
+
+menu:
+  main:
+    - name: 首页
+      url: /
+      weight: 1
+    - name: 归档
+      url: /archives
+      weight: 2
+    - name: 分类
+      url: /categories
+      weight: 3
+    - name: 关于
+      url: /about
+      weight: 4
+
+permalinks:
+#  posts: /:year/:month/:slug/  # 根据步骤4记录的URL结构调整

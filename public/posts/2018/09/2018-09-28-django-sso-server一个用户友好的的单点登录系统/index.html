@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="最近写了一个单点登录系统,这里做一些总结.\ngithub地址:(欢迎来star一发^_^) https://github.com/calmkart/Django-sso-server\n">
+<title>Django sso server(一个用户友好的的单点登录系统)</title>
+
+
+<link rel="canonical" href="http://localhost:1313/posts/2018/09/2018-09-28-django-sso-server%E4%B8%80%E4%B8%AA%E7%94%A8%E6%88%B7%E5%8F%8B%E5%A5%BD%E7%9A%84%E7%9A%84%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E7%B3%BB%E7%BB%9F/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="Django sso server(一个用户友好的的单点登录系统)">
+<meta property='og:description' content="最近写了一个单点登录系统,这里做一些总结.\ngithub地址:(欢迎来star一发^_^) https://github.com/calmkart/Django-sso-server\n">
+<meta property='og:url' content='http://localhost:1313/posts/2018/09/2018-09-28-django-sso-server%E4%B8%80%E4%B8%AA%E7%94%A8%E6%88%B7%E5%8F%8B%E5%A5%BD%E7%9A%84%E7%9A%84%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E7%B3%BB%E7%BB%9F/'>
+<meta property='og:site_name' content='cAlm的个人Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='django' /><meta property='article:tag' content='python' /><meta property='article:tag' content='sso' /><meta property='article:tag' content='单点登录' /><meta property='article:published_time' content='2018-09-28T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2018-09-28T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="Django sso server(一个用户友好的的单点登录系统)">
+<meta name="twitter:description" content="最近写了一个单点登录系统,这里做一些总结.\ngithub地址:(欢迎来star一发^_^) https://github.com/calmkart/Django-sso-server\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">cAlm的个人Blog</a></h1>
+            <h2 class="site-description">随手记录些东西</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives' >
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/categories' >
+                
+                <span>分类</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about' >
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/" style="background-color: hsl(208, 60%, 84%); color: hsl(208, 60%, 15%);">
+                计算机
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/posts/2018/09/2018-09-28-django-sso-server%E4%B8%80%E4%B8%AA%E7%94%A8%E6%88%B7%E5%8F%8B%E5%A5%BD%E7%9A%84%E7%9A%84%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E7%B3%BB%E7%BB%9F/">Django sso server(一个用户友好的的单点登录系统)</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2018-09-28T00:00:00Z'>Friday, September 28, 2018</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+
+    <section class="article-content">
+    
+    
+    <p>最近写了一个单点登录系统,这里做一些总结.</p>
+<p><a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/09/5C45207A-AF09-475D-ACD6-E732CFE1596D.png"  target="_blank" rel="noopener"
+    ><img src="images/5C45207A-AF09-475D-ACD6-E732CFE1596D.png" alt="" />
+</a> github地址:(欢迎来star一发^_^) <a class="link" href="https://github.com/calmkart/Django-sso-server"  target="_blank" rel="noopener"
+    >https://github.com/calmkart/Django-sso-server</a></p>
+<h3 id="1流程原理">1.流程原理
+</h3><h4 id="1系统管理流程">&lt;1&gt;.系统管理流程
+</h4><p>管理员在初始化系统时，填写ldap相关设置以及管理员账号相关设置，之后管理员账号可以在管理员后台调整相关配置 其中: a.系统初始化时将自动生成rsa公私钥,系统中所有涉及的密码,都会经过aes加密存放在数据库中,包括rsa私钥也会经过aes加密存放 b.在取用密码时将调用aes解密,加密的salt写在了common/crypto.py中,也可以自己替换</p>
+<h4 id="2用户流程">&lt;2&gt;.用户流程
+</h4><p>用户登录sso系统，验证ldap账号成功后，将用户信息以</p>
+<pre tabindex="0"><code>now = time.time()
+user_info = &#34;{0}|||||{1}&#34;.format(ldap_username, now)
+</code></pre><p>的形式,通过rsa公钥加密写入cookie中，key为sso_user</p>
+<pre tabindex="0"><code>response.set_cookie(&#39;sso_user&#39;, rsa.crypto(
+                public_key, user_info), domain=options.objects.all()[0].cookie_domain)
+</code></pre><p>其他需要接入sso系统的子系统可以通过sso系统的api，来判断用户是否可以登录</p>
+<pre tabindex="0"><code>url:      /api/auth
+method:   POST
+post_json_data:  {&#34;sso_user&#34;:cookie}
+return:     {&#34;status&#34;:True/False, &#34;msg&#34;:username}
+</code></pre><p>本sso系统已提供了相关装饰器，可在管理后台-添加站点的帮助栏查看</p>
+<pre tabindex="0"><code>import requests
+
+def auth_login(func):
+&#39;&#39;&#39;
+装饰器,用于需要登录的views functions,将读取cookie并调用sso的api获取username
+
+也可手动编写相关装饰器
+sso系统的登录鉴权api为&#34;http://sso域名/api/auth&#34;(如&#34;http://sso.calmkart.com/api/auth&#34;)
+用POST方法以json形式将sso_cookie传给上述api,
+返回{&#34;status&#34;:True, &#34;msg&#34;:{username}}则登录成功
+否则{&#34;status&#34;:False, &#34;msg&#34;:{exception}}则登录失败
+
+&#39;&#39;&#39;
+    def _auth(request):
+        cookie = request.COOKIES.get(&#34;sso_user&#34;, &#34;&#34;)
+        if cookie==&#34;&#34;:
+            return HttpResponseRedirect(&#34;{http://sso站域名/}&#34;)
+        r = request.post(&#34;{http://sso站域名/api/auth}&#34;,data={&#34;sso_cookie&#34;:cookie})
+        if r.json()[&#34;status&#34;]==False:
+            return HttpResponseRedirect(&#34;{http://sso站域名}&#34;)
+        else:
+            username = r.json()[&#34;msg&#34;]
+            if username == &#34;&#34; or username == &#34;error&#34;:
+                return HttpResponseRedirect(&#34;{http://sso站域名/}&#34;)
+            else:
+                return func(request, username)
+    return _auth
+</code></pre><p>用户拥有cookie后登陆系统，系统将解cookie，并获取当前时间，若时间不超过最大时间，则返回username</p>
+<h4 id="3企业扫码登陆流程">&lt;3&gt;.企业扫码登陆流程
+</h4><p>在管理后台配置企业微信扫码登陆相关参数，通过企业微信相关js api，生成二维码，用户扫码后，企业微信后台将用户请求重定向到/api/wxlogin  (method:get)上，并加上携带有用户username信息的code参数，成功则写cookie。</p>
+<p> </p>
+<h3 id="2common相关模块原理">2.common相关模块原理
+</h3><p>参见本blog其他博文</p>
+<h4 id="1关于django的图片验证码">&lt;1&gt;<a class="link" href="http://www.calmkart.com/?p=332"  target="_blank" rel="noopener"
+    >关于django的图片验证码</a>
+</h4><h4 id="2关于python操作ldap">&lt;2&gt;<a class="link" href="http://www.calmkart.com/?p=355"  target="_blank" rel="noopener"
+    >关于python操作ldap</a>
+</h4><h4 id="3关于python操作rsaaes加解密">&lt;3&gt;<a class="link" href="http://www.calmkart.com/?p=353"  target="_blank" rel="noopener"
+    >关于python操作rsa,aes加解密</a>
+</h4>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/django/">Django</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+            <a href="/tags/sso/">Sso</a>
+        
+            <a href="/tags/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/">单点登录</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/posts/2018/09/2018-09-18-django%E7%B1%BB%E8%A7%86%E5%9B%BE%E8%A3%85%E9%A5%B0%E5%99%A8/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">django类视图装饰器</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2017/12/2017-12-27-django%E4%BD%BF%E7%94%A8middleware%E5%AE%9E%E7%8E%B0views%E7%9A%84%E8%AE%BF%E9%97%AE%E9%99%90%E5%88%B6/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">django使用middleware实现views的访问限制</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2018/09/2018-09-28-python%E6%93%8D%E4%BD%9Cldap/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">python操作ldap</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2018/09/2018-09-28-python%E6%93%8D%E4%BD%9Crsa%E5%92%8Caes%E5%8A%A0%E8%A7%A3%E5%AF%86/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">python操作rsa和aes加解密</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">django生成图片验证码</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
+<div id="tcomment"></div>
+<style>
+    .twikoo {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+    :root[data-scheme="dark"] {
+        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
+        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
+    }
+    .twikoo .el-input-group__prepend,
+    .twikoo .tk-action-icon,
+    .twikoo .tk-submit-action-icon,
+    .twikoo .tk-time,
+    .twikoo .tk-comments-no,
+    .twikoo .tk-comments-count {
+        color: var(--twikoo-body-text-color);
+    }
+    .twikoo .el-input__inner,
+    .twikoo .el-textarea__inner,
+    .twikoo .tk-preview-container,
+    .twikoo .tk-content,
+    .twikoo .tk-nick,
+    .twikoo .tk-send,
+    .twikoo .tk-comments-no,
+    .twikoo .el-input__count,
+    .twikoo .tk-submit-action-icon {
+        color: var(--twikoo-body-text-color-main)!important;
+    }
+    .twikoo .el-button{
+        color: var(--twikoo-body-text-color)!important;
+    }
+    .twikoo .el-input__count {
+        color: var(--twikoo-body-text-color) !important;
+    }
+    .OwO .OwO-body {
+        background-color: var(--body-background) !important;
+        color: var(--body-text-color) !important;
+    }
+</style><script>
+    twikoo.init({
+        envId: '',
+        el: '#tcomment',})
+</script>
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 cAlm的个人Blog
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.2d3f4e9dd7b2453cd71ff8971f18724ef8b4f783f2e8c70b9a281707db74e8a5.js" defer></script>
+
+
+    </body>
+</html>

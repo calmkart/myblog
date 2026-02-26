@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>权限系统 on cAlm的个人Blog</title>
+        <link>http://localhost:1313/tags/%E6%9D%83%E9%99%90%E7%B3%BB%E7%BB%9F/</link>
+        <description>Recent content in 权限系统 on cAlm的个人Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Thu, 06 Sep 2018 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/%E6%9D%83%E9%99%90%E7%B3%BB%E7%BB%9F/index.xml" rel="self" type="application/rss+xml" /><item>
+            <title>为django-admin的userpermission添加read only(can view)权限</title>
+            <link>http://localhost:1313/posts/2018/09/2018-09-06-%E4%B8%BAdjango-admin%E7%9A%84userpermission%E6%B7%BB%E5%8A%A0read-onlycan-view%E6%9D%83%E9%99%90/</link>
+            <pubDate>Thu, 06 Sep 2018 00:00:00 +0000</pubDate>
+            <guid>http://localhost:1313/posts/2018/09/2018-09-06-%E4%B8%BAdjango-admin%E7%9A%84userpermission%E6%B7%BB%E5%8A%A0read-onlycan-view%E6%9D%83%E9%99%90/</guid>
+            <description>&lt;p&gt;默认的django-admin中用户的models权限只有三个,分别是(Can change, Can add, Can delete),显然的,对于绝大部分crud工程师(^_^)而言,一眼看过去就少了些什么,没错,少了很关键的Can view权限.&lt;/p&gt;&#xA;&lt;p&gt;当然django-admin的用户权限是可以自定义的,需要改permission的meta,这里不细述,发现一个简单好用的django app,可以直接添加Can view权限,美滋滋.&lt;/p&gt;&#xA;&lt;p&gt;最终效果如下 &lt;a class=&#34;link&#34; href=&#34;http://www.calmkart.com/wp-content/uploads/2018/09/B6CE8AA0-F925-4290-B2C0-E3C98ECF0C79.png&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;&lt;img src=&#34;images/B6CE8AA0-F925-4290-B2C0-E3C98ECF0C79.png&#34; alt=&#34;&#34; /&gt;&#xA;&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;插件是: django-admin-view-permission 地址 &lt;a class=&#34;link&#34; href=&#34;https://github.com/ctxis/django-admin-view-permission&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;https://github.com/ctxis/django-admin-view-permission&lt;/a&gt; 使用方式及其简单&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;#pip安装插件&#xA;pip install django-admin-view-permission&#xA;&#xA;#将app注册,记得一定注册在django.contrib.admin之前&#xA;INSTALLED_APPS = [&#xA;    &amp;#39;admin_view_permission&amp;#39;,&#xA;    &amp;#39;django.contrib.admin&amp;#39;,&#xA;    ...&#xA;]&#xA;&#xA;#更新数据库&#xA;python manage.py migrate&#xA;&#xA;即可&#xA;&#xA;#如需要只对一些数据库管用,可以&#xA;ADMIN_VIEW_PERMISSION_MODELS = [&#xA;    &amp;#39;auth.User&amp;#39;,&#xA;    ...&#xA;]&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;的确是个好东西啊,免掉了手写这种本应就有的权限.分享一下.&lt;/p&gt;</description>
+        </item></channel>
+</rss>

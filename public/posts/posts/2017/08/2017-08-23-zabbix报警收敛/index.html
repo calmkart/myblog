@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="因zabbix可能同一段时间报警过多，接受消息时如果不做收敛可能出错也不容易审查，所以需要一个报警收敛机制。\n">
+<title>zabbix报警收敛</title>
+
+
+<link rel="canonical" href="http://localhost:1313/posts/posts/2017/08/2017-08-23-zabbix%E6%8A%A5%E8%AD%A6%E6%94%B6%E6%95%9B/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="zabbix报警收敛">
+<meta property='og:description' content="因zabbix可能同一段时间报警过多，接受消息时如果不做收敛可能出错也不容易审查，所以需要一个报警收敛机制。\n">
+<meta property='og:url' content='http://localhost:1313/posts/posts/2017/08/2017-08-23-zabbix%E6%8A%A5%E8%AD%A6%E6%94%B6%E6%95%9B/'>
+<meta property='og:site_name' content='cAlm的个人Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='python' /><meta property='article:tag' content='zabbix' /><meta property='article:tag' content='报警' /><meta property='article:published_time' content='2017-08-23T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2017-08-23T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="zabbix报警收敛">
+<meta name="twitter:description" content="因zabbix可能同一段时间报警过多，接受消息时如果不做收敛可能出错也不容易审查，所以需要一个报警收敛机制。\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">cAlm的个人Blog</a></h1>
+            <h2 class="site-description">随手记录些东西</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives' >
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/categories' >
+                
+                <span>分类</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about' >
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/" style="background-color: hsl(208, 60%, 84%); color: hsl(208, 60%, 15%);">
+                计算机
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/posts/posts/2017/08/2017-08-23-zabbix%E6%8A%A5%E8%AD%A6%E6%94%B6%E6%95%9B/">zabbix报警收敛</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2017-08-23T00:00:00Z'>Wednesday, August 23, 2017</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+
+    <section class="article-content">
+    
+    
+    <p>因zabbix可能同一段时间报警过多，接受消息时如果不做收敛可能出错也不容易审查，所以需要一个报警收敛机制。</p>
+<p>实验环境分为server端与client端： server端模拟收敛程序通过TCP SOCKET连接接受zabbix报警，做收敛处理并发送； client端模拟zabbix报警程序，通过TCP SOCKET连接发送模拟的zabbix报警给server;</p>
+<p>server端程序如下：</p>
+<pre tabindex="0"><code># -*- coding:utf-8 -*-
+from threading import Timer
+import urllib2
+import socket
+import threading
+import re
+
+#event_list为收敛类型数目列表
+#ip_list为IP收敛字典列表
+#summary为收敛类型说明列表
+#keyw为正则匹配元素
+
+class convergence(object):
+	event_list = [0,0,0,0]
+	summary = [&#39;获取uptime时间失败&#39;,&#39;SNMP_cant_respond_for_5minutes错误&#39;,&#39;OK错误&#39;,&#39;流量速率异常错误&#39;]
+	ip_list = [{},{},{},{}]
+	keyw = [&#39;获取uptime时间失败&#39;,&#39;SNMPcan\&#39;trespondfor5minutes&#39;,&#39;ok&#39;,&#39;流量速度异常&#39;]
+	t = None
+	
+	def convergence(self,event):
+		temp = self.keyword(event)
+		ip = self.findip(event)
+		if temp != 0:
+			#做报警IP收敛
+			if self.ip_list[temp-1].has_key(ip):
+				self.ip_list[temp-1][ip] = self.ip_list[temp-1][ip]+1
+			else:
+				self.ip_list[temp-1][ip] = 1
+			#做报警条目收敛
+			self.event_list[temp-1] = self.event_list[temp-1]+1
+			if self.t == None:
+				self.timer(event)
+			else:
+				pass
+		
+		else:
+			#按原格式发送
+			print event
+			pass
+
+	def send(self,event):
+		print &#39;目前的缓存区为&#39;+str(self.event_list)
+		if max(self.event_list) == 0:
+			pass
+		else:
+			for i in range(0,len(event_list)):
+				if self.event_list[i]==0:
+					pass
+				else:#发送收敛后的报警到指定位置
+					content = str(event_list[i]+&#39;次&#39;+self.summary[i]+&#39;(前20秒内)&#39;)
+					self.event_list[i] = 0
+					self.t = None
+					urllib2.urlopen(&#39;http://www.calmkart.com&#39;)
+					print content
+
+	def timer(self,event):#启动定时器
+		self.t = Timer(20,self.send,args=[event])
+		self.t.start()
+	
+	def keyword(self,event):
+		for i in range(0,len(self.keyw)):
+			if re.search(self.keyw[i],event,flags=re.IGNORECASE) != None:
+				return i+1
+		return 0
+	
+	def findip(self,event):
+		m = re.search(r&#39;(?&lt;![\.\d])(?:\d{1,3}\.){3}\d{1,3}(?![\.\d])&#39;,event)
+		if m is not None:
+			ip = m.group()
+			return str(ip)
+		return &#39;查不到IP&#39;
+
+test = convergence()
+
+#tcp测试,server端，接收
+host = &#39;0.0.0.0&#39;
+port = 9001
+s = socket.socket()
+s.bind((host,port))
+s.listen(5)
+
+while True:
+	c,addr = s.accept()
+	data = c.recv(1024)
+	test.convergence(data)
+	
+##udp测试,server端，接收
+#s= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#host = &#39;10.17.16.207&#39;
+#port = 9001
+#s.bind((host,port))
+#
+#while True:
+#	data,addr = s.recvfrom(2048)
+#	test.convergence(data)
+</code></pre><p> </p>
+<p>clent端程序如下：</p>
+<pre tabindex="0"><code># --- coding:utf-8 ---
+import random
+from multiprocessing.connection import Client
+
+str1 = [
+	&#39;192.168.0.1SNMP错误&#39;,
+        &#39;192.168.0.2SNMP错误&#39;,
+        &#39;192.168.0.100,OK&#39;,
+        &#39;192.168.0.101,ok&#39;,
+	&#39;192.168.0.102,流量速率异常&#39;,
+	&#39;192.168.0.103,流量速率异常&#39;,
+	&#39;192.168.0.104,获取uptime时间失败&#39;,
+	&#39;192.168.0.105,获取uptime时间失败&#39;
+] 
+address = (&#39;0.0.0.0&#39;,9001)
+
+for i in range(0,1000):
+	m = str1[random.randrange(0,11)]
+	conn = Client(address)
+	conn.send(m)
+	conn.close
+</code></pre><p>主要用到的工具是正则表达式做匹配</p>
+<p>代码已上传至github,地址 <a class="link" href="https://github.com/calmkart/Zabbix_convergence"  target="_blank" rel="noopener"
+    >https://github.com/calmkart/Zabbix_convergence</a></p>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/python/">Python</a>
+        
+            <a href="/tags/zabbix/">Zabbix</a>
+        
+            <a href="/tags/%E6%8A%A5%E8%AD%A6/">报警</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/posts/posts/2017/08/2017-08-10-windows%E9%85%8D%E7%BD%AEsnmp-v3%E7%9B%91%E6%8E%A7net-snmp/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">windows配置snmp v3监控(net-snmp)</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/posts/2017/08/2017-08-07-%E7%94%A8telnetlib%E5%BA%93%E5%AE%9E%E7%8E%B0%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%89%B9%E9%87%8F%E7%AE%A1%E7%90%86/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">用telnetlib库实现交换机批量管理</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
+<div id="tcomment"></div>
+<style>
+    .twikoo {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+    :root[data-scheme="dark"] {
+        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
+        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
+    }
+    .twikoo .el-input-group__prepend,
+    .twikoo .tk-action-icon,
+    .twikoo .tk-submit-action-icon,
+    .twikoo .tk-time,
+    .twikoo .tk-comments-no,
+    .twikoo .tk-comments-count {
+        color: var(--twikoo-body-text-color);
+    }
+    .twikoo .el-input__inner,
+    .twikoo .el-textarea__inner,
+    .twikoo .tk-preview-container,
+    .twikoo .tk-content,
+    .twikoo .tk-nick,
+    .twikoo .tk-send,
+    .twikoo .tk-comments-no,
+    .twikoo .el-input__count,
+    .twikoo .tk-submit-action-icon {
+        color: var(--twikoo-body-text-color-main)!important;
+    }
+    .twikoo .el-button{
+        color: var(--twikoo-body-text-color)!important;
+    }
+    .twikoo .el-input__count {
+        color: var(--twikoo-body-text-color) !important;
+    }
+    .OwO .OwO-body {
+        background-color: var(--body-background) !important;
+        color: var(--body-text-color) !important;
+    }
+</style><script>
+    twikoo.init({
+        envId: '',
+        el: '#tcomment',})
+</script>
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 cAlm的个人Blog
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.2d3f4e9dd7b2453cd71ff8971f18724ef8b4f783f2e8c70b9a281707db74e8a5.js" defer></script>
+
+
+    </body>
+</html>
