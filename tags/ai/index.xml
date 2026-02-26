@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ai on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/ai/</link><description>Recent content in Ai on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 03 Nov 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/ai/index.xml" rel="self" type="application/rss+xml"/><item><title>一些想法，来自康德</title><link>https://www.calmkart.com/posts/2025/11/2025-11-03-%E4%B8%80%E4%BA%9B%E6%83%B3%E6%B3%95%E6%9D%A5%E8%87%AA%E5%BA%B7%E5%BE%B7/</link><pubDate>Mon, 03 Nov 2025 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2025/11/2025-11-03-%E4%B8%80%E4%BA%9B%E6%83%B3%E6%B3%95%E6%9D%A5%E8%87%AA%E5%BA%B7%E5%BE%B7/</guid><description>&lt;p&gt;最近学习了很多机器学习、深度学习和LLM相关的知识，有一些不成熟的想法冒出来，想记录下来。因为之前好像未曾听过有人做过类似的类比和思考讨论，但又觉得自己的想法也许很荒谬，会不会被喷呢？&lt;/p&gt;
+&lt;p&gt;不过回头想想，小牛马写的和技术不一定有关的简单文字，应该本来也不会被多少人看到，应该还好。如果各种巧合使您不小心看到该文，即使我的想法很荒谬，也请看过之后一笑而过吧。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id="提问"&gt;提问
+&lt;/h3&gt;&lt;p&gt;康德界定了人类认知世界以及因果律（广义科学）之所以可能的先验边界，那么AI的认知是否存在类似的先验边界？如果有，这些边界又在哪里？是什么使得AI的认知成为可能？&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id="深度学习模型的基本结构"&gt;深度学习模型的基本结构
+&lt;/h3&gt;&lt;p&gt;现代深度学习模型通常采用多层感知机构架：每层由若干神经元组成，每个神经元执行 f(Wx + b) 的运算，其中 f 是非线性激活函数（如 ReLU、GELU），用于增强模型表达能力。虽然被称为“神经网络”，但其结构仅是对生物系统的粗略类比，远非真实脑机制的复现。&lt;/p&gt;
+&lt;p&gt;Attention 机制进一步扩展了这一框架，通过可学习的 Query、Key、Value 投影矩阵，动态建立输入序列内部的依赖关系，使模型能根据上下文调整词的表示，有效解决一词多义等问题。&lt;/p&gt;
+&lt;p&gt;然而，无论最终的机器学习/深度学习/大模型架构如何复杂，都可以概括理解成一个 F(x) 的函数变换：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;输入&lt;/strong&gt;：人给的特征 x；&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;变换&lt;/strong&gt;：经过函数 F(x) 的变换；&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;输出&lt;/strong&gt;：结果 y_hat。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;根据输出 y_hat 和人类认为的正确答案 y 做比对，通过梯度下降的偏微分方程计算，调整 F(x) 函数参数，最终使得 y_hat 尽量接近 y 。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id="预设"&gt;预设
+&lt;/h3&gt;&lt;p&gt;我们在这里做一个预设：假设这种输入 x ，经过系统 F(x)，输出结果 y 的结构，和人脑处理输入的过程是一致的，只是目前的算法远比人脑简单。吴恩达也曾提到，是否未来我们能够找到一个足够复杂的算法，到那时是否就可以达到甚至超越人类智能？我认为不可能。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id="康德哲学的视角"&gt;康德哲学的视角
+&lt;/h3&gt;&lt;p&gt;从哲学上来说，康德曾经为科学（即因果律/充足根据律）之所以可以成立，寻找过边界。康德将世界分为&lt;strong&gt;物自体（实体）&lt;strong&gt;和&lt;/strong&gt;表象（体验）&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;物自体&lt;/strong&gt;可以认识一切，却不能被一切所认识；&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;表象&lt;/strong&gt;是物自体在人类感知中的投影，是我们能够感知到的部分。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="举例说明"&gt;举例说明：
+&lt;/h4&gt;&lt;p&gt;人认识“花”，并不是认识“花”本身，而是认识“花”的颜色、形状、香气（表象）。例如，狗的视觉因为光锥细胞比人少，就只能认识少数几种颜色。但即使是两个人口中说的“红”，心里想的“红”，也不一定就是一样的色彩。人脑对事物的感知本身只是一种“花”作为物自体在“人脑”中的投影（表象）。&lt;/p&gt;
+&lt;h4 id="因果律的本质"&gt;因果律的本质：
+&lt;/h4&gt;&lt;p&gt;因果律（科学，比如春天花会开）之所以存在，不是因为“花”作为物自体本身是这样，而是人脑需要通过因果律（科学）来理解物自体。也就是说，因果律（科学）是属于人脑的体系，是用来感知物自体时我们需要的东西，因为我们需要所以存在，并不是它本身就跟随物自体存在。&lt;/p&gt;
+&lt;p&gt;物自体不可以被认识，但可以通过我们的感知成为符合因果律的表象。当人脑不再感知时，因果律（科学）也不复存在。因此，因果律（广义科学）的边界就在人认识物自体的表象中，而一旦推到物自体本身，则任何因果律（科学）都将失效，也永远不可能被人所认知。这就是科学（因果规律）的边界。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id="类比"&gt;类比
+&lt;/h3&gt;&lt;p&gt;从这个角度出发，我们可以做一个类比：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;人对事物的感知&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;本体通过表象感知物自体；&lt;/li&gt;
+&lt;li&gt;物自体被翻译成若干符合人脑系统所能理解的因果律特征的表象；&lt;/li&gt;
+&lt;li&gt;人脑不可能真正认识物自体，也不可能超越物自体。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;机器学习/深度学习/LLM对事物的感知&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;机器通过人对物自体感知的表象进行学习；&lt;/li&gt;
+&lt;li&gt;对于机器来说，人类对物体感知的表象是机器需要识别的“物自体”；&lt;/li&gt;
+&lt;li&gt;机器不可能真正认识人对物自体感知的表象，也不可能超越人对物自体感知的表象。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;换句话说：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;人永远不可能知道什么是物自体的“花”，只能通过“红”（颜色）、“香”（味道）、“春天花会开”（构建因果律逻辑）来构建表象，间接理解“花”。&lt;/li&gt;
+&lt;li&gt;而机器相较于人更弱一层：它根本不知道什么是物自体的“花”，甚至也无法通过表象去认识物自体的“花”。机器只能通过自己的“脑”（并非人脑的因果律脑），通过人类认识物自体“花”的表象“红”/“香”/“春天花会开”，也永远不可能知道什么是“红”（颜色）、“香”（味道）、“春天花会开”（人的因果律逻辑）。机器只能通过自己的 Attention QKV 矩阵、神经网络非线性变换层，来间接理解“红”（颜色）、“香”（味道）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id="局限性"&gt;局限性
+&lt;/h3&gt;&lt;p&gt;一方面，机器的输入来自人类对事物感知的表象，而这些表象一定符合属于人脑独有的因果律（即广义科学）。另一方面，通过梯度下降训练的标准输出 y 会让 y_hat 也尽量接近人脑独有的因果律（科学结果）。因此，机器永远无法超越人类认识物自体的表象（人脑的认识）。&lt;/p&gt;
+&lt;p&gt;如果人类希望通过机器来学习，从而更好地认识物自体，从这个角度来看是不可能的。机器的认识边界不可能超过人脑对物自体认识的表象，不可能不符合人脑认识事物的因果规律，也就是不可能诞生人脑可以诞生之外的创造性的东西。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id="总的来说"&gt;总的来说
+&lt;/h3&gt;&lt;p&gt;机器学习和深度学习模型的运作方式，本质上是对人类感知世界的模仿，但它始终受限于人类提供的输入和因果律框架。正如康德所言，我们所认识的，从来不是事物本身，而是我们看待事物的方式，人类通过因果律感知物自体，而机器则通过人类的表象感知因果律。&lt;/p&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;科学之所以成立，不是因为它揭示了物自体的真相，&lt;br&gt;
+而是因为它是人类认知结构的一部分——&lt;br&gt;
+我们用因果律去“构造”世界，而非“发现”世界。&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+&lt;p&gt;在这个意义上，机器的学习能力和创造力永远无法超越人类的认知边界。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id="继续提问"&gt;继续提问
+&lt;/h3&gt;&lt;p&gt;人的自由意志是否存在？何以存在？AI的自由意志又何由可以存在呢？&lt;/p&gt;
+&lt;p&gt;更多的问题，有空写个下篇继续简单聊聊&lt;/p&gt;</description></item></channel></rss>

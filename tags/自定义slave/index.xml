@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>自定义slave on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/%E8%87%AA%E5%AE%9A%E4%B9%89slave/</link><description>Recent content in 自定义slave on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Thu, 13 Jun 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/%E8%87%AA%E5%AE%9A%E4%B9%89slave/index.xml" rel="self" type="application/rss+xml"/><item><title>kubernetes+jenkins实现现代cicd流水线(一)</title><link>https://www.calmkart.com/posts/2019/06/2019-06-13-kubernetesjenkins%E5%AE%9E%E7%8E%B0%E7%8E%B0%E4%BB%A3cicd%E6%B5%81%E6%B0%B4%E7%BA%BF%E4%B8%80/</link><pubDate>Thu, 13 Jun 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/06/2019-06-13-kubernetesjenkins%E5%AE%9E%E7%8E%B0%E7%8E%B0%E4%BB%A3cicd%E6%B5%81%E6%B0%B4%E7%BA%BF%E4%B8%80/</guid><description>&lt;p&gt;前面几篇文章已经谈过在k8s中如何实现rook/ceph持久化存储和服务发现/负载均衡/服务暴露策略，接下来几篇文章将以springboot项目为例，详解如何利用kubernetes容器编排平台实现cicd流水线(devops)。&lt;/p&gt;
+&lt;p&gt;我们根据上面几篇文章已经有了一个k8s集群，常见的的cicd工具有jenkins，gitlab-ci和&lt;a class="link" href="https://github.com/drone/drone" target="_blank" rel="noopener"
+ &gt;drone&lt;/a&gt;等等，但因为种种原因(比如gitlabci只支持gitlab，drone需要借助其他git仓库的用户权限系统不支持原生裸git)，这里最终还是选择了jenkins进行实验。&lt;/p&gt;
+&lt;p&gt;首先要解决的肯定是流程上的问题，就是所谓的cicd流程，参考了一些演讲ppt的做法，不过ppt嘛，你懂的，图画的还是很好看，但是也啰里八嗦的，不够简洁明快，有些地方明明很简单却故意讲的很高深莫测好像很厉害的样子，总之就是看着看着就觉得有点好笑 &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/06/%e6%8a%8a%e5%a4%a7%e4%bc%99%e9%80%97%e4%b9%90%e4%ba%86.jpg" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/%e6%8a%8a%e5%a4%a7%e4%bc%99%e9%80%97%e4%b9%90%e4%ba%86.jpg" alt="" /&gt;
+&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;大致流程图我就意思意思吧:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;用户提交代码 &amp;mdash;-&amp;gt; Jenkins触发构建 &amp;mdash;-&amp;gt; 编译打包 &amp;mdash;-&amp;gt; 归档成品 &amp;mdash;-&amp;gt; 制作镜像 &amp;mdash;-&amp;gt;k8s发布&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;其中构建触发这一部分因为是用的多分支流水线，觉得还是用触发扫描api由用户在运维平台点击一下比较好。构建因为是用的基于k8s的jenkins，所以同样用了动态的jenkins-slave，这样就可以做到有工作则自动生成jenkins-slave进行编译，无工作则自动销毁jenkins-slave释放资源，从而实现资源的最大化利用和伸缩性。&lt;/p&gt;
+&lt;p&gt;首先在k8s中部署jenkins 1. 创建jenkins-master-home pvc&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# vim jenkins-master-pvc.yaml
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ name: jenkins-master-home
+ namespace: kube-ops
+ labels:
+ app: jenkins-master-home
+spec:
+ storageClassName: rook-ceph-block
+ accessModes:
+ - ReadWriteOnce
+ resources:
+ requests:
+ storage: 100Gi
+
+# kubectl apply -f jenkins-master-pvc.yaml 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2. 创建 rbac&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# vim rbac.yaml
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ name: jenkins2
+ namespace: kube-ops
+
+---
+
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+ name: jenkins2
+rules:
+ - apiGroups: [&amp;#34;extensions&amp;#34;, &amp;#34;apps&amp;#34;]
+ resources: [&amp;#34;deployments&amp;#34;]
+ verbs: [&amp;#34;create&amp;#34;, &amp;#34;delete&amp;#34;, &amp;#34;get&amp;#34;, &amp;#34;list&amp;#34;, &amp;#34;watch&amp;#34;, &amp;#34;patch&amp;#34;, &amp;#34;update&amp;#34;]
+ - apiGroups: [&amp;#34;&amp;#34;]
+ resources: [&amp;#34;services&amp;#34;]
+ verbs: [&amp;#34;create&amp;#34;, &amp;#34;delete&amp;#34;, &amp;#34;get&amp;#34;, &amp;#34;list&amp;#34;, &amp;#34;watch&amp;#34;, &amp;#34;patch&amp;#34;, &amp;#34;update&amp;#34;]
+ - apiGroups: [&amp;#34;&amp;#34;]
+ resources: [&amp;#34;pods&amp;#34;]
+ verbs: [&amp;#34;create&amp;#34;,&amp;#34;delete&amp;#34;,&amp;#34;get&amp;#34;,&amp;#34;list&amp;#34;,&amp;#34;patch&amp;#34;,&amp;#34;update&amp;#34;,&amp;#34;watch&amp;#34;]
+ - apiGroups: [&amp;#34;&amp;#34;]
+ resources: [&amp;#34;pods/exec&amp;#34;]
+ verbs: [&amp;#34;create&amp;#34;,&amp;#34;delete&amp;#34;,&amp;#34;get&amp;#34;,&amp;#34;list&amp;#34;,&amp;#34;patch&amp;#34;,&amp;#34;update&amp;#34;,&amp;#34;watch&amp;#34;]
+ - apiGroups: [&amp;#34;&amp;#34;]
+ resources: [&amp;#34;pods/log&amp;#34;]
+ verbs: [&amp;#34;get&amp;#34;,&amp;#34;list&amp;#34;,&amp;#34;watch&amp;#34;]
+ - apiGroups: [&amp;#34;&amp;#34;]
+ resources: [&amp;#34;secrets&amp;#34;]
+ verbs: [&amp;#34;get&amp;#34;]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+ name: jenkins2
+roleRef:
+ apiGroup: rbac.authorization.k8s.io
+ kind: ClusterRole
+ name: jenkins2
+subjects:
+ - kind: ServiceAccount
+ name: jenkins2
+ namespace: kube-ops
+
+# kubectl apply -f rbac.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.创建jenkins deployment和service&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# vim jenkins.yaml
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+ name: jenkins2-deployment
+ namespace: kube-ops
+spec:
+ template:
+ metadata:
+ labels:
+ app: jenkins2
+ spec:
+ terminationGracePeriodSeconds: 10
+ serviceAccountName: jenkins2
+ containers:
+ - name: jenkins
+ image: jenkins/jenkins:lts
+ imagePullPolicy: IfNotPresent
+ ports:
+ - containerPort: 8080
+ name: web
+ protocol: TCP
+ - containerPort: 50000
+ name: agent
+ protocol: TCP
+ resources:
+ limits:
+ cpu: 4000m
+ memory: 8Gi
+ requests:
+ cpu: 1000m
+ memory: 2Gi
+ livenessProbe:
+ httpGet:
+ path: /login
+ port: 8080
+ initialDelaySeconds: 60
+ timeoutSeconds: 5
+ failureThreshold: 12
+ readinessProbe:
+ httpGet:
+ path: /login
+ port: 8080
+ initialDelaySeconds: 60
+ timeoutSeconds: 5
+ failureThreshold: 12
+ volumeMounts:
+ - name: jenkinshome
+ subPath: jenkins2
+ mountPath: /var/jenkins_home
+ env:
+ - name: LIMITS_MEMORY
+ valueFrom:
+ resourceFieldRef:
+ resource: limits.memory
+ divisor: 1Mi
+ - name: JAVA_OPTS
+ value: -Xmx$(LIMITS_MEMORY)m -XshowSettings:vm -Dhudson.slaves.NodeProvisioner.initialDelay=0 -Dhudson.slaves.NodeProvisioner.MARGIN=50 -Dhudson.slaves.NodeProvisioner.MARGIN0=0.85 -Duser.timezone=Asia/Shanghai
+ securityContext:
+ fsGroup: 1000
+ volumes:
+ - name: jenkinshome
+ persistentVolumeClaim:
+ claimName: jenkins-master-home
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: jenkins2
+ namespace: kube-ops
+ labels:
+ app: jenkins2
+spec:
+ selector:
+ app: jenkins2
+ type: ClusterIP
+ ports:
+ - name: web
+ port: 8080
+ targetPort: web
+ - name: agent
+ port: 50000
+ targetPort: agent
+
+# kubectl apply -f jenkins.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个时候jenkins就已经起起来了，我们给jenkins的webui添加一个ingress负载均衡和服务暴露&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# vim kube-ops-ingress.yaml
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+ name: kube-ops-ingress
+ annotations:
+ nginx.ingress.kubernetes.io/ssl-redirect: &amp;#34;false&amp;#34;
+ namespace: kube-ops
+spec:
+ rules:
+ - host: k8s-jenkins.example.cn
+ http:
+ paths:
+ - path: /
+ backend:
+ serviceName: jenkins2
+ servicePort: 8080
+
+# kubectl apply -f kube-ops-ingress.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这时候因为ingress service是用的master node的externalIp，所以我们可以直接通过修改dns，将k8s-jenkins.example.cn域名指向master node的externalIp，然后直接访问k8s-jenkins.example.cn就可以访问到jenkins服务。(有问题可以查看下kubectl get ingress -o wide &amp;ndash;all-namespaces)&lt;/p&gt;
+&lt;p&gt;然后安装常见的插件，进入jenkins后记得再安装如下两个插件 blueOcean(新一代的流水线UI)，kubernetes(k8s slave支持)，Multibranch Scan Webhook Trigger(多分枝流水线扫描触发器)&lt;/p&gt;
+&lt;p&gt;安装好之后，进入设置，拉到最下面，选择添加一个云(k8s) &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/06/xzygy.png" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/xzygy.png" alt="" /&gt;
+&lt;/a&gt; 按如上配置，在页面测试连接k8s正常即可(jenkins服务名这里叫jenkins2，按实际修改)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;至于下面的是否添加镜像，我推荐是不在这里添加，而选择用Yaml直接编写添加。原因是，这里添加slave k8s pod tempalte的话，slave编号无法动态化，会导致后以后构建任务等待前任务，无法多slave并行。(很多文章会在这里添加slave pod template，然后用一个自由风格软件项目做例子，那根本无法在实际环境中用的)&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;这里还有个小坑，无论是yaml的slave k8s pod tempalte还是在jenkins设置里页面添加的slave k8s pod template，如果想使用自定义slave image的话，containers: - name 一定要填写成- name: jnlp，否则会不读取自定义slave image而采用官方的&lt;a class="link" href="https://github.com/jenkinsci/docker-jnlp-slave" target="_blank" rel="noopener"
+ &gt;docker-jnlp-slave&lt;/a&gt;。&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;接下来我们创建自己的jenkins-jnlp-slave容器，参考官方的&lt;a class="link" href="https://github.com/jenkinsci/docker-jnlp-slave" target="_blank" rel="noopener"
+ &gt;docker-jnlp-slave&lt;/a&gt; Dockerfile如下&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;ARG VERSION=0.0.1
+ARG user=jenkins
+ARG group=jenkins
+ARG uid=1000
+ARG gid=1000
+
+ENV HOME /home/${user}
+RUN groupadd -g ${gid} ${group}
+RUN useradd -d $HOME -u ${uid} -g ${group} ${user}
+LABEL maintainer=&amp;#34;calmkart@calmkart.com&amp;#34; Description=&amp;#34;jenkins jnlp slave image&amp;#34; Vendor=&amp;#34;calmkart@calmkart.com&amp;#34; Version=&amp;#34;${VERSION}&amp;#34;
+
+ARG AGENT_WORKDIR=/home/${user}/agent
+
+RUN curl --create-dirs -fsSLo /usr/share/jenkins/slave.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/3.29/remoting-3.29.jar \
+ &amp;amp;&amp;amp; chmod 755 /usr/share/jenkins \
+ &amp;amp;&amp;amp; chmod 644 /usr/share/jenkins/slave.jar \
+ &amp;amp;&amp;amp; rm -rf /etc/yum.repos.d/*
+
+COPY kubectl kubectl
+COPY jdk/ ./jdk
+COPY maven ./maven
+COPY jenkins-slave /usr/local/bin/jenkins-slave
+COPY CentOS-Base.repo /etc/yum.repos.d/
+COPY epel.repo /etc/yum.repos.d/
+
+RUN yum makecache \
+ &amp;amp;&amp;amp; yum install -y unzip.x86_64 \
+ &amp;amp;&amp;amp; chmod +x ./kubectl \
+ &amp;amp;&amp;amp; chmod +x /usr/local/bin/jenkins-slave \
+ &amp;amp;&amp;amp; mv ./kubectl /usr/local/bin/kubectl \
+ &amp;amp;&amp;amp; /bin/bash maven/default/install_maven \
+ &amp;amp;&amp;amp; /bin/bash jdk/default/install_jdk \
+ &amp;amp;&amp;amp; yum install -y nodejs \
+ &amp;amp;&amp;amp; yum install -y python36.x86_64 \
+ &amp;amp;&amp;amp; yum install -y docker-ce.x86_64 \
+ &amp;amp;&amp;amp; yum install -y git \
+ &amp;amp;&amp;amp; yum install -y which
+
+USER ${user}
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/maven/bin:/usr/java/jdk/bin
+RUN export PATH=$PATH:/opt/maven/bin:/usr/java/jdk/bin
+ENV AGENT_WORKDIR=${AGENT_WORKDIR}
+RUN mkdir /home/${user}/.jenkins &amp;amp;&amp;amp; mkdir -p ${AGENT_WORKDIR}
+
+VOLUME /home/${user}/.jenkins
+VOLUME ${AGENT_WORKDIR}
+WORKDIR /home/${user}
+
+ENTRYPOINT [&amp;#34;jenkins-slave&amp;#34;]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这里创建的是一个基于centos的jenkins jnlp slave容器镜像，安装了python2,python3,nodejs,docker,kubectl,maven,git等工具和环境。&lt;/p&gt;
+&lt;p&gt;将该镜像build并上传到harbor仓库即可在项目的Jenkinsfile中使用.&lt;/p&gt;
+&lt;p&gt;以下是具体待构建项目中jenkins jnlp slave的pod template信息&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# vim jnlp-slave-declarative.yaml
+metadata:
+ namespace: kube-ops
+spec:
+ containers:
+ - name: jnlp
+ image: harbor.example.org/example/jenkins-jnlp-slave:v0.0.1
+ workingDir: /home/jenkins
+ ttyEnabled: true
+ privileged: false
+ alwaysPullImage: false
+ volumeMounts:
+ - name: volume-0
+ mountPath: /var/run/docker.sock
+ - name: volume-1
+ mountPath: /home/jenkins/.kube
+ - name: volume-2
+ mountPath: /home/jenkins
+ - name: volume-3
+ mountPath: /root/.m2
+ volumes:
+ - name: volume-0
+ hostPath:
+ path: /var/run/docker.sock
+ type: &amp;#34;&amp;#34;
+ - name: volume-1
+ hostPath:
+ path: /root/.kube
+ type: &amp;#34;&amp;#34;
+ - name: volume-2
+ nfs:
+ path: /home/shared/nfs/jenkins-home
+ server: 10.1.33.159
+ - name: volume-3
+ nfs:
+ path: /home/shared/nfs/maven-home
+ server: 10.1.33.159
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;关于这个slave k8s pod template要解释一些东西，这里挂载了4个volume到slave中，分别是&lt;/p&gt;
+&lt;p&gt;1.在slave中调用宿主机的docker命令,用于构造和上传镜像 /var/run/docker.sock -&amp;gt; /var/run/docker.sock&lt;/p&gt;
+&lt;p&gt;2.在slave中调用宿主机的kubectl命令,用于在k8s中发布项目(创建deployment和service) /root/.kube -&amp;gt; /home/jenkins/.kube&lt;/p&gt;
+&lt;p&gt;3.搭建了一个nfs用于多个slave共享workspace,避免多次clone代码 /home/shared/nfs/jenkins-home -&amp;gt; /home/jenkins&lt;/p&gt;
+&lt;p&gt;4.搭建了一个nfs用于多个slave共享本地maven仓库,避免多次下载jar包,同时统一maven配置 /home/shared/nfs/maven-home —&amp;gt; /root/.m2&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;这里为什么不用ceph呢？原因很简单，因为ceph rbd块存储不支持ReadWriteMany，而cephfs共享存储虽然支持ReadWriteMany但是不支持分区。所以还是采用了最简单的nfs实现共享存储。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;在项目的Jenkinsfile中编写如下agent字段调用该pod template的slave&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;def label_tag = &amp;#34;slave-${UUID.randomUUID().toString()}&amp;#34;
+pipeline {
+ agent {
+ kubernetes {
+ label label_tag
+ yamlFile &amp;#39;jnlp-slave-declarative.yaml&amp;#39;
+ }
+ }
+ }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这是申明式pipeline的用法中比较好的写法，因为如果不单独写一个yaml的话我记得是不支持很多细节语法的.（具体细节参考&lt;a class="link" href="https://github.com/jenkinsci/kubernetes-plugin" target="_blank" rel="noopener"
+ &gt;jenkins kubernetes plugin&lt;/a&gt;插件说明）&lt;/p&gt;
+&lt;p&gt;做到这里之后，我们扫描多分支流水线，就可以发现创建一个新slave处理构建任务，构建完成则自动销毁了。 但这还远远不够，很多细节没有处理，下篇文章再详述编译发布构成和申明式Pipeline Jenkinsfile,以及项目Dockerfile镜像详细写法例子。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="历史评论-4-条"&gt;历史评论 (4 条)
+&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;lsprit&lt;/strong&gt; (2019-06-14 19:28)&lt;/p&gt;
+&lt;p&gt;大神，我知道CI是持续集成，CD是什么啊？&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-06-17 13:25)&lt;/p&gt;
+&lt;p&gt;continuous integration continuous deployment&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;lizhengyi&lt;/strong&gt; (2019-06-24 15:37)&lt;/p&gt;
+&lt;p&gt;楼主最近看机会吗，我们组正在招聘运维开发工程师，主要负责公司发布系统和监控系统的开发和维护，公司叫省钱快报，办公地点在北二环，地铁5号线雍和宫站附近，薪资待遇业界上游水平，期待您的回复。&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-06-26 15:06)&lt;/p&gt;
+&lt;p&gt;不好意思,年内没有换工作的意向.&lt;/p&gt;
+
+ &lt;/blockquote&gt;</description></item></channel></rss>

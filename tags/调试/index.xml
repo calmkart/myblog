@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>调试 on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/%E8%B0%83%E8%AF%95/</link><description>Recent content in 调试 on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 21 Oct 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/%E8%B0%83%E8%AF%95/index.xml" rel="self" type="application/rss+xml"/><item><title>使用kubectl-debug来调试pod</title><link>https://www.calmkart.com/posts/2019/10/2019-10-21-%E4%BD%BF%E7%94%A8kubectl-debug%E6%9D%A5%E8%B0%83%E8%AF%95pod/</link><pubDate>Mon, 21 Oct 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/10/2019-10-21-%E4%BD%BF%E7%94%A8kubectl-debug%E6%9D%A5%E8%B0%83%E8%AF%95pod/</guid><description>&lt;p&gt;在k8s环境中,我们经常会碰到各种疑难杂症.比如下面这个例子: 某pod无法启动,查看日志显示原来是init时容器无法拉取某个外部网络上的包.我们exec登陆容器后试图调试下产生这个问题的原因,我们输入ping xxx.xxx.xxx,但sh直接提示&amp;quot;找不到ping命令&amp;quot;,甚至直接无法exec到一个没有sh的容器中. 这样的情况我们该怎么办呢？这里有一个解决类似问题的调试工具&lt;a class="link" href="https://github.com/aylei/kubectl-debug" target="_blank" rel="noopener"
+ &gt;kubectl-debug&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;kubectl-debug的原理也很简单,因为docker容器是基于namespace做的隔离,所以可以创建一个新的预装好了各种调试工具的容器,直接加入待调试容器的namespace中,这样就可以与待调试pod共享各类栈,实现方便调试.(有点类似于k8s中的sidecar设计模式,但是使用的是一个用后既销的独立容器)&lt;/p&gt;
+&lt;p&gt;这里介绍一下简单的使用方式 我们可以直接下载编译好的二进制文件包 &lt;a class="link" href="https://github.com/aylei/kubectl-debug/releases" target="_blank" rel="noopener"
+ &gt;https://github.com/aylei/kubectl-debug/releases&lt;/a&gt; 也可以clone源代码自己做编译(可以获得更多最新修复和更新)&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# 这里要开启docker,因为是通过docker编译的
+git clone https://github.com/aylei/kubectl-debug.git
+cd kubectl-debug
+make
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;最简单的使用方式&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;kubectl-debug POD_NAME
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;kubectl-debug将拉取nicolaka/netshoot镜像作为默认的debug镜像. 过一小会拉取镜像的功夫,我们创建好了一个插入待调试pod namespace中的调试容器,并且已经获取了stdin和stdout,我们就可以进行调试了. 调试完成后exit退出,kubectl-debug将完成相关的清理工作.&lt;/p&gt;
+&lt;p&gt;当然,如果觉得默认的nicolaka/netshoot调试镜像不好用,也可以使用自己的私有镜像进行调试&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# 使用私有仓库镜像,并设置私有仓库使用的kubernetes secret
+# secret data原文请设置为 {Username: , Password: }
+# 默认secret_name为kubectl-debug-registry-secret,默认namspace为default
+kubectl-debug POD_NAME --image calmkart/netshoot:latest --registry-secret-name --registry-secret-namespace 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;甚至如果原pod已经无法启动了,我们可以使用fork模式fork出一个新的待调试pod用于调试(自动替换掉entry-point)&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;kubectl debug POD_NAME --fork
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;更多功能可以参考&lt;a class="link" href="https://github.com/aylei/kubectl-debug/blob/master/docs/zh-cn.md" target="_blank" rel="noopener"
+ &gt;kubectl-debug官方文档&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;总之这个工具还是非常实用的,我也参与添加了一些增强功能和bug修复.k8s官方据说也将在未来版本增加&lt;a class="link" href="https://github.com/kubernetes/enhancements/issues/277" target="_blank" rel="noopener"
+ &gt;临时容器&lt;/a&gt;功能以支持调试,虽然不知道啥时候能用上,但还是期待的.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="历史评论-2-条"&gt;历史评论 (2 条)
+&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;myway&lt;/strong&gt; (2019-10-23 16:59)&lt;/p&gt;
+&lt;p&gt;请问下如何调试生产环境的k8s呢，用kubectl-debug会不会有什么风险？&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-10-24 20:12)&lt;/p&gt;
+&lt;p&gt;你只要不乱搞，看不出有啥风险。
+乱搞,ex:
+1.乱给forkpod打label
+2.在debug container里一顿神操作
+之类.&lt;/p&gt;
+
+ &lt;/blockquote&gt;</description></item></channel></rss>

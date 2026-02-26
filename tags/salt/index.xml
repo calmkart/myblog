@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Salt on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/salt/</link><description>Recent content in Salt on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Fri, 06 Jul 2018 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/salt/index.xml" rel="self" type="application/rss+xml"/><item><title>saltshaker--一个salt的webui</title><link>https://www.calmkart.com/posts/2018/07/2018-07-06-saltshaker-%E4%B8%80%E4%B8%AAsalt%E7%9A%84webui/</link><pubDate>Fri, 06 Jul 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/07/2018-07-06-saltshaker-%E4%B8%80%E4%B8%AAsalt%E7%9A%84webui/</guid><description>&lt;p&gt;salt的webui,官方的是halite,但已经被放弃了，不维护很久了 尝试过其他几个star比较的开源实现,比如saltpad,但要么就是bug满天飞,要么就是技能栈不符难以二次开发 最后发现了一个开源实现叫saltshaker的不错,最终效果如下 &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/07/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_82481f1c-b153-4fb5-928f-2b98163e9635.png" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_82481f1c-b153-4fb5-928f-2b98163e9635.png" alt="" /&gt;
+&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;官方项目地址 &lt;a class="link" href="https://github.com/yueyongyue/saltshaker" target="_blank" rel="noopener"
+ &gt;https://github.com/yueyongyue/saltshaker&lt;/a&gt; 部署文档见 install.txt&lt;/p&gt;
+&lt;p&gt;大致总结过程如下,非详情.&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;git clone https://github.com/yueyongyue/saltshaker.git
+pip install virtualenv
+virtualenv env
+source env/bin/activate
+yum install salt-api.noarch
+
+salt-api --version
+pip install cherrypy==3.8.0
+useradd -M -s /sbin/nologin admin
+passwd admin
+vim /etc/salt/master.d/saltapi.conf
+systemctl restart salt-master.service
+systemctl restart salt-api.service
+systemctl status salt-api.service
+systemctl status salt-master.service
+lsof -i:50075
+pip install Django==1.8.4
+pip install django-crontab
+
+yum install python-devel.x86_64
+yum install mysql-devel
+yum install MySQL-python
+yum install gcc
+
+pip install mysql-python
+
+查源码，改dashboard/views里index函数checkport的端口
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;几个容易踩坑的地方:&lt;/p&gt;
+&lt;p&gt;1.centos7.4用pip安装mysql-python的时候，需要先安装python-devel,mysql-devel,MySQL-python,gcc,否则会报错&lt;/p&gt;
+&lt;p&gt;2.supervisor要自己装，相关配置自己写一下，也容易&lt;/p&gt;
+&lt;p&gt;3.如果salt-api等几个部件没有运行在默认端口，那么启动saltshaker后在首页会显示down的状态，需要修改dashboard/views.py里的index函数checkport里的端口号.&lt;/p&gt;
+&lt;p&gt;4.如果salt-master版本比较高(大于2015.x)，官方yum源的salt-api就没有与之对应的版本了，需要自己下载salt-api的新包，我是自建的yum源，然后&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;createrepo &amp;lt;path&amp;gt;
+createrepo --update &amp;lt;path&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;更新仓库信息，安装最新的包&lt;/p&gt;
+&lt;p&gt;5.django crontab在settings.py里被注释掉了3个，得把注释去掉，然后把所有django crontab跑起来.&lt;/p&gt;
+&lt;p&gt;最后，这个东西感觉也不是很完善好用，不过是django的，二次开发也很容易，有机会再自己来改改。&lt;/p&gt;</description></item><item><title>修改salt源码实现jobs.list_jobs加密账号密码</title><link>https://www.calmkart.com/posts/2017/12/2017-12-18-%E4%BF%AE%E6%94%B9salt%E6%BA%90%E7%A0%81%E5%AE%9E%E7%8E%B0jobs-list_jobs%E5%8A%A0%E5%AF%86%E8%B4%A6%E5%8F%B7%E5%AF%86%E7%A0%81/</link><pubDate>Mon, 18 Dec 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/12/2017-12-18-%E4%BF%AE%E6%94%B9salt%E6%BA%90%E7%A0%81%E5%AE%9E%E7%8E%B0jobs-list_jobs%E5%8A%A0%E5%AF%86%E8%B4%A6%E5%8F%B7%E5%AF%86%E7%A0%81/</guid><description>&lt;p&gt;在salt master中为各个minion运行各种命令，当输入命令中显式带有账号密码时，可以在master端通过 salt.runners.jobs.last_run() salt.runners.jobs.list_job() salt.runners.jobs.list_jobs() salt.runners.jobs.list_jobs_filter() 等种种方法查看到账号密码，这样就会有安全风险。 所以，可以通过修改salt源码的方式实现对显示密码的记录加密。最终效果如下图： &lt;img src="images/zzxg.jpg" alt="" /&gt;
+&lt;/p&gt;
+&lt;p&gt;修改方法很简单，首先找到系统中的salt文件夹，本测试机在&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;/usr/lib/python2.7/dist-packages/salt/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;修改./runners/jobs.py文件&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;#添加函数,这里主要是正则匹配，可以匹配更多的pass选项，实现更多的隐藏密码
+import re
+def encry_pass(target):
+ result = re.sub(r&amp;#34;(?&amp;lt;=--password )\w+&amp;#34;, &amp;#34;*&amp;#34;, target)
+ return result
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;并在list_job()函数，list_jobs()函数，list_jobs_filter()函数，print_job()函数末尾分别加入如下代码&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;#list_job()
+ret = eval(encry_pass(str(ret))) #增加此行
+return ret
+
+#list_jobs()
+mret = eval(encry_pass(str(mret))) #增加此行
+return mret
+
+#list_jobs_filter()
+ret = eval(encry_pass(str(ret))) #增加此行 
+return ret
+
+#print_job()
+ret = eval(encry_pass(str(ret))) #增加此行
+return ret
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;搞定&lt;/p&gt;
+&lt;p&gt;一点小补充： 为什么要用&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;ret = eval(encry_pass(str(ret)))
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;因为ret是dict类型，得先把dict类型转换成str类型再写入encry_pass()正则匹配函数的参数里，然后encry_pass()正则匹配函数返回一个str对象，而ret需要的是dict对象，所以需要再用eval()转回来,也就是 ret(dict)&amp;mdash;-&amp;gt;str(ret)&amp;mdash;&amp;ndash;&amp;gt;ret(str)&amp;mdash;&amp;ndash;&amp;gt;result(str)&amp;mdash;&amp;ndash;&amp;gt;eval(result)&amp;mdash;&amp;ndash;&amp;gt;result(dict)&amp;mdash;&amp;ndash;&amp;gt;ret(dict)&lt;/p&gt;</description></item></channel></rss>

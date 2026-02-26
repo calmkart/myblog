@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/linux/</link><description>Recent content in Linux on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 08 Nov 2017 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>两个简单的linux监控软件</title><link>https://www.calmkart.com/posts/2017/11/2017-11-08-%E4%B8%A4%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84linux%E7%9B%91%E6%8E%A7%E8%BD%AF%E4%BB%B6/</link><pubDate>Wed, 08 Nov 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/11/2017-11-08-%E4%B8%A4%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84linux%E7%9B%91%E6%8E%A7%E8%BD%AF%E4%BB%B6/</guid><description>&lt;p&gt;除了zabbix，nagios这样重量型的监控软件之外，挑选了几个简单的linux监控软件，也还比较好用，记录一下&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1.linux-dash&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;源地址：&lt;a class="link" href="https://github.com/afaqurk/linux-dash" target="_blank" rel="noopener"
+ &gt;https://github.com/afaqurk/linux-dash&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;汉化地址：&lt;a class="link" href="https://github.com/NoBey/linux-dash-zh" target="_blank" rel="noopener"
+ &gt;https://github.com/NoBey/linux-dash-zh&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;安装过程非常简单，不啰嗦了。&lt;/p&gt;
+&lt;p&gt;本服务器试用地址：&lt;a class="link" href="http://linux-dash.calmkart.com/" target="_blank" rel="noopener"
+ &gt;http://linux-dash.calmkart.com/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt; &lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2.psdash&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;源地址：&lt;a class="link" href="https://github.com/Jahaja/psdash" target="_blank" rel="noopener"
+ &gt;https://github.com/Jahaja/psdash&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;安装过程同样略过，很简单。&lt;/p&gt;
+&lt;p&gt;本服务器试用地址：&lt;a class="link" href="http://psdash.calmkart.com/" target="_blank" rel="noopener"
+ &gt;http://psdash.calmkart.com/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;可以感受下到底哪个比较好用。&lt;/p&gt;</description></item><item><title>自用简易VIM配置</title><link>https://www.calmkart.com/posts/2017/08/2017-08-24-%E8%87%AA%E7%94%A8%E7%AE%80%E6%98%93vim%E9%85%8D%E7%BD%AE/</link><pubDate>Thu, 24 Aug 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/08/2017-08-24-%E8%87%AA%E7%94%A8%E7%AE%80%E6%98%93vim%E9%85%8D%E7%BD%AE/</guid><description>&lt;p&gt;最常用到的编辑器VIM，记录一下自用简易配置方式，方便需要的时候使用。&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;cd
+./.vimrc
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;./.vimrc&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;&amp;#34;去掉vi的一致性&amp;#34;
+set nocompatible
+&amp;#34; 隐藏滚动条&amp;#34;
+set guioptions-=r
+set guioptions-=L
+set guioptions-=b
+&amp;#34;隐藏顶部标签栏&amp;#34;
+set showtabline=0
+&amp;#34;设置字体&amp;#34;
+set guifont=Monaco:h13
+syntax on &amp;#34;开启语法高亮&amp;#34;
+set background=dark &amp;#34;设置背景色&amp;#34;
+set fileformat=unix &amp;#34;设置以unix的格式保存文件&amp;#34;
+set tabstop=4 &amp;#34;设置table长度&amp;#34;
+set shiftwidth=4 &amp;#34;同上&amp;#34;
+set showmatch &amp;#34;显示匹配的括号&amp;#34;
+set scrolloff=5 &amp;#34;距离顶部和底部5行&amp;#34;
+set laststatus=2 &amp;#34;命令行为两行&amp;#34;
+set fenc=utf-8 &amp;#34;文件编码&amp;#34;
+set backspace=2
+set mouse=n &amp;#34;启用鼠标&amp;#34;
+set selection=exclusive
+set selectmode=mouse,key
+set matchtime=5
+set ignorecase &amp;#34;忽略大小写&amp;#34;
+set incsearch
+set hlsearch &amp;#34;高亮搜索项&amp;#34;
+set expandtab &amp;#34;不允许扩展table&amp;#34;
+set autoread
+set list
+set listchars=tab:&amp;gt;-
+set nu
+
+map :w:!python %
+
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin &amp;#39;VundleVim/Vundle.vim&amp;#39;
+Plugin &amp;#39;vim-airline/vim-airline&amp;#39;
+call vundle#end()
+
+let g:airline_powerline_fonts = 1
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后安装插件 这里主要安装Vundle管理插件以及界面美化插件vim-airline&lt;/p&gt;
+&lt;p&gt;1.安装Vundle&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;VIM下运行 :BundleInstall 进行安装插件 :BundleClean 卸载没有写在./.vimrc中的插件&lt;/p&gt;
+&lt;p&gt;2.安装vim-airline Plugin &amp;lsquo;vim-airline/vim-airline&amp;rsquo; 既可&lt;/p&gt;
+&lt;p&gt; &lt;/p&gt;
+&lt;p&gt; &lt;/p&gt;
+&lt;p&gt;配置已上传github: &lt;a class="link" href="https://github.com/calmkart/vim_config" target="_blank" rel="noopener"
+ &gt;https://github.com/calmkart/vim_config&lt;/a&gt;&lt;/p&gt;</description></item></channel></rss>

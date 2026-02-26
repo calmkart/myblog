@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Saltstack on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/saltstack/</link><description>Recent content in Saltstack on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Fri, 06 Jul 2018 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/saltstack/index.xml" rel="self" type="application/rss+xml"/><item><title>saltshaker--一个salt的webui</title><link>https://www.calmkart.com/posts/2018/07/2018-07-06-saltshaker-%E4%B8%80%E4%B8%AAsalt%E7%9A%84webui/</link><pubDate>Fri, 06 Jul 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/07/2018-07-06-saltshaker-%E4%B8%80%E4%B8%AAsalt%E7%9A%84webui/</guid><description>&lt;p&gt;salt的webui,官方的是halite,但已经被放弃了，不维护很久了 尝试过其他几个star比较的开源实现,比如saltpad,但要么就是bug满天飞,要么就是技能栈不符难以二次开发 最后发现了一个开源实现叫saltshaker的不错,最终效果如下 &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/07/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_82481f1c-b153-4fb5-928f-2b98163e9635.png" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_82481f1c-b153-4fb5-928f-2b98163e9635.png" alt="" /&gt;
+&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;官方项目地址 &lt;a class="link" href="https://github.com/yueyongyue/saltshaker" target="_blank" rel="noopener"
+ &gt;https://github.com/yueyongyue/saltshaker&lt;/a&gt; 部署文档见 install.txt&lt;/p&gt;
+&lt;p&gt;大致总结过程如下,非详情.&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;git clone https://github.com/yueyongyue/saltshaker.git
+pip install virtualenv
+virtualenv env
+source env/bin/activate
+yum install salt-api.noarch
+
+salt-api --version
+pip install cherrypy==3.8.0
+useradd -M -s /sbin/nologin admin
+passwd admin
+vim /etc/salt/master.d/saltapi.conf
+systemctl restart salt-master.service
+systemctl restart salt-api.service
+systemctl status salt-api.service
+systemctl status salt-master.service
+lsof -i:50075
+pip install Django==1.8.4
+pip install django-crontab
+
+yum install python-devel.x86_64
+yum install mysql-devel
+yum install MySQL-python
+yum install gcc
+
+pip install mysql-python
+
+查源码，改dashboard/views里index函数checkport的端口
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;几个容易踩坑的地方:&lt;/p&gt;
+&lt;p&gt;1.centos7.4用pip安装mysql-python的时候，需要先安装python-devel,mysql-devel,MySQL-python,gcc,否则会报错&lt;/p&gt;
+&lt;p&gt;2.supervisor要自己装，相关配置自己写一下，也容易&lt;/p&gt;
+&lt;p&gt;3.如果salt-api等几个部件没有运行在默认端口，那么启动saltshaker后在首页会显示down的状态，需要修改dashboard/views.py里的index函数checkport里的端口号.&lt;/p&gt;
+&lt;p&gt;4.如果salt-master版本比较高(大于2015.x)，官方yum源的salt-api就没有与之对应的版本了，需要自己下载salt-api的新包，我是自建的yum源，然后&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;createrepo &amp;lt;path&amp;gt;
+createrepo --update &amp;lt;path&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;更新仓库信息，安装最新的包&lt;/p&gt;
+&lt;p&gt;5.django crontab在settings.py里被注释掉了3个，得把注释去掉，然后把所有django crontab跑起来.&lt;/p&gt;
+&lt;p&gt;最后，这个东西感觉也不是很完善好用，不过是django的，二次开发也很容易，有机会再自己来改改。&lt;/p&gt;</description></item><item><title>saltstack的安装和基本使用</title><link>https://www.calmkart.com/posts/2017/11/2017-11-29-saltstack%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/</link><pubDate>Wed, 29 Nov 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/11/2017-11-29-saltstack%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/</guid><description>&lt;p&gt;saltstack可用于批量管理集群,用的是c/s架构，master管理多个minion&lt;/p&gt;
+&lt;p&gt;测试系统：debian8.7&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;一.安装master&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;1.添加apt key&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;wget -O - https://repo.saltstack.com/apt/debian/8/amd64/latest/SALTSTACK-GPG-KEY.pub | sudo apt-key add -
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.将saltstack源添加进apt源&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;vi /etc/apt/sources.list
+#添加saltstack源
+deb http://repo.saltstack.com/apt/debian/8/amd64/latest jessie main
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.更新apt&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;apt-get update
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.安装master端相关组件&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;apt-get install salt-api
+apt-get install salt-cloud
+apt-get install salt-master
+apt-get install salt-minion
+apt-get install salt-ssh
+apt-get install salt-syndic
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.配置master&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;vi /etc/salt/master
+####################常见配置如下####################
+#指定master，冒号后有一个空格
+user: root
+#自动接收minion
+auto_accept: True
+
+#-------以下为可选--------------
+#自动接收minion
+auto_accept: True
+#salt的运行线程，开的线程越多一般处理的速度越快，但一般不要超过CPU的个数
+worker_threads: 10
+# master的管理端口
+publish_port : 4505
+# master跟minion的通讯端口，用于文件服务，认证，接受返回结果等
+ret_port : 4506
+# 如果这个master运行的salt-syndic连接到了一个更高层级的master,那么这个参数需要配置成连接到的这个高层级master的监听端口
+syndic_master_port : 4506
+# 指定pid文件位置
+pidfile: /var/run/salt-master.pid
+# saltstack 可以控制的文件系统的开始位置
+root_dir: /
+# 日志文件地址
+log_file: /var/log/salt_master.log
+# 分组设置
+nodegroups:
+ group_all: &amp;#39;*&amp;#39;
+# salt state执行时候的根目录
+file_roots:
+ base:
+ - /srv/salt/
+# 设置pillar 的根目录
+pillar_roots:
+ base:
+ - /srv/pillar
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;6.启动master&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;systemctl start salt-master
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;二.安装minion&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;1.安装salt-minion&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;apt-get install salt-minion
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.配置minion相关信息&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;vi /etc/salt/minion
+
+###################以下为常见设置###########################
+#指定master，冒号后有一个空格
+master: 10.32.80.121
+
+#-------以下为可选--------------
+# minion的识别ID，可以是IP，域名，或是可以通过DNS解析的字符串
+id: xx
+# salt运行的用户权限
+user: root
+# master的识别ID，可以是IP，域名，或是可以通过DNS解析的字符串
+master : ip
+# master通讯端口
+master_port: 4506
+# 备份模式，minion是本地备份，当进行文件管理时的文件备份模式
+backup_mode: minion
+# 执行salt-call时候的输出方式
+output: nested 
+# minion等待master接受认证的时间
+acceptance_wait_time: 10
+# 失败重连次数，0表示无限次，非零会不断尝试到设置值后停止尝试
+acceptance_wait_time_max: 0
+# 重新认证延迟时间，可以避免因为master的key改变导致minion需要重新认证的syn风暴
+random_reauth_delay: 60
+# 日志文件位置
+log_file: /var/logs/salt_minion.log
+# 文件路径基本位置
+file_roots:
+ base:
+ - /etc/salt/minion/file
+# pillar基本位置
+pillar_roots:
+ base:
+ - /data/salt/minion/pillar
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.启动minion&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;systemctl start salt-minion
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;三.通过master管理minion&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;1.配置key&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;#查看当前所有的key
+salt-key
+
+#注册所有key
+salt-key -A
+
+#注册某个key
+salt-key -a minion_id
+
+#删除全部key
+salt-key -D
+
+#删除某个key
+salt-key -d minion_id
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.测试是否连通&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;#测试所有minion的连通性
+salt &amp;#39;*&amp;#39; test.ping
+
+#测试某个minion的连通性
+salt &amp;#39;minion_id&amp;#39; test.ping
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.常用命令&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;#salt cmd.run用于让minion批量执行命令
+salt &amp;#39;*&amp;#39; cmd.run &amp;#39;ifconfig&amp;#39;
+salt &amp;#39;minion_id&amp;#39; cmd.run &amp;#39;ifconfig&amp;#39;
+
+#salt-run manage查看minioni信息
+salt-run manage.status #查看所有minion状态
+salt-run manage.down ##查看down掉的minion
+salt-run manage.up ##查看up的minion
+
+#salt-key管理密钥
+salt-key [options]
+salt-key -L ##查看所有minion-key
+salt-key -a &amp;lt;key-name&amp;gt; ##接受某个minion-key
+salt-key -d &amp;lt;key-name&amp;gt; ##删除某个minion-key
+salt-key -A ##接受所有的minion-key
+salt-key -D ##删除所有的minion-key
+
+#salt-call在minion上执行某命令
+salt-call [options] &amp;lt;function&amp;gt; [arguments]
+salt-call test.ping ##自己执行test.ping命令
+salt-call cmd.run &amp;#39;ifconfig&amp;#39; ##自己执行cmd.run函数
+
+#salt-cp分发文件给minion(不支持目录分发)
+salt-cp &amp;#39;*&amp;#39; testfile.html /tmp #把testfile.html发送到所有minion的/tmp文件夹
+salt-cp &amp;#39;test*&amp;#39; index.html /tmp/a.html #把index.html发送到所有test*的minion并重命名为/tmp/a.html
+
+#目标minion分组
+修改/etc/salt/master
+nodegroups:
+ testgroup1: &amp;#39;L@test82.salt.cn,test83.salt.cn&amp;#39;
+ testgroup2: &amp;#39;192.168.2.84&amp;#39;
+#-N为分组命令符
+salt -N testgroup1 test.ping
+#分组分为多种类型：
+ G -- 针对 Grains 做单个匹配，例如：G@os:Ubuntu
+ E -- 针对 minion 针对正则表达式做匹配，例如：E@web\d+.(dev|qa|prod).loc
+ P -- 针对 Grains 做正则表达式匹配，例如：P@os:(RedHat|Fedora|CentOS)
+ L -- 针对 minion 做列表匹配，例如：L@minion1.example.com,minion3.domain.com or bl*.domain.com
+ I -- 针对 Pillar 做单个匹配，例如：I@pdata:foobar
+ S -- 针对子网或是 IP 做匹配，例如：S@192.168.1.0/24 or S@192.168.1.100
+ R -- 针对客户端范围做匹配，例如： R@%foo.bar
+&lt;/code&gt;&lt;/pre&gt;</description></item></channel></rss>

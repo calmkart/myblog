@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Virt-Manager on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/virt-manager/</link><description>Recent content in Virt-Manager on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Thu, 19 Sep 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/virt-manager/index.xml" rel="self" type="application/rss+xml"/><item><title>virt-manager libxml2 module bug解决</title><link>https://www.calmkart.com/posts/2019/09/2019-09-19-virt-manager-libxml2-module-bug%E8%A7%A3%E5%86%B3/</link><pubDate>Thu, 19 Sep 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/09/2019-09-19-virt-manager-libxml2-module-bug%E8%A7%A3%E5%86%B3/</guid><description>&lt;p&gt;&lt;a class="link" href="https://github.com/virt-manager/virt-manager" target="_blank" rel="noopener"
+ &gt;virt-manager&lt;/a&gt;是一个kvm的管理工具，在自己用的小型环境里还是很方便的，我也用了挺久。因为是mac所以是用&lt;a class="link" href="https://github.com/jeffreywildman/homebrew-virt-manager" target="_blank" rel="noopener"
+ &gt;homebrew-virt-manager&lt;/a&gt;。之前一直用的老版本，最近mac更新，而且老版本有存储池无法从/var/lib/libvirt/里切换的bug，所以通过brew更新到了最新的2.2.1版本，就出现了 &lt;strong&gt;No module named &amp;rsquo;libxml2&amp;rsquo;&lt;/strong&gt;  的bug，通过google和官方issue找不到解决办法，最终自己解决，这里记录一下，方便其他需要的朋友查询。&lt;/p&gt;
+&lt;p&gt;主要的症状是brew安装或者更新完成homebrew-virt-manager后，运行virt-manager会显示&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;File &amp;#34;/usr/local/Cellar/virt-manager/2.2.1_2/libexec/share/virt-manager/virtinst/xmlapi.py&amp;#34;, line 7, in &amp;lt;module&amp;gt;
+ import libxml2
+ModuleNotFoundError: No module named &amp;#39;libxml2&amp;#39;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;原因是默认的包从python2升级到了python3。&lt;/p&gt;
+&lt;p&gt;我们首先安装python3的libxml2包&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;pip3 install libxml2-python3
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后查询安装位置&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;➜ ~ python3
+Python 3.7.1 (default, Nov 6 2018, 18:49:54)
+[Clang 9.0.0 (clang-900.0.39.2)] on darwin
+Type &amp;#34;help&amp;#34;, &amp;#34;copyright&amp;#34;, &amp;#34;credits&amp;#34; or &amp;#34;license&amp;#34; for more information.
+&amp;gt;&amp;gt;&amp;gt; import libxml2
+&amp;gt;&amp;gt;&amp;gt; print(libxml2.__file__)
+/usr/local/lib/python3.7/site-packages/libxml2.py
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后将libxml2包和相关包从系统python3的默认site-packages拷贝到virt-manager的site-packages中即可&lt;/p&gt;
+&lt;p&gt;参考上面显示的路径，既是将&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;/usr/local/lib/python3.7/site-packages/libxml*&lt;/strong&gt; &lt;/p&gt;
+&lt;p&gt;拷贝到&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;/usr/local/Cellar/virt-manager/2.2.1_2/libexec/lib/python3.7/site-packages&lt;/strong&gt;&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;cp -r /usr/local/lib/python3.7/site-packages/libxml* /usr/local/Cellar/virt-manager/2.2.1_2/libexec/lib/python3.7/site-packages
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt; &lt;/p&gt;
+&lt;p&gt;TIPS:&lt;/p&gt;
+&lt;p&gt;1，注意要拷贝libxml*而不仅仅是libxml2.py，因为libxml2还依赖libxml2mod。拷贝少了还是会报找不到包。&lt;/p&gt;
+&lt;p&gt;2，我们也可以将python3的package添加到默认PYTHONPATH中去，也可以解决这个问题。&lt;/p&gt;
+&lt;p&gt;3，顺便记录一个virt / virt-manager使用的问题，更换默认存储池后新建的默认存储池必须设置名称为default，不然会自动在/var/lib/libvirt/目录下重建默认存储池&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="历史评论-1-条"&gt;历史评论 (1 条)
+&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;huku&lt;/strong&gt; (2019-09-20 19:26)&lt;/p&gt;
+&lt;p&gt;非常感谢，前几个月碰到同样的问题了，一直没找到解决方法&lt;/p&gt;
+
+ &lt;/blockquote&gt;</description></item></channel></rss>

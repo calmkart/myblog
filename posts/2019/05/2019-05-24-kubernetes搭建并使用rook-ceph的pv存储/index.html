@@ -1,0 +1,138 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下.\n"><title>kubernetes搭建并使用rook/ceph的pv存储</title><link rel=canonical href=https://www.calmkart.com/posts/2019/05/2019-05-24-kubernetes%E6%90%AD%E5%BB%BA%E5%B9%B6%E4%BD%BF%E7%94%A8rook-ceph%E7%9A%84pv%E5%AD%98%E5%82%A8/><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=preload as=style href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap"><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap"><link rel=stylesheet href=/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css><meta property='og:title' content="kubernetes搭建并使用rook/ceph的pv存储"><meta property='og:description' content="k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下.\n"><meta property='og:url' content='https://www.calmkart.com/posts/2019/05/2019-05-24-kubernetes%E6%90%AD%E5%BB%BA%E5%B9%B6%E4%BD%BF%E7%94%A8rook-ceph%E7%9A%84pv%E5%AD%98%E5%82%A8/'><meta property='og:site_name' content='cAlm的个人Blog'><meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='ceph'><meta property='article:tag' content='k8s'><meta property='article:tag' content='kubernetes'><meta property='article:tag' content='rook'><meta property='article:tag' content='分布式存储'><meta property='article:tag' content='运维开发'><meta property='article:published_time' content='2019-05-24T00:00:00+00:00'><meta property='article:modified_time' content='2019-05-24T00:00:00+00:00'><meta name=twitter:title content="kubernetes搭建并使用rook/ceph的pv存储"><meta name=twitter:description content="k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下.\n"></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><div class=site-meta><h1 class=site-name><a href=/>cAlm的个人Blog</a></h1><h2 class=site-description>随手记录些东西</h2></div></header><ol class=menu id=main-menu><li><a href=/><span>首页</span></a></li><li><a href=/archives><span>归档</span></a></li><li><a href=/categories><span>分类</span></a></li><li><a href=/about><span>关于</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/ style=background-color:#bed8ef;color:#0f283d>计算机</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/posts/2019/05/2019-05-24-kubernetes%E6%90%AD%E5%BB%BA%E5%B9%B6%E4%BD%BF%E7%94%A8rook-ceph%E7%9A%84pv%E5%AD%98%E5%82%A8/>kubernetes搭建并使用rook/ceph的pv存储</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2019-05-24T00:00:00Z>Friday, May 24, 2019</time></div></footer></div></header><section class=article-content><p>k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下.</p><p>首先有一个三个节点的k8s集群 <a class=link href=http://www.calmkart.com/wp-content/uploads/2019/05/111.png target=_blank rel=noopener><img src=images/111.png alt>
+</a>首先创建rook-ceph-common</p><pre tabindex=0><code>wget https://raw.githubusercontent.com/rook/rook/master/cluster/examples/kubernetes/ceph/common.yaml
+kubectl apply -f common.yaml
+</code></pre><p>然后创建rook-ceph-operator</p><pre tabindex=0><code>wget https://raw.githubusercontent.com/rook/rook/release-1.0/cluster/examples/kubernetes/ceph/operator.yaml
+kubectl apply -f operator.yaml
+</code></pre><p>以上两步基本上不会出啥问题,标准配置 接下来创建cluster的问题比较多,贴上我的配置</p><pre tabindex=0><code>vim cluster.yaml
+
+apiVersion: ceph.rook.io/v1
+kind: CephCluster
+metadata:
+  name: rook-ceph
+  namespace: rook-ceph
+spec:
+  cephVersion:
+    image: ceph/ceph:v14.2.1-20190430
+    allowUnsupported: true
+  #设置data路径到自己规划的路径
+  dataDirHostPath: /home/shared/rook
+  mon:
+    count: 3
+    allowMultiplePerNode: true
+  dashboard:
+    enabled: true
+    port: 8443
+    urlPrefix: /
+    #关闭https
+    ssl: false
+  network:
+    #如要在k8s集群外使用,这里可以打开
+    hostNetwork: false
+  rbdMirroring:
+    workers: 0
+  storage:
+    #全节点使用
+    useAllNodes: true
+    useAllDevices: false
+    deviceFilter:
+    config:
+      osdsPerDevice: &#34;1&#34;
+    directories:
+    - path: /home/shared/rook
+</code></pre><pre tabindex=0><code>kubectl apply -f cluster.yaml
+</code></pre><p>查看部署情况 <a class=link href=http://www.calmkart.com/wp-content/uploads/2019/05/2.png target=_blank rel=noopener><img src=images/2.png alt>
+</a>这样就基本上没问题了,k8s中的每个Node会启两个pod(rook-ceph-agent和rook-discover),并且mgr和osd都没问题。 然后给ceph-dashboard提供NodePort的外部访问service</p><pre tabindex=0><code>vim dashboard-external-http.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rook-ceph-mgr-dashboard-external-https
+  namespace: rook-ceph
+  labels:
+    app: rook-ceph-mgr
+    rook_cluster: rook-ceph
+spec:
+  ports:
+  - name: dashboard
+    port: 8443
+    protocol: TCP
+    targetPort: 8443
+  selector:
+    app: rook-ceph-mgr
+    rook_cluster: rook-ceph
+  sessionAffinity: None
+  type: NodePort
+</code></pre><pre tabindex=0><code>kubectl apply -f dashboard-external-https.yaml
+</code></pre><p>然后查看下service的情况,是否正常 <a class=link href=http://www.calmkart.com/wp-content/uploads/2019/05/3.png target=_blank rel=noopener><img src=images/3.png alt>
+</a>这样就对了,可以访问一下http://:，看看是不是能进ceph-dashboard</p><p>一般情况下问题不大,查看admin的默认密码</p><pre tabindex=0><code>kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath=&#34;{[&#39;data&#39;][&#39;password&#39;]}&#34; | base64 --decode &amp;&amp; echo
+</code></pre><p>但是admin登陆进去了之后，肯定会疯狂500错误，查了下官方的issue，这里有bug。</p><p><strong>解决办法是:</strong> <strong>在dashboard里创建一个新role角色(右上角用户管理,roles)，把权限全钩上，然后去掉iscsi的所有权限。</strong> <strong>接着创建一个新用户,绑定这个新的role角色,最后用新用户登陆</strong></p><p>接着创建pool和storage用于自动生成pvc匹配的pv</p><pre tabindex=0><code>vim storageclass.yaml
+
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: replicapool
+  namespace: rook-ceph
+spec:
+  replicated:
+    size: 2
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+   name: rook-ceph-block
+provisioner: ceph.rook.io/block
+parameters:
+  blockPool: replicapool
+  clusterNamespace: rook-ceph
+  fstype: xfs
+</code></pre><pre tabindex=0><code>kubectl apply -f storagecalss.yaml
+</code></pre><p>创建pool和storage之后通过dashboard或者命令 kubectl get cephcluster -n rook-ceph 查看一下集群是否health，如果是health就没毛病了</p><p>最后测试一下申请一个pvc看看是否会自动生成pv与之绑定</p><pre tabindex=0><code>apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jenkins-home
+  namespace: kube-ops
+  labels:
+    app: jenkins-home
+spec:
+  storageClassName: rook-ceph-block
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+</code></pre><p><a class=link href=http://www.calmkart.com/wp-content/uploads/2019/05/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_dd2a2f8b-10fb-4f3f-8d21-bbaa31a4ba7d.png target=_blank rel=noopener><img src=images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_dd2a2f8b-10fb-4f3f-8d21-bbaa31a4ba7d.png alt>
+</a>可见，管用了.</p><p><strong>外加一些小tips:</strong></p><p>如果rook-ceph配置有误需要还原重新配置,一定要遵循官方的清理步骤 <a class=link href=https://rook.github.io/docs/rook/v1.0/ceph-teardown.html target=_blank rel=noopener>https://rook.github.io/docs/rook/v1.0/ceph-teardown.html</a> 切记要删除掉所有k8s的node上配置的data文件夹,不然会导致新集群无法初始化.</p><p>创建不出pod很多都是权限原因或者node无法调度,需要检查下rbac权限设置或者各个node的情况.</p><p>最后附上rook项目的github地址: <a class=link href=https://github.com/rook/rook target=_blank rel=noopener>https://github.com/rook/rook</a></p><hr><h2 id=历史评论-2-条>历史评论 (2 条)</h2><p><em>以下评论来自原 WordPress 站点，仅作存档展示。</em></p><blockquote><p><strong>huan</strong> (2019-05-28 16:30)</p><p>大佬又开始搞K8S，我要跟着学习学习</p></blockquote><blockquote><p>↳ <strong>calmkart</strong> (2019-05-29 17:06)</p><p>学学学,建议买课,极客时间张磊博士的深入剖析k8s很好</p></blockquote></section><footer class=article-footer><section class=article-tags><a href=/tags/ceph/>Ceph</a>
+<a href=/tags/k8s/>K8s</a>
+<a href=/tags/kubernetes/>Kubernetes</a>
+<a href=/tags/rook/>Rook</a>
+<a href=/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/>分布式存储</a>
+<a href=/tags/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/>运维开发</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/posts/2018/09/2018-09-28-python%E6%93%8D%E4%BD%9Cldap/><div class=article-details><h2 class=article-title>python操作ldap</h2></div></a></article><article><a href=/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/><div class=article-details><h2 class=article-title>django生成图片验证码</h2></div></a></article><article><a href=/posts/2018/09/2018-09-18-django%E7%B1%BB%E8%A7%86%E5%9B%BE%E8%A3%85%E9%A5%B0%E5%99%A8/><div class=article-details><h2 class=article-title>django类视图装饰器</h2></div></a></article><article><a href=/posts/2018/09/2018-09-06-%E4%B8%BAdjango-admin%E7%9A%84userpermission%E6%B7%BB%E5%8A%A0read-onlycan-view%E6%9D%83%E9%99%90/><div class=article-details><h2 class=article-title>为django-admin的userpermission添加read only(can view)权限</h2></div></a></article><article><a href=/posts/2018/07/2018-07-23-%E4%B8%80%E4%B8%AA%E8%87%AA%E8%A7%A3%E6%9E%90nginx-upstream%E5%92%8Clocation%E5%B9%B6%E6%A3%80%E6%B5%8B%E8%BF%9E%E9%80%9A%E6%80%A7%E7%9A%84web%E7%B3%BB%E7%BB%9F/><div class=article-details><h2 class=article-title>一个自解析nginx upstream和location并检测连通性的web系统</h2></div></a></article></div></div></aside><div id=tcomment></div><script src=https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js></script><script>twikoo.init({envId:"calmblog.vercel.app",el:"#tcomment",lang:"zh-CN"})</script><footer class=site-footer><section class=copyright>&copy;
+2026 cAlm的个人Blog</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=4.0.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><script type=module>
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main></div><script type=text/javascript src=/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js defer></script></body></html>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>验证码 on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/%E9%AA%8C%E8%AF%81%E7%A0%81/</link><description>Recent content in 验证码 on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 18 Sep 2018 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/%E9%AA%8C%E8%AF%81%E7%A0%81/index.xml" rel="self" type="application/rss+xml"/><item><title>django生成图片验证码</title><link>https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/</link><pubDate>Tue, 18 Sep 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/</guid><description>&lt;p&gt;最近在做一个好玩的通用django单点登录系统，登录系统少不了验证码，参考了一下别人的做法和开源项目，总结一下。&lt;/p&gt;
+&lt;p&gt;结果如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_837b19bb-98df-4c26-afae-6678c91ff47a.png" alt="" /&gt;
+&lt;/p&gt;
+&lt;p&gt;主要思路流程是，后端根据随机码绘图，然后做混淆(我这里几乎没做模糊之类的混淆)，最后将随机验证码写进后端session里，前端获取图像后，提交时与session里的验证码做比较。流程还是比较简单的，大致代码如下。&lt;/p&gt;
+&lt;p&gt;1.captcha_handle.py&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;captcha_handle.py
+#用于生成随机字符串以及生成验证码图片
+
+# -*- coding:utf-8 -*-
+import random,string
+from PIL import Image,ImageDraw,ImageFont,ImageFilter
+
+#生成随机字符串
+def _getRandomChar():
+ #string模块包含各种字符串，以下为小写字母加数字
+ ran = string.ascii_lowercase+string.digits
+ char = &amp;#39;&amp;#39;
+ for i in range(4):
+ char += random.choice(ran)
+ return char
+
+#返回一个随机的RGB颜色
+def _getRandomColor():
+ return (random.randint(50,150),random.randint(50,150),random.randint(50,150))
+
+def create_captcha():
+
+ #创建图片，模式，大小，背景色
+ img = Image.new(&amp;#39;RGB&amp;#39;, (120,30), (255,255,255))
+ #创建画布
+ draw = ImageDraw.Draw(img)
+ #设置字体
+ font = ImageFont.truetype(&amp;#39;Arial.ttf&amp;#39;, 25)
+
+ code = _getRandomChar()
+ #将生成的字符画在画布上
+ for t in range(4):
+ draw.text((30*t+5,0),code[t],_getRandomColor(),font)
+
+ #生成干扰点
+ for _ in range(random.randint(0,50)):
+ #位置，颜色
+ draw.point((random.randint(0, 120), random.randint(0, 30)),fill=_getRandomColor())
+
+ #使用模糊滤镜使图片模糊
+ # img = img.filter(ImageFilter.BLUR)
+ #保存
+ #img.save(&amp;#39;&amp;#39;.join(code)+&amp;#39;.jpg&amp;#39;,&amp;#39;jpeg&amp;#39;)
+ return img,code
+
+if __name__ == &amp;#39;__main__&amp;#39;:
+ create_code()
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.views.py&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;views.py
+#视图，生成验证码图片和code，返回图片，code存进session
+class get_captcha(View):
+
+ def get(self, request):
+ &amp;#39;&amp;#39;&amp;#39;
+ 生成验证码图片和验证码code,返回验证码图片,并以形式将验证码存放在session里
+ &amp;#39;&amp;#39;&amp;#39;
+ try:
+ f = BytesIO()
+ img, code = create_captcha()
+ request.session[&amp;#34;captcha&amp;#34;] = code
+ img.save(f,&amp;#39;PNG&amp;#39;)
+ return HttpResponse(f.getvalue())
+ except Exception as e:
+ log().error(str(e))
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.login.html&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;{# html #}
+&amp;lt;div class=&amp;#34;col-xs-4&amp;#34;&amp;gt;
+ &amp;lt;img id=&amp;#34;captcha_img&amp;#34; src=&amp;#34;{% url &amp;#39;get_captcha&amp;#39; %}&amp;#34; onclick=&amp;#34;refresh_captcha()&amp;#34; style=&amp;#34;margin-top: 28px;&amp;#34;&amp;gt;
+ &amp;lt;p class=&amp;#34;help-block&amp;#34; onclick=&amp;#34;refresh_captcha()&amp;#34;&amp;gt;
+ 看不清楚?换一张!
+ &amp;lt;/p&amp;gt;
+&amp;lt;/div&amp;gt;
+
+{# js #}
+&amp;lt;script&amp;gt;
+ //刷新验证码
+ function refresh_captcha() {
+ $(&amp;#34;#captcha_img&amp;#34;).attr(&amp;#34;src&amp;#34;,$(&amp;#34;#captcha_img&amp;#34;)[0].src + &amp;#39;?&amp;#39;);
+ };
+&amp;lt;/script&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.url.py&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;url(r&amp;#39;^get_captcha/$&amp;#39;,cas_views.get_captcha.as_view(), name=&amp;#34;get_captcha&amp;#34;),
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.views.py&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;#校验验证码是否正确
+if request.session[&amp;#34;captcha&amp;#34;].lower() != captcha.lower():
+ return JsonResponse({&amp;#34;status&amp;#34;:False, &amp;#34;msg&amp;#34;:&amp;#34;验证码错误!&amp;#34;})
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;一些代码是参考网络上其他开源代码，不过其实也挺简单的，熟悉request.session就差不多了。做个记录。&lt;/p&gt;</description></item></channel></rss>

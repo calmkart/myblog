@@ -1,0 +1,74 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="9.装饰器 既将函数传参给装饰器函数，在函数执行的上下文作某些通用操作。\n记得要用@wraps复制函数名称(__name__)，等等属性\n使用举例：\nfrom functools import wraps def requires_auth(f): @wraps(f) def decorated(*args, **kwargs): auth = request.authorization if not auth or not check_auth(auth.username, auth.password): #若未登录，返回401 authenticate() return f(*args, **kwargs) return decorated "><title>《Python进阶》读书笔记(2)</title><link rel=canonical href=https://www.calmkart.com/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02/><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=preload as=style href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap"><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap"><link rel=stylesheet href=/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css><meta property='og:title' content="《Python进阶》读书笔记(2)"><meta property='og:description' content="9.装饰器 既将函数传参给装饰器函数，在函数执行的上下文作某些通用操作。\n记得要用@wraps复制函数名称(__name__)，等等属性\n使用举例：\nfrom functools import wraps def requires_auth(f): @wraps(f) def decorated(*args, **kwargs): auth = request.authorization if not auth or not check_auth(auth.username, auth.password): #若未登录，返回401 authenticate() return f(*args, **kwargs) return decorated "><meta property='og:url' content='https://www.calmkart.com/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02/'><meta property='og:site_name' content='cAlm的个人Blog'><meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='python'><meta property='article:published_time' content='2017-11-15T00:00:00+00:00'><meta property='article:modified_time' content='2017-11-15T00:00:00+00:00'><meta name=twitter:title content="《Python进阶》读书笔记(2)"><meta name=twitter:description content="9.装饰器 既将函数传参给装饰器函数，在函数执行的上下文作某些通用操作。\n记得要用@wraps复制函数名称(__name__)，等等属性\n使用举例：\nfrom functools import wraps def requires_auth(f): @wraps(f) def decorated(*args, **kwargs): auth = request.authorization if not auth or not check_auth(auth.username, auth.password): #若未登录，返回401 authenticate() return f(*args, **kwargs) return decorated "></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><div class=site-meta><h1 class=site-name><a href=/>cAlm的个人Blog</a></h1><h2 class=site-description>随手记录些东西</h2></div></header><ol class=menu id=main-menu><li><a href=/><span>首页</span></a></li><li><a href=/archives><span>归档</span></a></li><li><a href=/categories><span>分类</span></a></li><li><a href=/about><span>关于</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/ style=background-color:#bed8ef;color:#0f283d>计算机
+</a><a href=/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/ style=background-color:#d4efbe;color:#243d0f>读书笔记</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02/>《Python进阶》读书笔记(2)</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2017-11-15T00:00:00Z>Wednesday, November 15, 2017</time></div></footer></div></header><section class=article-content><h4 id=9装饰器>9.装饰器</h4><p>既将函数传参给装饰器函数，在函数执行的上下文作某些通用操作。</p><p>记得要用@wraps复制函数名称(__name__)，等等属性</p><p>使用举例：</p><pre tabindex=0><code>from functools import wraps
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            #若未登录，返回401
+            authenticate()
+        return f(*args, **kwargs)
+    return decorated
+</code></pre><h4 id=10可变数据类型和不可变数据类型>10.可变数据类型和不可变数据类型</h4><p>可变数据类型：list,dict</p><p>不可变数据类型：int,float,string,tuple</p><p>可变不可变，指的是变量指向的值：可变，就是说可以改变指向的值而地址不变。不可变，就是说改变变量的值必然改变地址。</p><p>python中的赋值(=)，就是左侧得到右侧内存的引用。</p><p>举例说明：</p><pre tabindex=0><code>a = [1]
+print a  #----&gt;[1]
+b = a
+b.append(2)
+print a #-----&gt;[1,2]
+</code></pre><p>因为list为可变数据类型，而a和b指向同一片内存。当对b做+=操作时，只是向后扩充内存内容，而不会修改内存位置。所以a也改变了。</p><p>同时要注意，python函数被定义时，默认参数只会被计算一次，不会每次都计算。所以，默认参数最好不要用可变数据类型，就算要用，也要注意在之后不要对其做修改。</p><h4 id=11__slots__>11.__slots__</h4><p>在类的定义中使用__slots__=[&ldquo;name&rdquo;,&ldquo;age&rdquo;]，则只有__slots__这个set中的属性可以被分配内存，不在其中的不可被分配内存。</p><h4 id=12容器collections>12.容器collections</h4><p>1.defaultdict</p><p>调用不存在的key时，会用默认的工厂方法作为key默认值.</p><p>举例说明：</p><pre tabindex=0><code>from collections import defaultdic
+
+favourite_colors = defaultdict(list)
+for name,color in colors:
+    favourite_colors[name].append(color)
+    #默认用name这个list作为KEY
+</code></pre><p>2.counter计数器</p><pre tabindex=0><code>from collections import counter
+c= counter(...)#为内部元素计数
+favs = counter(name for name,color in colors)
+#为name计数,以dict返回
+</code></pre><p>3.deque双向链表</p><pre tabindex=0><code>from collections import deque
+</code></pre><p>4.namedtuple命名元组</p><pre tabindex=0><code>from collections import namedtuple
+
+animal = namedtuple(&#39;animal&#39;, &#39;name age type&#39;)
+perry = animal(name=&#34;perry&#34;, age=31, type=&#34;cat&#34;)
+#可以访问perry.name这样访问属性
+print perry.name
+#输出perry
+#可将命名元组转换为dict，用_asdict()方法
+perry._asdict()
+</code></pre><h4 id=13dir>13.dir()</h4><p>返回对象所有属性和方法</p><p>举例：</p><pre tabindex=0><code>a = [1,2,3]
+print dir(a)
+</code></pre><h4 id=14type和id>14.type()和id()</h4><p>type()返回对象类型，id()返回不同种类对象唯一ID</p><h4 id=15推导式>15.推导式</h4><p>1.列表推导式</p><p>通过for和if生成list</p><p>举例说明：</p><pre tabindex=0><code>m=[i for i in range(30) if i%3 is 0]
+#------------这是list-----这是条件-----
+</code></pre><p>语法：</p><pre tabindex=0><code>variable = [out_exp for out_exp in input_list if out_exp==2]
+#----------------------------------这是list------这是条件----
+</code></pre><p>2.字典推导式</p><pre tabindex=0><code>dict = {v:k for k,v in some_dict.items()}
+</code></pre><p> </p><p><a class=link href="http://www.calmkart.com/?p=124" target=_blank rel=noopener>《Python进阶》读书笔记(1)</a> <a class=link href="http://www.calmkart.com/?p=150" target=_blank rel=noopener>《Python进阶》读书笔记(3)</a></p></section><footer class=article-footer><section class=article-tags><a href=/tags/python/>Python</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01/><div class=article-details><h2 class=article-title>《Python进阶》读书笔记(1)</h2></div></a></article><article><a href=/posts/2017/09/2017-09-05-%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%92%8C%E7%BC%96%E7%A0%81/><div class=article-details><h2 class=article-title>(转)字符串和编码</h2></div></a></article><article><a href=/posts/2017/09/2017-09-04-%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E6%94%AF%E6%8C%81%E8%87%AA%E5%BB%BA%E8%AF%8D%E5%BA%93%E7%9A%84%E8%83%8C%E8%8B%B1%E8%AF%AD%E5%8D%95%E8%AF%8D%E7%BD%91%E7%AB%99/><div class=article-details><h2 class=article-title>一个简单的，支持自建词库的背英语单词网站</h2></div></a></article><article><a href=/posts/2017/08/2017-08-23-zabbix%E6%8A%A5%E8%AD%A6%E6%94%B6%E6%95%9B/><div class=article-details><h2 class=article-title>zabbix报警收敛</h2></div></a></article><article><a href=/posts/2017/08/2017-08-07-%E7%94%A8telnetlib%E5%BA%93%E5%AE%9E%E7%8E%B0%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%89%B9%E9%87%8F%E7%AE%A1%E7%90%86/><div class=article-details><h2 class=article-title>用telnetlib库实现交换机批量管理</h2></div></a></article></div></div></aside><div id=tcomment></div><script src=https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js></script><script>twikoo.init({envId:"calmblog.vercel.app",el:"#tcomment",lang:"zh-CN"})</script><footer class=site-footer><section class=copyright>&copy;
+2026 cAlm的个人Blog</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=4.0.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><script type=module>
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main></div><script type=text/javascript src=/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js defer></script></body></html>

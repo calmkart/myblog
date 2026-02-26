@@ -1,0 +1,1360 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>K8s on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/k8s/</link><description>Recent content in K8s on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 10 Dec 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/k8s/index.xml" rel="self" type="application/rss+xml"/><item><title>使用kubefwd对k8s中的service进行本地化调试</title><link>https://www.calmkart.com/posts/2019/12/2019-12-10-%E4%BD%BF%E7%94%A8kubefwd%E5%AF%B9k8s%E4%B8%AD%E7%9A%84service%E8%BF%9B%E8%A1%8C%E6%9C%AC%E5%9C%B0%E5%8C%96%E8%B0%83%E8%AF%95/</link><pubDate>Tue, 10 Dec 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/12/2019-12-10-%E4%BD%BF%E7%94%A8kubefwd%E5%AF%B9k8s%E4%B8%AD%E7%9A%84service%E8%BF%9B%E8%A1%8C%E6%9C%AC%E5%9C%B0%E5%8C%96%E8%B0%83%E8%AF%95/</guid><description>&lt;p&gt;大家都知道,k8s中的服务(service)是对k8s中的deployment等对象的一个一致访问点.所以service会有一个vip(headless service没有).无论是普通service的vip或者headless service的pod ip其实都是k8s集群中的内部ip,在集群内访问它是非常容易的.比如有一个service叫nginx,我们在集群内的另一个pod里既可以对这个nginx service的vip进行get访问,也可以通过coredns对这个nginx service的域名如(nginx, nginx.default等)进行访问.但是在集群外呢?这就麻烦了.&lt;/p&gt;
+&lt;p&gt;常见的集群外访问service的方式大致分为 LoadBalance, NodePort, ExternalIp等方式, 再细致一点也可以通过Ingress在7层做一层分发再外接上述流量接入,甚至你可以直接将api server做proxy. 很显然的，这些方式如果在我们只是需要对服务进行调试或者随便用用的场景都是要么太复杂(Ingress), 要么花钱(LoadBanlence),要么不靠谱(NodePort).&lt;/p&gt;
+&lt;p&gt;这时候你会说,嗷,我们可以使用kubectl port-forward 功能,将service的端口port-forward到本地端口.对，没错，这确实是一个不错的解决方式，但这仍然存在非常多的问题。&lt;/p&gt;
+&lt;p&gt;比如,我们并不想要将nginx service的80端口port-forward到我的8080端口上，就想用80端口，那么如果有两个service分别叫nginx1和nginx2，这不就没法弄了吗？再比如，如果我们port-forward的svc的pod发生了变动,怎么办？再比如,我们就是想像在集群内一样，通过service的内部域名对其访问(nginx, nginx.default等)，怎么办？再比如，如果我们有100个服务，难道我们要手动对每个服务port-forward然后手动选择一个没用过的端口吗？甚至，当我们的服务创建,删除,我们又得手动操作,这是何等的麻烦？&lt;/p&gt;
+&lt;p&gt;基于上述问题,一个叫&lt;a class="link" href="https://github.com/txn2/kubefwd" target="_blank" rel="noopener"
+ &gt;kubefwd&lt;/a&gt;的工具出现了。&lt;/p&gt;
+&lt;p&gt;我们先从使用开始。 首先有一个集群,有nginx和nginx1两个service,其中nginx是普通service,而nginx1是headless service.&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;➜ ~ kubectl get pods
+NAME READY STATUS RESTARTS AGE
+nginx-deployment-5cdfb5fc49-fgn78 1/1 Running 0 24d
+nginx-deployment-5cdfb5fc49-rjg26 1/1 Running 0 24d
+nginx-deployment1-75c5577b94-tp7zr 1/1 Running 0 21d
+nginx-deployment1-75c5577b94-vcpn5 1/1 Running 0 21d
+pi-gw8s7 0/1 Completed 0 74d
+➜ ~ kubectl get service
+NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE
+kubernetes ClusterIP 10.96.0.1 443/TCP 74d
+nginx ClusterIP 10.101.159.59 80/TCP 33d
+nginx1 ClusterIP None 80/TCP 21d
+➜ ~
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后我们下载最新版的kubefwd(&lt;a class="link" href="https://github.com/txn2/kubefwd/releases" target="_blank" rel="noopener"
+ &gt;release&lt;/a&gt;)在本地运行。&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;➜ kubefwd git:(master) sudo kubefwd svc
+Password:
+INFO[11:44:47] _ _ __ _
+INFO[11:44:47] | | ___ _| |__ ___ / _|_ ____| |
+INFO[11:44:47] | |/ / | | | &amp;#39;_ \ / _ \ |_\ \ /\ / / _ |
+INFO[11:44:47] | &amp;lt;| |_| | |_) | __/ _|\ V V / (_| |
+INFO[11:44:47] |_|\_\\__,_|_.__/ \___|_| \_/\_/ \__,_|
+INFO[11:44:47]
+INFO[11:44:47] Version 0.0.0
+INFO[11:44:47] https://github.com/txn2/kubefwd
+INFO[11:44:47]
+INFO[11:44:47] Press [Ctrl-C] to stop forwarding.
+INFO[11:44:47] &amp;#39;cat /etc/hosts&amp;#39; to see all host entries.
+INFO[11:44:47] Loaded hosts file /etc/hosts
+INFO[11:44:47] Hostfile management: Original hosts backup already exists at /Users/calmkart/hosts.original
+WARN[11:44:47] WARNING: No Pod selector for service kubernetes in default on cluster .
+INFO[11:44:47] Forwarding: nginx1:80 to pod nginx-deployment1-75c5577b94-tp7zr:80
+INFO[11:44:47] Forwarding: nginx-deployment1-75c5577b94-tp7zr.nginx1:80 to pod nginx-deployment1-75c5577b94-tp7zr:80
+INFO[11:44:47] Forwarding: nginx-deployment1-75c5577b94-vcpn5.nginx1:80 to pod nginx-deployment1-75c5577b94-vcpn5:80
+INFO[11:44:47] Forwarding: nginx:80 to pod nginx-deployment-5cdfb5fc49-fgn78:80
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;我们可以通过控制台INFO输出清晰的看到,我们已经将普通service nginx port-forward到了它的第一个pod nginx-deployment-5cdfb5fc49-fgn78上，将headless service nginx1 port-forward到了它的第一个pod上，同时还port-forward到了它的每一个pod上(因为headless service中的pod是不等价的).&lt;/p&gt;
+&lt;p&gt;接着我们查看一下本机的hosts&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;➜ ~ cat /etc/hosts
+##
+# Host Database
+#
+# localhost is used to configure the loopback interface
+# when the system is booting. Do not change this entry.
+##
+127.0.0.1 localhost
+127.1.27.1 nginx1 nginx1.default.svc.cluster.local nginx1.default
+127.1.27.2 nginx-deployment1-75c5577b94-tp7zr.nginx1 nginx-deployment1-75c5577b94-tp7zr.nginx1.default.svc.cluster.local nginx-deployment1-75c5577b94-tp7zr.nginx1.default
+127.1.27.3 nginx-deployment1-75c5577b94-vcpn5.nginx1 nginx-deployment1-75c5577b94-vcpn5.nginx1.default.svc.cluster.local nginx-deployment1-75c5577b94-vcpn5.nginx1.default
+127.1.27.4 nginx nginx.default.svc.cluster.local nginx.default
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;厉害了，居然多出了这么多记录。 从这个hosts看起来，我们访问nginx1/nginx1.default.svc.cluster.local/nginx1.default应该都可以访问到k8s集群中的nginx1服务; 我们访问nginx/nginx.default.svc.cluster.local/nginx.default应该都可以访问到k8s集群中的nginx服务,我们来尝试一下。 使用httpie试试&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;➜ ~ http get nginx1
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Connection: keep-alive
+Content-Length: 612
+Content-Type: text/html
+Date: Tue, 10 Dec 2019 03:57:05 GMT
+ETag: &amp;#34;58e66cf5-264&amp;#34;
+Last-Modified: Thu, 06 Apr 2017 16:29:41 GMT
+Server: nginx/1.11.13
+
+➜ ~ http get nginx
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Connection: keep-alive
+Content-Length: 612
+Content-Type: text/html
+Date: Tue, 10 Dec 2019 03:57:17 GMT
+ETag: &amp;#34;54999765-264&amp;#34;
+Last-Modified: Tue, 23 Dec 2014 16:25:09 GMT
+Server: nginx/1.7.9
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;厉害了也，真的管用。&lt;/p&gt;
+&lt;p&gt;我们尝试在k8s集群中新添加一个service叫nginx2,这个服务和nginx1一样是一个headless service&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: nginx-deployment2
+ labels:
+ app: nginx2
+spec:
+ replicas: 2
+ selector:
+ matchLabels:
+ app: nginx2
+ template:
+ metadata:
+ labels:
+ app: nginx2
+ test: test
+ test1: test1
+ spec:
+ containers:
+ - name: nginx
+ image: nginx:latest
+ ports:
+ - containerPort: 80
+ readinessProbe:
+ tcpSocket:
+ port: 80
+ livenessProbe:
+ tcpSocket:
+ port: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: nginx2
+spec:
+ clusterIP: None
+ selector:
+ app: nginx2
+ ports:
+ - protocol: TCP
+ port: 80
+ targetPort: 80
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt; &lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;➜ ~ kubectl apply -f nginx2.yaml
+deployment.apps/nginx-deployment2 created
+service/nginx2 created
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个时候我们发现运行的kubefwd INFO记录显示了如下内容&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;INFO[12:01:12] Forwarding: nginx2:80 to pod nginx-deployment2-5995ddf44f-6r9fg:80
+INFO[12:01:12] Forwarding: nginx-deployment2-5995ddf44f-6r9fg.nginx2:80 to pod nginx-deployment2-5995ddf44f-6r9fg:80
+INFO[12:01:12] Forwarding: nginx-deployment2-5995ddf44f-d5q9d.nginx2:80 to pod nginx-deployment2-5995ddf44f-d5q9d:80
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;我们来看看Hosts&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;127.1.27.5 nginx2 nginx2.default.svc.cluster.local nginx2.default
+127.1.27.6 nginx-deployment2-5995ddf44f-6r9fg.nginx2 nginx-deployment2-5995ddf44f-6r9fg.nginx2.default.svc.cluster.local nginx-deployment2-5995ddf44f-6r9fg.nginx2.default
+127.1.27.7 nginx-deployment2-5995ddf44f-d5q9d.nginx2 nginx-deployment2-5995ddf44f-d5q9d.nginx2.default.svc.cluster.local nginx-deployment2-5995ddf44f-d5q9d.nginx2.default
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;果然，新添加了这些记录。看来我们通过本地域名解析nginx2就可以访问到nginx2服务啦.我们来试试.&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;➜ ~ http get nginx2
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Connection: keep-alive
+Content-Length: 612
+Content-Type: text/html
+Date: Tue, 10 Dec 2019 04:03:23 GMT
+ETag: &amp;#34;5dd3e500-264&amp;#34;
+Last-Modified: Tue, 19 Nov 2019 12:50:08 GMT
+Server: nginx/1.17.6
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;果然，和我们预想的一样。 最后我们通过ctrl+c停止kubefwd.&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;^CWARN[12:04:08] Stopped forwarding nginx-deployment1-75c5577b94-vcpn5.nginx1 in default.
+WARN[12:04:08] Stopped forwarding nginx-deployment2-5995ddf44f-d5q9d.nginx2 in default.
+WARN[12:04:08] Stopped forwarding nginx2 in default.
+WARN[12:04:08] Stopped forwarding nginx in default.
+WARN[12:04:08] Stopped forwarding nginx-deployment2-5995ddf44f-6r9fg.nginx2 in default.
+WARN[12:04:08] Stopped forwarding nginx1 in default.
+WARN[12:04:08] Stopped forwarding nginx-deployment1-75c5577b94-tp7zr.nginx1 in default.
+INFO[12:04:08] Done...
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;terminal中显示我们停止了nginx,nginx1,nginx2的转发,我们再来看看hosts呢？&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;##
+# Host Database
+#
+# localhost is used to configure the loopback interface
+# when the system is booting. Do not change this entry.
+##
+127.0.0.1 localhost
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;果然，已经清理完毕了。&lt;/p&gt;
+&lt;p&gt;以上基本就是常规使用的全过程，接下来大致讲讲原理吧。&lt;/p&gt;
+&lt;p&gt;kubefwd项目过去的运行机制是在运行时通过api-server拉取k8s中的所有service服务信息(List),并将服务分为普通服务和无头服务两类,通过普通服务的第一个pod/无头服务的每一个pod的port-forward subresource对其做转发,并在本地为其创建无人使用的环回接口ip,将其转发上去,实现端口的隔离。&lt;/p&gt;
+&lt;p&gt;后来代码经过我的一次很大的重构,目前的流程是像一个自定义控制器一样,在启动时ListAndWatch api-server的service信息，能够自动感知api-server的服务变化，当服务被创建/删除，服务转发的pod被修改/删除时开启对应的goroutine对其进行port-forward并修改Hosts(过程中加锁).当kubefwd被停止时(或者某service被删除时)启动清理流程，结束转发并清理hosts.&lt;/p&gt;
+&lt;p&gt;其实原理上并不复杂，但确实是能在k8s环境中解决某一个方向上的问题的。 欢迎大家来试着使用使用。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="历史评论-1-条"&gt;历史评论 (1 条)
+&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;1&lt;/strong&gt; (2019-12-16 17:03)&lt;/p&gt;
+&lt;p&gt;1&lt;/p&gt;
+
+ &lt;/blockquote&gt;</description></item><item><title>使用kubectl-debug来调试pod</title><link>https://www.calmkart.com/posts/2019/10/2019-10-21-%E4%BD%BF%E7%94%A8kubectl-debug%E6%9D%A5%E8%B0%83%E8%AF%95pod/</link><pubDate>Mon, 21 Oct 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/10/2019-10-21-%E4%BD%BF%E7%94%A8kubectl-debug%E6%9D%A5%E8%B0%83%E8%AF%95pod/</guid><description>&lt;p&gt;在k8s环境中,我们经常会碰到各种疑难杂症.比如下面这个例子: 某pod无法启动,查看日志显示原来是init时容器无法拉取某个外部网络上的包.我们exec登陆容器后试图调试下产生这个问题的原因,我们输入ping xxx.xxx.xxx,但sh直接提示&amp;quot;找不到ping命令&amp;quot;,甚至直接无法exec到一个没有sh的容器中. 这样的情况我们该怎么办呢？这里有一个解决类似问题的调试工具&lt;a class="link" href="https://github.com/aylei/kubectl-debug" target="_blank" rel="noopener"
+ &gt;kubectl-debug&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;kubectl-debug的原理也很简单,因为docker容器是基于namespace做的隔离,所以可以创建一个新的预装好了各种调试工具的容器,直接加入待调试容器的namespace中,这样就可以与待调试pod共享各类栈,实现方便调试.(有点类似于k8s中的sidecar设计模式,但是使用的是一个用后既销的独立容器)&lt;/p&gt;
+&lt;p&gt;这里介绍一下简单的使用方式 我们可以直接下载编译好的二进制文件包 &lt;a class="link" href="https://github.com/aylei/kubectl-debug/releases" target="_blank" rel="noopener"
+ &gt;https://github.com/aylei/kubectl-debug/releases&lt;/a&gt; 也可以clone源代码自己做编译(可以获得更多最新修复和更新)&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# 这里要开启docker,因为是通过docker编译的
+git clone https://github.com/aylei/kubectl-debug.git
+cd kubectl-debug
+make
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;最简单的使用方式&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;kubectl-debug POD_NAME
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;kubectl-debug将拉取nicolaka/netshoot镜像作为默认的debug镜像. 过一小会拉取镜像的功夫,我们创建好了一个插入待调试pod namespace中的调试容器,并且已经获取了stdin和stdout,我们就可以进行调试了. 调试完成后exit退出,kubectl-debug将完成相关的清理工作.&lt;/p&gt;
+&lt;p&gt;当然,如果觉得默认的nicolaka/netshoot调试镜像不好用,也可以使用自己的私有镜像进行调试&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# 使用私有仓库镜像,并设置私有仓库使用的kubernetes secret
+# secret data原文请设置为 {Username: , Password: }
+# 默认secret_name为kubectl-debug-registry-secret,默认namspace为default
+kubectl-debug POD_NAME --image calmkart/netshoot:latest --registry-secret-name --registry-secret-namespace 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;甚至如果原pod已经无法启动了,我们可以使用fork模式fork出一个新的待调试pod用于调试(自动替换掉entry-point)&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;kubectl debug POD_NAME --fork
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;更多功能可以参考&lt;a class="link" href="https://github.com/aylei/kubectl-debug/blob/master/docs/zh-cn.md" target="_blank" rel="noopener"
+ &gt;kubectl-debug官方文档&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;总之这个工具还是非常实用的,我也参与添加了一些增强功能和bug修复.k8s官方据说也将在未来版本增加&lt;a class="link" href="https://github.com/kubernetes/enhancements/issues/277" target="_blank" rel="noopener"
+ &gt;临时容器&lt;/a&gt;功能以支持调试,虽然不知道啥时候能用上,但还是期待的.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="历史评论-2-条"&gt;历史评论 (2 条)
+&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;myway&lt;/strong&gt; (2019-10-23 16:59)&lt;/p&gt;
+&lt;p&gt;请问下如何调试生产环境的k8s呢，用kubectl-debug会不会有什么风险？&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-10-24 20:12)&lt;/p&gt;
+&lt;p&gt;你只要不乱搞，看不出有啥风险。
+乱搞,ex:
+1.乱给forkpod打label
+2.在debug container里一顿神操作
+之类.&lt;/p&gt;
+
+ &lt;/blockquote&gt;</description></item><item><title>kubernetes scheduler流程图</title><link>https://www.calmkart.com/posts/2019/09/2019-09-18-kubernetes-scheduler%E6%B5%81%E7%A8%8B%E5%9B%BE/</link><pubDate>Wed, 18 Sep 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/09/2019-09-18-kubernetes-scheduler%E6%B5%81%E7%A8%8B%E5%9B%BE/</guid><description>&lt;p&gt;最近在跟着&lt;a class="link" href="https://github.com/farmer-hutao/k8s-source-code-analysis" target="_blank" rel="noopener"
+ &gt;《k8s-1.13版本源码分析》&lt;/a&gt;读k8s源码，顺着流程把scheduler调度器模块过了一遍，文中有一幅k8s  scheduler调度器工作流程图画的不错，这里做个记录备忘。&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/09/kube-scheduler-workflow.png" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/kube-scheduler-workflow.png" alt="" /&gt;
+&lt;/a&gt;&lt;/p&gt;</description></item><item><title>配置和使用kube-prometheus</title><link>https://www.calmkart.com/posts/2019/08/2019-08-22-%E9%85%8D%E7%BD%AE%E5%92%8C%E4%BD%BF%E7%94%A8kube-prometheus/</link><pubDate>Thu, 22 Aug 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/08/2019-08-22-%E9%85%8D%E7%BD%AE%E5%92%8C%E4%BD%BF%E7%94%A8kube-prometheus/</guid><description>&lt;p&gt;我们在k8s集群中使用云原生的promethues通常需要用到coreos的&lt;a class="link" href="https://github.com/coreos/prometheus-operator" target="_blank" rel="noopener"
+ &gt;prometheus-operater&lt;/a&gt;，它可以方便的帮助我们在k8s中部署和配置使用prometheus。但prometheus并不是开箱即用的，如果要做到开箱即用的监控全家桶，官方提供了两个选择，分别是&lt;a class="link" href="https://github.com/helm/charts/tree/master/stable/prometheus-operator" target="_blank" rel="noopener"
+ &gt;prometheus-operater helm chart&lt;/a&gt;和&lt;a class="link" href="https://github.com/coreos/kube-prometheus" target="_blank" rel="noopener"
+ &gt;kube-prometheus&lt;/a&gt;。这两者都可以为我们提供开箱即用的方式部署promethues+alertmanager+promethues-push-gateway(kube-promethueus不包含,需要单独部署)+grafana全家桶，同时包含&lt;a class="link" href="https://github.com/kubernetes-monitoring/kubernetes-mixin" target="_blank" rel="noopener"
+ &gt;kubernetes-mixin&lt;/a&gt;的一整套报警规则和node-exporter，kube-state-metrics等一系列metrics exporter。区别在于helm chart由社区维护，而kube-promethues由coreos维护。这里我们将以kube-prometheus为例，简要说明配置和使用方式。&lt;/p&gt;
+&lt;p&gt;首先是部署，还是非常简单的，我们先将kube-prometheus的仓库clone下来&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;git clone https://github.com/coreos/kube-prometheus.git
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后根据官方文档操作即可&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;$ kubectl create -f manifests/
+
+# It can take a few seconds for the above &amp;#39;create manifests&amp;#39; command to fully create the following resources, so verify the resources are ready before proceeding.
+$ until kubectl get customresourcedefinitions servicemonitors.monitoring.coreos.com ; do date; sleep 1; echo &amp;#34;&amp;#34;; done
+$ until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo &amp;#34;&amp;#34;; done
+
+$ kubectl apply -f manifests/ # This command sometimes may need to be done twice (to workaround a race condition).
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这里将自动为我们部署prometheus，alertmanager和grafana。我们接下来可以通过port-forward也可以通过ingress将服务暴露出来&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;Prometheus
+
+$ kubectl --namespace monitoring port-forward svc/prometheus-k8s 9090
+
+Then access via http://localhost:9090
+
+Grafana
+
+$ kubectl --namespace monitoring port-forward svc/grafana 3000
+
+Then access via http://localhost:3000 and use the default grafana user:password of admin:admin.
+
+Alert Manager
+
+$ kubectl --namespace monitoring port-forward svc/alertmanager-main 9093
+
+Then access via http://localhost:9093
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;或者编写ingress&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# ingress-monitor.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+ name: monitoring-ingress
+ annotations:
+ nginx.ingress.kubernetes.io/ssl-redirect: &amp;#34;false&amp;#34;
+ namespace: monitoring
+spec:
+ rules:
+ - host: k8s-prometheus.calmkart.com
+ http:
+ paths:
+ - path: /
+ backend:
+ serviceName: prometheus-k8s
+ servicePort: 9090
+ - host: k8s-grafana.calmkart.com
+ http:
+ paths:
+ - path: /
+ backend:
+ serviceName: grafana
+ servicePort: 3000
+ - host: k8s-alertmanager.calmkart.com
+ http:
+ paths:
+ - path: /
+ backend:
+ serviceName: alertmanager-main
+ servicePort: 9093
+
+# kubectl apply -f ingress-monitor.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后我们就可以访问到prometheus,alertmanager和grafana的服务页面了 &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/08/prometheus.jpg" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/prometheus.jpg" alt="" /&gt;
+&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/08/alert-manager.jpg" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/alert-manager.jpg" alt="" /&gt;
+&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/08/grafana.jpg" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/grafana.jpg" alt="" /&gt;
+&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;这里prometheus已经集成了一些k8s相关的exporter和kubernetes-mixin的报警规则，我们可以从prometheus的status-&amp;gt;rules和status-&amp;gt;target中查看到。&lt;/p&gt;
+&lt;p&gt;接下来，我们部署&lt;a class="link" href="https://github.com/helm/charts/tree/master/stable/prometheus-pushgateway" target="_blank" rel="noopener"
+ &gt;push-gateway&lt;/a&gt;&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;#可以参考我这里NodePort的values参数,也可以自行设置
+# values.yaml
+
+# Default values for prometheus-pushgateway.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+image:
+ repository: prom/pushgateway
+ tag: v0.9.0
+ pullPolicy: IfNotPresent
+
+service:
+ type: NodePort
+ port: 9091
+ targetPort: 9091
+
+# Optional pod annotations
+podAnnotations: {}
+
+# Optional pod labels
+podLabels: {}
+
+# Optional service labels
+serviceLabels: {}
+
+# Optional serviceAccount labels
+serviceAccountLabels: {}
+
+# Optional additional arguments
+extraArgs: []
+
+# Optional additional environment variables
+extraVars: []
+
+resources: {}
+ # We usually recommend not to specify default resources and to leave this as a conscious
+ # choice for the user. This also increases chances charts run on environments with little
+ # resources, such as Minikube. If you do want to specify resources, uncomment the following
+ # lines, adjust them as necessary, and remove the curly braces after &amp;#39;resources:&amp;#39;.
+ # limits:
+ # cpu: 200m
+ # memory: 50Mi
+ # requests:
+ # cpu: 100m
+ # memory: 30Mi
+
+serviceAccount:
+ # Specifies whether a ServiceAccount should be created
+ create: true
+ # The name of the ServiceAccount to use.
+ # If not set and create is true, a name is generated using the fullname template
+ name:
+
+## Configure ingress resource that allow you to access the
+## pushgateway installation. Set up the URL
+## ref: http://kubernetes.io/docs/user-guide/ingress/
+##
+ingress:
+ ## Enable Ingress.
+ ##
+ enabled: false
+
+ ## Annotations.
+ ##
+ # annotations:
+ # kubernetes.io/ingress.class: nginx
+ # kubernetes.io/tls-acme: &amp;#39;true&amp;#39;
+
+ ## Hostnames.
+ ## Must be provided if Ingress is enabled.
+ ##
+ # hosts:
+ # - pushgateway.domain.com
+
+ ## TLS configuration.
+ ## Secrets must be manually created in the namespace.
+ ##
+ # tls:
+ # - secretName: pushgateway-tls
+ # hosts:
+ # - pushgateway.domain.com
+
+tolerations: {}
+ # - effect: NoSchedule
+ # operator: Exists
+
+## Node labels for pushgateway pod assignment
+## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+replicaCount: 1
+
+## Affinity for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}
+
+# Enable this if you&amp;#39;re using https://github.com/coreos/prometheus-operator
+serviceMonitor:
+ enabled: true
+ namespace: monitoring
+ # fallback to the prometheus default unless specified
+ # interval: 10s
+ ## Defaults to what&amp;#39;s used if you follow CoreOS [Prometheus Install Instructions](https://github.com/helm/charts/tree/master/stable/prometheus-operator#tldr)
+ ## [Prometheus Selector Label](https://github.com/helm/charts/tree/master/stable/prometheus-operator#prometheus-operator-1)
+ ## [Kube Prometheus Selector Label](https://github.com/helm/charts/tree/master/stable/prometheus-operator#exporters)
+ selector:
+ prometheus: kube-prometheus
+ # Retain the job and instance labels of the metrics pushed to the Pushgateway
+ # [Scraping Pushgateway](https://github.com/prometheus/pushgateway#configure-the-pushgateway-as-a-target-to-scrape)
+ honorLabels: true
+
+# The values to set in the PodDisruptionBudget spec (minAvailable/maxUnavailable)
+# If not set then a PodDisruptionBudget will not be created
+podDisruptionBudget:
+
+# helm install --name push-gateway -f values.yaml stable/prometheus-pushgateway
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后我们来试着接入内部和外部的prometheus监控target.&lt;/p&gt;
+&lt;p&gt;1.实现接入内部的target 无论是外部或内部的target都需要一个metrics-server目标，对于内部target而言，一般是一个服务，比如服务calm-server 在prometheus-operater的使用方式中，有一个crd叫serviceMonitor，我们创建一个新的serviceMonitor就创建了一个prometheus的target 我们首先查看monitoring命名空间中已有的serviceMonitor(既prometheus target)&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;[xxx@xxxxx]# kubectl get servicemonitors.monitoring.coreos.com -n monitoring
+NAME AGE
+alertmanager 23d
+coredns 23d
+grafana 23d
+ingress-nginx 17d
+kube-apiserver 23d
+kube-controller-manager 23d
+kube-scheduler 23d
+kube-state-metrics 23d
+kubelet 23d
+node-exporter 23d
+prometheus 23d
+prometheus-operator 23d
+prometheus-pushgateway 19d
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;我们创建一个新的serviceMonitor,将calm-server的/metrics作为target # calm-server-serviceMonitor.yaml&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+ name: calm-server-metrics
+ labels:
+ k8s-app: calm-server-metrics
+ namespace: monitoring
+spec:
+ namespaceSelector:
+ any: true
+ selector:
+ matchLabels:
+ app: calm-server
+ endpoints:
+ - port: web
+ interval: 10s
+ honorLabels: true
+
+# kubectl apply -f calm-server-serviceMonitor.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这里有几个需要注意的tips:&lt;/p&gt;
+&lt;p&gt;1.如果service和prometheus不再同一个命名空间，需要设置namespaceSelector，可以单独设置需要搜索的namespace，也可以像上面那样设置为全局搜索。&lt;/p&gt;
+&lt;p&gt;2.其次，endpoints中设置的port会按照interval设置的时间定时去:/metrics拉取数据，所以对应的服务需要提供相应的metrics(官方有非常多的exporter提供使用，可以参考&lt;a class="link" href="https://prometheus.io/docs/instrumenting/exporters/" target="_blank" rel="noopener"
+ &gt;https://prometheus.io/docs/instrumenting/exporters/&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;我们接下来再查看所有serviceMonitor crd api对象，就会发现创建成功，同时prometheus的state-&amp;gt;target中也会出现对应的target，我们也可以在prometheus中查询到对应的数据了。&lt;/p&gt;
+&lt;p&gt;2.实现接入外部target 实现了接入内部的target，那么，k8s集群外部的服务想要接入该怎么办呢？当然还是通过监控k8s集群内service的方式，不是service对应的是一个外部的endpoint对象。下面我们将以calm-server服务为例，说明如何通过k8s的endpoint外部对象接入外部target监控。 首先我们创建一个endpoint对象&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# calm-server-endpoint.yaml
+apiVersion: v1
+kind: Endpoints
+metadata:
+ name: calm-server-metrics
+subsets:
+ - addresses:
+ - ip: x.x.x.x
+ ports:
+ - name: metrics
+ port: xxxx
+ protocol: TCP
+# kubectl apply -f calm-server-endpoint.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;我们将ip和port替换成我们的外部服务，apply后就创建了一个endpoint api对象，我们可以通过kubectl get endpoints查看&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;[xxx@xxxxxxx]# kubectl get endpoints
+NAME ENDPOINTS AGE
+calm-server-metrics 10.41.13.17:6789 19d
+kubernetes 10.1.33.159:6443 92d
+push-gateway-prometheus-pushgateway 10.240.224.15:9091 19d
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这里需要注意的是,endpoint对象是不区分namespaces的 接着，我们创建一个service，service的选择器选择calm-server-metrics这个外部endpoint&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# calm-server-metrics-service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+ name: calm-server-metrics
+ labels:
+ app: calm-server-metrics
+spec:
+ type: ExternalName
+ externalName: x.x.x.x
+ clusterIP: &amp;#34;&amp;#34;
+ ports:
+ - name: metrics
+ port: xxxx
+ protocol: TCP
+ targetPort: 6789
+
+# kubectl apply -f calm-server-metrics-service.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;我们这个时候访问这个服务，就等于访问了外部的endpoint，既外部服务 我们就可以像上面创建内部服务的serviceMonitor一样，创建serviceMonitor api对象从而更新prometheus target列表了。&lt;/p&gt;
+&lt;p&gt;接下来我们会有一个问题，如何修改这一系列全家桶的配置呢?比如prometheus的配置，grafana的配置。比如我们需要修改smtp报警配置该怎么办呢？如果是非云原生环境，我们可以直接修改配置文件即可，但在云原生环境中不一样。&lt;/p&gt;
+&lt;p&gt;kube-prometheus官方文档推荐的方式是使用&lt;a class="link" href="https://jsonnet.org/" target="_blank" rel="noopener"
+ &gt;jsonnet&lt;/a&gt;对官方库做编译修改。那么如何直接通过修改yaml的方式修改配置文件呢？下面将分别介绍如何修改全家桶中的各个配置文件。&lt;/p&gt;
+&lt;p&gt;1.首先是prometheus的alert rules，我们可以通过修改prometheus-rules.yaml文件修改。 2.其次是alertmanager的config,我们可以修改alertmanager-secret.yaml文件,注意，这是一个secret对象，内容经过了base64加密，我们应该先将内容解密再做修改，修改后再加密替换即可。 3.最后是grafana的配置修改，参考了grafana官方的docker image之后，我们可以先修改grafana-deployment.yaml文件，为其增加一个volume,配置如下&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+ labels:
+ app: grafana
+ name: grafana
+ namespace: monitoring
+spec:
+ replicas: 1
+ selector:
+ matchLabels:
+ app: grafana
+ template:
+ metadata:
+ labels:
+ app: grafana
+ spec:
+ containers:
+ - image: grafana/grafana:6.2.2
+ name: grafana
+ ports:
+ - containerPort: 3000
+ name: http
+ readinessProbe:
+ httpGet:
+ path: /api/health
+ port: http
+ resources:
+ limits:
+ cpu: 200m
+ memory: 200Mi
+ requests:
+ cpu: 100m
+ memory: 100Mi
+ volumeMounts:
+ - mountPath: /var/lib/grafana
+ name: grafana-storage
+ readOnly: false
+ - mountPath: /etc/grafana/provisioning/datasources
+ name: grafana-datasources
+ readOnly: false
+ - mountPath: /etc/grafana/provisioning/dashboards
+ name: grafana-dashboards
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/apiserver
+ name: grafana-dashboard-apiserver
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/controller-manager
+ name: grafana-dashboard-controller-manager
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/k8s-cluster-rsrc-use
+ name: grafana-dashboard-k8s-cluster-rsrc-use
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/k8s-node-rsrc-use
+ name: grafana-dashboard-k8s-node-rsrc-use
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/k8s-resources-cluster
+ name: grafana-dashboard-k8s-resources-cluster
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/k8s-resources-namespace
+ name: grafana-dashboard-k8s-resources-namespace
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/k8s-resources-pod
+ name: grafana-dashboard-k8s-resources-pod
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/k8s-resources-workload
+ name: grafana-dashboard-k8s-resources-workload
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/k8s-resources-workloads-namespace
+ name: grafana-dashboard-k8s-resources-workloads-namespace
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/kubelet
+ name: grafana-dashboard-kubelet
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/nodes
+ name: grafana-dashboard-nodes
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/persistentvolumesusage
+ name: grafana-dashboard-persistentvolumesusage
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/pods
+ name: grafana-dashboard-pods
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/prometheus-remote-write
+ name: grafana-dashboard-prometheus-remote-write
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/prometheus
+ name: grafana-dashboard-prometheus
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/proxy
+ name: grafana-dashboard-proxy
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/scheduler
+ name: grafana-dashboard-scheduler
+ readOnly: false
+ - mountPath: /grafana-dashboard-definitions/0/statefulset
+ name: grafana-dashboard-statefulset
+ readOnly: false
+ - mountPath: /etc/grafana
+ name: config-custom
+ nodeSelector:
+ beta.kubernetes.io/os: linux
+ securityContext:
+ runAsNonRoot: true
+ runAsUser: 65534
+ serviceAccountName: grafana
+ volumes:
+ - emptyDir: {}
+ name: grafana-storage
+ - name: grafana-datasources
+ secret:
+ secretName: grafana-datasources
+ - configMap:
+ name: grafana-dashboards
+ name: grafana-dashboards
+ - configMap:
+ name: grafana-dashboard-apiserver
+ name: grafana-dashboard-apiserver
+ - configMap:
+ name: grafana-dashboard-controller-manager
+ name: grafana-dashboard-controller-manager
+ - configMap:
+ name: grafana-dashboard-k8s-cluster-rsrc-use
+ name: grafana-dashboard-k8s-cluster-rsrc-use
+ - configMap:
+ name: grafana-dashboard-k8s-node-rsrc-use
+ name: grafana-dashboard-k8s-node-rsrc-use
+ - configMap:
+ name: grafana-dashboard-k8s-resources-cluster
+ name: grafana-dashboard-k8s-resources-cluster
+ - configMap:
+ name: grafana-dashboard-k8s-resources-namespace
+ name: grafana-dashboard-k8s-resources-namespace
+ - configMap:
+ name: grafana-dashboard-k8s-resources-pod
+ name: grafana-dashboard-k8s-resources-pod
+ - configMap:
+ name: grafana-dashboard-k8s-resources-workload
+ name: grafana-dashboard-k8s-resources-workload
+ - configMap:
+ name: grafana-dashboard-k8s-resources-workloads-namespace
+ name: grafana-dashboard-k8s-resources-workloads-namespace
+ - configMap:
+ name: grafana-dashboard-kubelet
+ name: grafana-dashboard-kubelet
+ - configMap:
+ name: grafana-dashboard-nodes
+ name: grafana-dashboard-nodes
+ - configMap:
+ name: grafana-dashboard-persistentvolumesusage
+ name: grafana-dashboard-persistentvolumesusage
+ - configMap:
+ name: grafana-dashboard-pods
+ name: grafana-dashboard-pods
+ - configMap:
+ name: grafana-dashboard-prometheus-remote-write
+ name: grafana-dashboard-prometheus-remote-write
+ - configMap:
+ name: grafana-dashboard-prometheus
+ name: grafana-dashboard-prometheus
+ - configMap:
+ name: grafana-dashboard-proxy
+ name: grafana-dashboard-proxy
+ - configMap:
+ name: grafana-dashboard-scheduler
+ name: grafana-dashboard-scheduler
+ - configMap:
+ name: grafana-dashboard-statefulset
+ name: grafana-dashboard-statefulset
+ - configMap:
+ name: grafana-config
+ name: config-custom
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其实就是将一个叫grafana-config的configMap作为volumeMount到/etc/grafana下。 然后我们创建这个configMap&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# grafana-configmap.yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: grafana-config
+ namespace: monitoring
+data:
+ grafana.ini: |
+ [smtp]
+ enabled = true
+ host = smtp.calmkart.com:465
+ user = calmkart@calmkart.com
+ password = xxxxxxxxxx
+ skip_verify = false
+ from_address = calmkart@calmkart.com
+ from_name = grafana
+
+# kubectl apply -f grafana-configmap.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这样就可以替换掉默认的配置文件了。&lt;/p&gt;
+&lt;p&gt;另外还有关于如何为grafana增加plugin等等话题，可以参考官方的相关资料。 就简单介绍到这里吧。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="历史评论-1-条"&gt;历史评论 (1 条)
+&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;曰..曰&lt;/strong&gt; (2019-08-26 19:35)&lt;/p&gt;
+&lt;p&gt;牛逼的彭董，碾压我等底层劳苦大众，我是服的&lt;/p&gt;
+
+ &lt;/blockquote&gt;</description></item><item><title>helm chart的制作及使用(顺便拉个票)</title><link>https://www.calmkart.com/posts/2019/08/2019-08-14-helm-chart%E7%9A%84%E5%88%B6%E4%BD%9C%E5%8F%8A%E4%BD%BF%E7%94%A8%E9%A1%BA%E4%BE%BF%E6%8B%89%E4%B8%AA%E7%A5%A8/</link><pubDate>Wed, 14 Aug 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/08/2019-08-14-helm-chart%E7%9A%84%E5%88%B6%E4%BD%9C%E5%8F%8A%E4%BD%BF%E7%94%A8%E9%A1%BA%E4%BE%BF%E6%8B%89%E4%B8%AA%E7%A5%A8/</guid><description>&lt;p&gt;首先拉个票 [阿里云开发者社区-云原生应用大赛] &lt;a class="link" href="https://developer.aliyun.com/hub" target="_blank" rel="noopener"
+ &gt;https://developer.aliyun.com/hub&lt;/a&gt; 麻烦不反感拉票的,有兴趣有空的,给我提交的下面三个应用点个星星，多谢了。(阿里云普通账号即可投票,支付宝登录亦可) &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/08/C0B4B70807593CFFFD06C612FCE18009.jpg" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/C0B4B70807593CFFFD06C612FCE18009.jpg" alt="" /&gt;
+&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;在k8s的容器云环境中,应用的部署方式通常是编写对应的api对象申明文件来完成. 比如比较简单的应用,如简单的django应用,我们通常就需要首先编写deployment用于控制replicaset-&amp;gt;pod，然后编写service控制deployment，最后编写ingress做服务暴露. 而比较复杂的应用,如prometheus,我们通常就要用到用户定义api对象crd,然后编写对应的循环和控制,最后完成上面的那一套部署方式.&lt;/p&gt;
+&lt;p&gt;显然,这挺复杂的,而且特别多的东西感觉都可以用模板传变量来代替.那么我们是否需要自己编写一个系统用以根据参数自动生成这些复杂的yaml文件呢?答案基本上是没必要的(当然一切特殊情况还是需要),我们有helm来帮我们做这一切.&lt;/p&gt;
+&lt;p&gt;你可以将helm与k8s的关系看作yum之于centos的关系.helm将应用进行打包,我们就可以通过填写必要的参数，自动生成和部署批量的yaml文件，从而实现一键部署复杂的系统. 比如promethues在k8s中的部署,如果我们用编写Yaml的方法来部署,很可能就要编写数十个yaml文件(包括promethues,alertmanager,grafana,push-gateway等等),但我们如果使用helm，我们就只需要一行命令&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;helm install stable/prometheus-operator
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;那么，我们应该怎样才能制作helm中的chart软件包用于给用户自动安装呢?首先,我们需要安装helm,下载二进制文件即可. &lt;a class="link" href="https://github.com/helm/helm/releases" target="_blank" rel="noopener"
+ &gt;https://github.com/helm/helm/releases&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;然后我们开始创建一个helm软件包(project-name可替换)&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;helm create &amp;lt;project-name&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;我们可以看到，创建了如下文件夹 &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/08/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_86ed0736-bdd6-4486-83a6-a6dedf0d876d.png" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_86ed0736-bdd6-4486-83a6-a6dedf0d876d.png" alt="" /&gt;
+&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;其中template下就是各个yaml文件的模板,而values.yaml则是可以填充进各个yaml文件模板的参数(用户可调节). 我们要做的就是对values.yaml和template下各模板做修改,以适应实际应用的需求.&lt;/p&gt;
+&lt;p&gt;其中,template的模板语法用的是golang的template语法，再加上sprig模板库函数(&lt;a class="link" href="https://github.com/Masterminds/sprig" target="_blank" rel="noopener"
+ &gt;https://github.com/Masterminds/sprig&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;当我们设计好了一个chart之后,我们可以通过如下命令测试生成的yaml文件是否符合预期&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;helm install --dry-run --debug ../&amp;lt;project-name&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;我们可以通过-f values.yaml统一设置参数,也可以通过&amp;ndash;set 单一设置参数&lt;/p&gt;
+&lt;p&gt;如果符合预期,我们就可以直接安装了&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;helm install ../&amp;lt;project-name&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;更多的helm相关的资料可以参考 &lt;a class="link" href="https://whmzsu.github.io/helm-doc-zh-cn/" target="_blank" rel="noopener"
+ &gt;helm用户与开发者指南(中文版)&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="历史评论-4-条"&gt;历史评论 (4 条)
+&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;huangguohuan&lt;/strong&gt; (2019-08-15 14:29)&lt;/p&gt;
+&lt;p&gt;向dalao低头，投了&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-08-15 19:11)&lt;/p&gt;
+&lt;p&gt;多谢安全王&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;liuhuohua&lt;/strong&gt; (2019-08-16 11:15)&lt;/p&gt;
+&lt;p&gt;喜欢看博主的技术文章，票已投&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-08-20 13:36)&lt;/p&gt;
+&lt;p&gt;谢谢&lt;/p&gt;
+
+ &lt;/blockquote&gt;</description></item><item><title>kubernetes+jenkins实现现代cicd流水线(一)</title><link>https://www.calmkart.com/posts/2019/06/2019-06-13-kubernetesjenkins%E5%AE%9E%E7%8E%B0%E7%8E%B0%E4%BB%A3cicd%E6%B5%81%E6%B0%B4%E7%BA%BF%E4%B8%80/</link><pubDate>Thu, 13 Jun 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/06/2019-06-13-kubernetesjenkins%E5%AE%9E%E7%8E%B0%E7%8E%B0%E4%BB%A3cicd%E6%B5%81%E6%B0%B4%E7%BA%BF%E4%B8%80/</guid><description>&lt;p&gt;前面几篇文章已经谈过在k8s中如何实现rook/ceph持久化存储和服务发现/负载均衡/服务暴露策略，接下来几篇文章将以springboot项目为例，详解如何利用kubernetes容器编排平台实现cicd流水线(devops)。&lt;/p&gt;
+&lt;p&gt;我们根据上面几篇文章已经有了一个k8s集群，常见的的cicd工具有jenkins，gitlab-ci和&lt;a class="link" href="https://github.com/drone/drone" target="_blank" rel="noopener"
+ &gt;drone&lt;/a&gt;等等，但因为种种原因(比如gitlabci只支持gitlab，drone需要借助其他git仓库的用户权限系统不支持原生裸git)，这里最终还是选择了jenkins进行实验。&lt;/p&gt;
+&lt;p&gt;首先要解决的肯定是流程上的问题，就是所谓的cicd流程，参考了一些演讲ppt的做法，不过ppt嘛，你懂的，图画的还是很好看，但是也啰里八嗦的，不够简洁明快，有些地方明明很简单却故意讲的很高深莫测好像很厉害的样子，总之就是看着看着就觉得有点好笑 &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/06/%e6%8a%8a%e5%a4%a7%e4%bc%99%e9%80%97%e4%b9%90%e4%ba%86.jpg" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/%e6%8a%8a%e5%a4%a7%e4%bc%99%e9%80%97%e4%b9%90%e4%ba%86.jpg" alt="" /&gt;
+&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;大致流程图我就意思意思吧:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;用户提交代码 &amp;mdash;-&amp;gt; Jenkins触发构建 &amp;mdash;-&amp;gt; 编译打包 &amp;mdash;-&amp;gt; 归档成品 &amp;mdash;-&amp;gt; 制作镜像 &amp;mdash;-&amp;gt;k8s发布&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;其中构建触发这一部分因为是用的多分支流水线，觉得还是用触发扫描api由用户在运维平台点击一下比较好。构建因为是用的基于k8s的jenkins，所以同样用了动态的jenkins-slave，这样就可以做到有工作则自动生成jenkins-slave进行编译，无工作则自动销毁jenkins-slave释放资源，从而实现资源的最大化利用和伸缩性。&lt;/p&gt;
+&lt;p&gt;首先在k8s中部署jenkins 1. 创建jenkins-master-home pvc&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# vim jenkins-master-pvc.yaml
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ name: jenkins-master-home
+ namespace: kube-ops
+ labels:
+ app: jenkins-master-home
+spec:
+ storageClassName: rook-ceph-block
+ accessModes:
+ - ReadWriteOnce
+ resources:
+ requests:
+ storage: 100Gi
+
+# kubectl apply -f jenkins-master-pvc.yaml 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2. 创建 rbac&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# vim rbac.yaml
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ name: jenkins2
+ namespace: kube-ops
+
+---
+
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+ name: jenkins2
+rules:
+ - apiGroups: [&amp;#34;extensions&amp;#34;, &amp;#34;apps&amp;#34;]
+ resources: [&amp;#34;deployments&amp;#34;]
+ verbs: [&amp;#34;create&amp;#34;, &amp;#34;delete&amp;#34;, &amp;#34;get&amp;#34;, &amp;#34;list&amp;#34;, &amp;#34;watch&amp;#34;, &amp;#34;patch&amp;#34;, &amp;#34;update&amp;#34;]
+ - apiGroups: [&amp;#34;&amp;#34;]
+ resources: [&amp;#34;services&amp;#34;]
+ verbs: [&amp;#34;create&amp;#34;, &amp;#34;delete&amp;#34;, &amp;#34;get&amp;#34;, &amp;#34;list&amp;#34;, &amp;#34;watch&amp;#34;, &amp;#34;patch&amp;#34;, &amp;#34;update&amp;#34;]
+ - apiGroups: [&amp;#34;&amp;#34;]
+ resources: [&amp;#34;pods&amp;#34;]
+ verbs: [&amp;#34;create&amp;#34;,&amp;#34;delete&amp;#34;,&amp;#34;get&amp;#34;,&amp;#34;list&amp;#34;,&amp;#34;patch&amp;#34;,&amp;#34;update&amp;#34;,&amp;#34;watch&amp;#34;]
+ - apiGroups: [&amp;#34;&amp;#34;]
+ resources: [&amp;#34;pods/exec&amp;#34;]
+ verbs: [&amp;#34;create&amp;#34;,&amp;#34;delete&amp;#34;,&amp;#34;get&amp;#34;,&amp;#34;list&amp;#34;,&amp;#34;patch&amp;#34;,&amp;#34;update&amp;#34;,&amp;#34;watch&amp;#34;]
+ - apiGroups: [&amp;#34;&amp;#34;]
+ resources: [&amp;#34;pods/log&amp;#34;]
+ verbs: [&amp;#34;get&amp;#34;,&amp;#34;list&amp;#34;,&amp;#34;watch&amp;#34;]
+ - apiGroups: [&amp;#34;&amp;#34;]
+ resources: [&amp;#34;secrets&amp;#34;]
+ verbs: [&amp;#34;get&amp;#34;]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+ name: jenkins2
+roleRef:
+ apiGroup: rbac.authorization.k8s.io
+ kind: ClusterRole
+ name: jenkins2
+subjects:
+ - kind: ServiceAccount
+ name: jenkins2
+ namespace: kube-ops
+
+# kubectl apply -f rbac.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.创建jenkins deployment和service&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# vim jenkins.yaml
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+ name: jenkins2-deployment
+ namespace: kube-ops
+spec:
+ template:
+ metadata:
+ labels:
+ app: jenkins2
+ spec:
+ terminationGracePeriodSeconds: 10
+ serviceAccountName: jenkins2
+ containers:
+ - name: jenkins
+ image: jenkins/jenkins:lts
+ imagePullPolicy: IfNotPresent
+ ports:
+ - containerPort: 8080
+ name: web
+ protocol: TCP
+ - containerPort: 50000
+ name: agent
+ protocol: TCP
+ resources:
+ limits:
+ cpu: 4000m
+ memory: 8Gi
+ requests:
+ cpu: 1000m
+ memory: 2Gi
+ livenessProbe:
+ httpGet:
+ path: /login
+ port: 8080
+ initialDelaySeconds: 60
+ timeoutSeconds: 5
+ failureThreshold: 12
+ readinessProbe:
+ httpGet:
+ path: /login
+ port: 8080
+ initialDelaySeconds: 60
+ timeoutSeconds: 5
+ failureThreshold: 12
+ volumeMounts:
+ - name: jenkinshome
+ subPath: jenkins2
+ mountPath: /var/jenkins_home
+ env:
+ - name: LIMITS_MEMORY
+ valueFrom:
+ resourceFieldRef:
+ resource: limits.memory
+ divisor: 1Mi
+ - name: JAVA_OPTS
+ value: -Xmx$(LIMITS_MEMORY)m -XshowSettings:vm -Dhudson.slaves.NodeProvisioner.initialDelay=0 -Dhudson.slaves.NodeProvisioner.MARGIN=50 -Dhudson.slaves.NodeProvisioner.MARGIN0=0.85 -Duser.timezone=Asia/Shanghai
+ securityContext:
+ fsGroup: 1000
+ volumes:
+ - name: jenkinshome
+ persistentVolumeClaim:
+ claimName: jenkins-master-home
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: jenkins2
+ namespace: kube-ops
+ labels:
+ app: jenkins2
+spec:
+ selector:
+ app: jenkins2
+ type: ClusterIP
+ ports:
+ - name: web
+ port: 8080
+ targetPort: web
+ - name: agent
+ port: 50000
+ targetPort: agent
+
+# kubectl apply -f jenkins.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个时候jenkins就已经起起来了，我们给jenkins的webui添加一个ingress负载均衡和服务暴露&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# vim kube-ops-ingress.yaml
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+ name: kube-ops-ingress
+ annotations:
+ nginx.ingress.kubernetes.io/ssl-redirect: &amp;#34;false&amp;#34;
+ namespace: kube-ops
+spec:
+ rules:
+ - host: k8s-jenkins.example.cn
+ http:
+ paths:
+ - path: /
+ backend:
+ serviceName: jenkins2
+ servicePort: 8080
+
+# kubectl apply -f kube-ops-ingress.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这时候因为ingress service是用的master node的externalIp，所以我们可以直接通过修改dns，将k8s-jenkins.example.cn域名指向master node的externalIp，然后直接访问k8s-jenkins.example.cn就可以访问到jenkins服务。(有问题可以查看下kubectl get ingress -o wide &amp;ndash;all-namespaces)&lt;/p&gt;
+&lt;p&gt;然后安装常见的插件，进入jenkins后记得再安装如下两个插件 blueOcean(新一代的流水线UI)，kubernetes(k8s slave支持)，Multibranch Scan Webhook Trigger(多分枝流水线扫描触发器)&lt;/p&gt;
+&lt;p&gt;安装好之后，进入设置，拉到最下面，选择添加一个云(k8s) &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/06/xzygy.png" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/xzygy.png" alt="" /&gt;
+&lt;/a&gt; 按如上配置，在页面测试连接k8s正常即可(jenkins服务名这里叫jenkins2，按实际修改)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;至于下面的是否添加镜像，我推荐是不在这里添加，而选择用Yaml直接编写添加。原因是，这里添加slave k8s pod tempalte的话，slave编号无法动态化，会导致后以后构建任务等待前任务，无法多slave并行。(很多文章会在这里添加slave pod template，然后用一个自由风格软件项目做例子，那根本无法在实际环境中用的)&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;这里还有个小坑，无论是yaml的slave k8s pod tempalte还是在jenkins设置里页面添加的slave k8s pod template，如果想使用自定义slave image的话，containers: - name 一定要填写成- name: jnlp，否则会不读取自定义slave image而采用官方的&lt;a class="link" href="https://github.com/jenkinsci/docker-jnlp-slave" target="_blank" rel="noopener"
+ &gt;docker-jnlp-slave&lt;/a&gt;。&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;接下来我们创建自己的jenkins-jnlp-slave容器，参考官方的&lt;a class="link" href="https://github.com/jenkinsci/docker-jnlp-slave" target="_blank" rel="noopener"
+ &gt;docker-jnlp-slave&lt;/a&gt; Dockerfile如下&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;ARG VERSION=0.0.1
+ARG user=jenkins
+ARG group=jenkins
+ARG uid=1000
+ARG gid=1000
+
+ENV HOME /home/${user}
+RUN groupadd -g ${gid} ${group}
+RUN useradd -d $HOME -u ${uid} -g ${group} ${user}
+LABEL maintainer=&amp;#34;calmkart@calmkart.com&amp;#34; Description=&amp;#34;jenkins jnlp slave image&amp;#34; Vendor=&amp;#34;calmkart@calmkart.com&amp;#34; Version=&amp;#34;${VERSION}&amp;#34;
+
+ARG AGENT_WORKDIR=/home/${user}/agent
+
+RUN curl --create-dirs -fsSLo /usr/share/jenkins/slave.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/3.29/remoting-3.29.jar \
+ &amp;amp;&amp;amp; chmod 755 /usr/share/jenkins \
+ &amp;amp;&amp;amp; chmod 644 /usr/share/jenkins/slave.jar \
+ &amp;amp;&amp;amp; rm -rf /etc/yum.repos.d/*
+
+COPY kubectl kubectl
+COPY jdk/ ./jdk
+COPY maven ./maven
+COPY jenkins-slave /usr/local/bin/jenkins-slave
+COPY CentOS-Base.repo /etc/yum.repos.d/
+COPY epel.repo /etc/yum.repos.d/
+
+RUN yum makecache \
+ &amp;amp;&amp;amp; yum install -y unzip.x86_64 \
+ &amp;amp;&amp;amp; chmod +x ./kubectl \
+ &amp;amp;&amp;amp; chmod +x /usr/local/bin/jenkins-slave \
+ &amp;amp;&amp;amp; mv ./kubectl /usr/local/bin/kubectl \
+ &amp;amp;&amp;amp; /bin/bash maven/default/install_maven \
+ &amp;amp;&amp;amp; /bin/bash jdk/default/install_jdk \
+ &amp;amp;&amp;amp; yum install -y nodejs \
+ &amp;amp;&amp;amp; yum install -y python36.x86_64 \
+ &amp;amp;&amp;amp; yum install -y docker-ce.x86_64 \
+ &amp;amp;&amp;amp; yum install -y git \
+ &amp;amp;&amp;amp; yum install -y which
+
+USER ${user}
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/maven/bin:/usr/java/jdk/bin
+RUN export PATH=$PATH:/opt/maven/bin:/usr/java/jdk/bin
+ENV AGENT_WORKDIR=${AGENT_WORKDIR}
+RUN mkdir /home/${user}/.jenkins &amp;amp;&amp;amp; mkdir -p ${AGENT_WORKDIR}
+
+VOLUME /home/${user}/.jenkins
+VOLUME ${AGENT_WORKDIR}
+WORKDIR /home/${user}
+
+ENTRYPOINT [&amp;#34;jenkins-slave&amp;#34;]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这里创建的是一个基于centos的jenkins jnlp slave容器镜像，安装了python2,python3,nodejs,docker,kubectl,maven,git等工具和环境。&lt;/p&gt;
+&lt;p&gt;将该镜像build并上传到harbor仓库即可在项目的Jenkinsfile中使用.&lt;/p&gt;
+&lt;p&gt;以下是具体待构建项目中jenkins jnlp slave的pod template信息&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;# vim jnlp-slave-declarative.yaml
+metadata:
+ namespace: kube-ops
+spec:
+ containers:
+ - name: jnlp
+ image: harbor.example.org/example/jenkins-jnlp-slave:v0.0.1
+ workingDir: /home/jenkins
+ ttyEnabled: true
+ privileged: false
+ alwaysPullImage: false
+ volumeMounts:
+ - name: volume-0
+ mountPath: /var/run/docker.sock
+ - name: volume-1
+ mountPath: /home/jenkins/.kube
+ - name: volume-2
+ mountPath: /home/jenkins
+ - name: volume-3
+ mountPath: /root/.m2
+ volumes:
+ - name: volume-0
+ hostPath:
+ path: /var/run/docker.sock
+ type: &amp;#34;&amp;#34;
+ - name: volume-1
+ hostPath:
+ path: /root/.kube
+ type: &amp;#34;&amp;#34;
+ - name: volume-2
+ nfs:
+ path: /home/shared/nfs/jenkins-home
+ server: 10.1.33.159
+ - name: volume-3
+ nfs:
+ path: /home/shared/nfs/maven-home
+ server: 10.1.33.159
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;关于这个slave k8s pod template要解释一些东西，这里挂载了4个volume到slave中，分别是&lt;/p&gt;
+&lt;p&gt;1.在slave中调用宿主机的docker命令,用于构造和上传镜像 /var/run/docker.sock -&amp;gt; /var/run/docker.sock&lt;/p&gt;
+&lt;p&gt;2.在slave中调用宿主机的kubectl命令,用于在k8s中发布项目(创建deployment和service) /root/.kube -&amp;gt; /home/jenkins/.kube&lt;/p&gt;
+&lt;p&gt;3.搭建了一个nfs用于多个slave共享workspace,避免多次clone代码 /home/shared/nfs/jenkins-home -&amp;gt; /home/jenkins&lt;/p&gt;
+&lt;p&gt;4.搭建了一个nfs用于多个slave共享本地maven仓库,避免多次下载jar包,同时统一maven配置 /home/shared/nfs/maven-home —&amp;gt; /root/.m2&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;这里为什么不用ceph呢？原因很简单，因为ceph rbd块存储不支持ReadWriteMany，而cephfs共享存储虽然支持ReadWriteMany但是不支持分区。所以还是采用了最简单的nfs实现共享存储。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;在项目的Jenkinsfile中编写如下agent字段调用该pod template的slave&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;def label_tag = &amp;#34;slave-${UUID.randomUUID().toString()}&amp;#34;
+pipeline {
+ agent {
+ kubernetes {
+ label label_tag
+ yamlFile &amp;#39;jnlp-slave-declarative.yaml&amp;#39;
+ }
+ }
+ }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这是申明式pipeline的用法中比较好的写法，因为如果不单独写一个yaml的话我记得是不支持很多细节语法的.（具体细节参考&lt;a class="link" href="https://github.com/jenkinsci/kubernetes-plugin" target="_blank" rel="noopener"
+ &gt;jenkins kubernetes plugin&lt;/a&gt;插件说明）&lt;/p&gt;
+&lt;p&gt;做到这里之后，我们扫描多分支流水线，就可以发现创建一个新slave处理构建任务，构建完成则自动销毁了。 但这还远远不够，很多细节没有处理，下篇文章再详述编译发布构成和申明式Pipeline Jenkinsfile,以及项目Dockerfile镜像详细写法例子。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="历史评论-4-条"&gt;历史评论 (4 条)
+&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;lsprit&lt;/strong&gt; (2019-06-14 19:28)&lt;/p&gt;
+&lt;p&gt;大神，我知道CI是持续集成，CD是什么啊？&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-06-17 13:25)&lt;/p&gt;
+&lt;p&gt;continuous integration continuous deployment&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;lizhengyi&lt;/strong&gt; (2019-06-24 15:37)&lt;/p&gt;
+&lt;p&gt;楼主最近看机会吗，我们组正在招聘运维开发工程师，主要负责公司发布系统和监控系统的开发和维护，公司叫省钱快报，办公地点在北二环，地铁5号线雍和宫站附近，薪资待遇业界上游水平，期待您的回复。&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-06-26 15:06)&lt;/p&gt;
+&lt;p&gt;不好意思,年内没有换工作的意向.&lt;/p&gt;
+
+ &lt;/blockquote&gt;</description></item><item><title>kubernetes集群中服务的负载均衡和外部发现</title><link>https://www.calmkart.com/posts/2019/05/2019-05-25-kubernetes%E9%9B%86%E7%BE%A4%E4%B8%AD%E6%9C%8D%E5%8A%A1%E7%9A%84%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%92%8C%E5%A4%96%E9%83%A8%E5%8F%91%E7%8E%B0/</link><pubDate>Sat, 25 May 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/05/2019-05-25-kubernetes%E9%9B%86%E7%BE%A4%E4%B8%AD%E6%9C%8D%E5%8A%A1%E7%9A%84%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%92%8C%E5%A4%96%E9%83%A8%E5%8F%91%E7%8E%B0/</guid><description>&lt;p&gt;传统的负载均衡策略一般是:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;客户端 -&amp;gt; dns -&amp;gt; 4层库在均衡(HA) -&amp;gt; 7层负载均衡 -&amp;gt; 具体的后端服务&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;这种方式处理服务发现和动态配置比较难搞,比如后端服务动态扩缩容什么的。 一开始的做法肯定是OP人工维护7层负载均衡集群配置，以nginx为例，用git仓库之类的做人工服务发现和变更。这样很显然是不科学的。然后就会开始希望用种种自动化的手段去处理服务发现，比如微博的nginx-upsync-module,比如nginx-lua，比如openresty，比如etcd+confd等种种手段实现服务发现和自动化配置，但还是有很多瑕疵，比如etcd+confd每次修改upstream的服务后端就要reload nginx，nginx的策略会新开x个worker，容易造成性能问题甚至机器顶不住。而且vm服务机器的逻辑和upstream挂钩也有问题，总之，麻烦的很。&lt;/p&gt;
+&lt;p&gt;而kubernetes处理这一套服务发现和负载均衡的方法就挺好用的，比如接下来会实践的这一套nginx-ingress+externalIP+dns的方式就很直观而且方便自动化流程，大致策略如下:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;客户端 -&amp;gt; dns -&amp;gt; k8s-nginx-ingress-service(in ExternalIP) -&amp;gt; ingress-obj -&amp;gt; service -&amp;gt; pod&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;kubernetes集群中具体工作的pod是由service做负载均衡和服务发现的，而service的外部发现策略通常有NodePort，Kube-proxy以及Ingress。对于内部服务暴露给外部，NodePort基本上是不好用的，因为本来Port就有限，而且如果是web服务(80,443)，需要接dns的，开在30000+端口以上，还得在外部做一个四层负载均衡，这样就很烦。Kube-proxy用在调试环境还行，同样有以上问题，所以Ingress是更好的选择。&lt;/p&gt;
+&lt;p&gt;nginx-ingress采用了nginx-lua模块实现upstream动态修正，无需reload nginx，可以解决上述提到的2x worker导致性能下降问题。且结合了service的pods自动发现(coredns)，轻松简单的完成很多过去很麻烦的任务。&lt;/p&gt;
+&lt;p&gt;首先在上篇blog里我们已经有了一个k8s集群，然后我们创建ingress-nginx相关的api对象&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
+kubectl apply -f mandatory.yaml
+
+#会创建好相应的ingress-nginx controller和rbac相关api
+[root@xxxxxxxx ingress-nginx]# kubectl get pods -n ingress-nginx
+NAME READY STATUS RESTARTS AGE
+nginx-ingress-controller-5694ccb578-hwj2j 1/1 Running 0 3h11m
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后我们创建一个ingress的service，用ExternalIP的方式暴露给集群外部&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;vim externalIp-ingress-service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+ name: ingress-nginx
+ namespace: ingress-nginx
+ labels:
+ app.kubernetes.io/name: ingress-nginx
+ app.kubernetes.io/part-of: ingress-nginx
+spec:
+ ports:
+ - name: http
+ port: 80
+ protocol: TCP
+ - name: https
+ port: 443
+ protocol: TCP
+ selector:
+ app.kubernetes.io/name: ingress-nginx
+ app.kubernetes.io/part-of: ingress-nginx
+ externalIPs:
+ #这里填写你的k8s masterip
+ - 10.1.33.159
+
+#将创建出如下服务
+[root@xxxxxxxxxxxx ingress-nginx]# kubectl get service -n ingress-nginx
+NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE
+ingress-nginx ClusterIP 10.96.139.222 10.1.33.159 80/TCP,443/TCP 3h12m
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;接下来我们就可以创建具体的ingress对象了&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;vim rook-ceph-ingress.yaml
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+ name: rook-ceph-ingress
+ annotations:
+ nginx.ingress.kubernetes.io/ssl-redirect: &amp;#34;false&amp;#34;
+ #要暴露的service对应的命名空间 
+ namespace: rook-ceph
+spec:
+ rules:
+ #这里按需配置,就是nginx的配置方法,具体查下ingress-nginx的项目文档
+ - host: k8s-ceph-dashboard.calmkart.com
+ http:
+ paths:
+ - path: /
+ backend:
+ serviceName: rook-ceph-mgr-dashboard
+ servicePort: 8443
+
+kubectl apply -f rook-ceph-ingress.yaml
+#这个ingress将自动发现rook-ceph命名空间中的rook-ceph-mgr-dashboard服务，并将之作负载均衡对外暴露
+[root@xxxxxxxxxxx ingress]# kubectl get service -n rook-ceph
+NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE
+rook-ceph-mgr ClusterIP 10.99.37.148 9283/TCP 3h48m
+rook-ceph-mgr-dashboard ClusterIP 10.110.163.110 8443/TCP 3h48m
+rook-ceph-mon-a ClusterIP 10.103.5.55 6789/TCP,3300/TCP 3h49m
+rook-ceph-mon-b ClusterIP 10.104.22.199 6789/TCP,3300/TCP 3h49m
+rook-ceph-mon-c ClusterIP 10.110.80.82 6789/TCP,3300/TCP 3h49m
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后我们查看一下ingress状态&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;[root@xxxxxxxxxx ingress]# kubectl get ingress -n rook-ceph
+NAME HOSTS ADDRESS PORTS AGE
+rook-ceph-ingress k8s-ceph-dashboard.calmkart.com 10.1.33.159 80 170m
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这样就没问题了 最后我们把dns记录k8s-ceph-dashboard.calmkart.com指向10.1.33.159&lt;/p&gt;
+&lt;p&gt;搞定。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="历史评论-8-条"&gt;历史评论 (8 条)
+&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;duboops&lt;/strong&gt; (2019-05-25 18:19)&lt;/p&gt;
+&lt;p&gt;楼主采用的K8s负载均衡策略在性能上会优于传统的均衡策略么？&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-05-29 17:05)&lt;/p&gt;
+&lt;p&gt;我这个例子里基本上不会，因为实际上都是用的nginx作负载均衡.但在内部coredns的性能上可能会有一些提升.不过网络环境中的性能瓶颈一般不会出在负载均衡层.&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;hukerlet&lt;/strong&gt; (2019-06-10 20:50)&lt;/p&gt;
+&lt;p&gt;看了楼主的文章，感觉您从事的工作是做基础架构么，好些文章写的真好，感觉您对k8s研究的很透彻。小弟刚从事运维工作没多久，最近工作中用到了容器，但对这方面是一知半解，不知道您能否抽空写些docker方面的文章呢，感激不尽。&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-06-11 11:05)&lt;/p&gt;
+&lt;p&gt;读书吧，入门《每天5分钟玩转docker》，进阶《Docker容器与容器云(第二版)》&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;linda_zhang&lt;/strong&gt; (2019-06-27 16:20)&lt;/p&gt;
+&lt;p&gt;博主好，我是互动出版的约稿编辑，有幸阅读到您博客上的文章，感觉您的文章内容偏向入记录整理在工作中碰到的案例，内容质量上挺不错的，要是加以整理想必质量会更胜一筹，不知道您有没有考虑过将博客文章再次归纳整理下，并新增相关章节，集结出版呢，互动出版社主要是面向广大互联网读者推出相关技术书籍，目前年发行册数超过百万，在互联网读者中有较大的影响力。期待博主拨冗回复，详叙具体事宜。我的邮箱：329647550#qq.com (注：发送邮件时请将#号转为@)&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;xiaohua&lt;/strong&gt; (2019-07-09 19:55)&lt;/p&gt;
+&lt;p&gt;楼主，我有个问题想向您请教下，我个人想往某一个技术方向去发展，比如成为k8s专家、或者mysql专家，但是感觉只钻研一个方向会不会以后的路会很窄，不知道您怎么看。&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-07-16 11:11)&lt;/p&gt;
+&lt;p&gt;看是哪种钻研了.讲道理一个某单方面的专家,其他方面也不会说完全不会.面学片精吧.&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt; ↳ **xiaohua** (2019-07-17 11:43)
+&amp;gt;
+&amp;gt; 嗯嗯，您说的对，我也觉得往专家发展应该触类旁通，精通一点，也要了解其他的，要不然就是空中楼阁了，谢谢您的建议
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>kubernetes搭建并使用rook/ceph的pv存储</title><link>https://www.calmkart.com/posts/2019/05/2019-05-24-kubernetes%E6%90%AD%E5%BB%BA%E5%B9%B6%E4%BD%BF%E7%94%A8rook-ceph%E7%9A%84pv%E5%AD%98%E5%82%A8/</link><pubDate>Fri, 24 May 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/05/2019-05-24-kubernetes%E6%90%AD%E5%BB%BA%E5%B9%B6%E4%BD%BF%E7%94%A8rook-ceph%E7%9A%84pv%E5%AD%98%E5%82%A8/</guid><description>&lt;p&gt;k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下.&lt;/p&gt;
+&lt;p&gt;首先有一个三个节点的k8s集群 &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/05/111.png" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/111.png" alt="" /&gt;
+&lt;/a&gt; 首先创建rook-ceph-common&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;wget https://raw.githubusercontent.com/rook/rook/master/cluster/examples/kubernetes/ceph/common.yaml
+kubectl apply -f common.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后创建rook-ceph-operator&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;wget https://raw.githubusercontent.com/rook/rook/release-1.0/cluster/examples/kubernetes/ceph/operator.yaml
+kubectl apply -f operator.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;以上两步基本上不会出啥问题,标准配置 接下来创建cluster的问题比较多,贴上我的配置&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;vim cluster.yaml
+
+apiVersion: ceph.rook.io/v1
+kind: CephCluster
+metadata:
+ name: rook-ceph
+ namespace: rook-ceph
+spec:
+ cephVersion:
+ image: ceph/ceph:v14.2.1-20190430
+ allowUnsupported: true
+ #设置data路径到自己规划的路径
+ dataDirHostPath: /home/shared/rook
+ mon:
+ count: 3
+ allowMultiplePerNode: true
+ dashboard:
+ enabled: true
+ port: 8443
+ urlPrefix: /
+ #关闭https
+ ssl: false
+ network:
+ #如要在k8s集群外使用,这里可以打开
+ hostNetwork: false
+ rbdMirroring:
+ workers: 0
+ storage:
+ #全节点使用
+ useAllNodes: true
+ useAllDevices: false
+ deviceFilter:
+ config:
+ osdsPerDevice: &amp;#34;1&amp;#34;
+ directories:
+ - path: /home/shared/rook
+&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex="0"&gt;&lt;code&gt;kubectl apply -f cluster.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查看部署情况 &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/05/2.png" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/2.png" alt="" /&gt;
+&lt;/a&gt; 这样就基本上没问题了,k8s中的每个Node会启两个pod(rook-ceph-agent和rook-discover),并且mgr和osd都没问题。 然后给ceph-dashboard提供NodePort的外部访问service&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;vim dashboard-external-http.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+ name: rook-ceph-mgr-dashboard-external-https
+ namespace: rook-ceph
+ labels:
+ app: rook-ceph-mgr
+ rook_cluster: rook-ceph
+spec:
+ ports:
+ - name: dashboard
+ port: 8443
+ protocol: TCP
+ targetPort: 8443
+ selector:
+ app: rook-ceph-mgr
+ rook_cluster: rook-ceph
+ sessionAffinity: None
+ type: NodePort
+&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex="0"&gt;&lt;code&gt;kubectl apply -f dashboard-external-https.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后查看下service的情况,是否正常 &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/05/3.png" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/3.png" alt="" /&gt;
+&lt;/a&gt; 这样就对了,可以访问一下http://&lt;!-- raw HTML omitted --&gt;:&lt;!-- raw HTML omitted --&gt;，看看是不是能进ceph-dashboard&lt;/p&gt;
+&lt;p&gt;一般情况下问题不大,查看admin的默认密码&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath=&amp;#34;{[&amp;#39;data&amp;#39;][&amp;#39;password&amp;#39;]}&amp;#34; | base64 --decode &amp;amp;&amp;amp; echo
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;但是admin登陆进去了之后，肯定会疯狂500错误，查了下官方的issue，这里有bug。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;解决办法是:&lt;/strong&gt; &lt;strong&gt;在dashboard里创建一个新role角色(右上角用户管理,roles)，把权限全钩上，然后去掉iscsi的所有权限。&lt;/strong&gt; &lt;strong&gt;接着创建一个新用户,绑定这个新的role角色,最后用新用户登陆&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;接着创建pool和storage用于自动生成pvc匹配的pv&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;vim storageclass.yaml
+
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+ name: replicapool
+ namespace: rook-ceph
+spec:
+ replicated:
+ size: 2
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+ name: rook-ceph-block
+provisioner: ceph.rook.io/block
+parameters:
+ blockPool: replicapool
+ clusterNamespace: rook-ceph
+ fstype: xfs
+&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex="0"&gt;&lt;code&gt;kubectl apply -f storagecalss.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;创建pool和storage之后通过dashboard或者命令 kubectl get cephcluster -n rook-ceph 查看一下集群是否health，如果是health就没毛病了&lt;/p&gt;
+&lt;p&gt;最后测试一下申请一个pvc看看是否会自动生成pv与之绑定&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ name: jenkins-home
+ namespace: kube-ops
+ labels:
+ app: jenkins-home
+spec:
+ storageClassName: rook-ceph-block
+ accessModes:
+ - ReadWriteOnce
+ resources:
+ requests:
+ storage: 20Gi
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/05/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_dd2a2f8b-10fb-4f3f-8d21-bbaa31a4ba7d.png" target="_blank" rel="noopener"
+ &gt;&lt;img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_dd2a2f8b-10fb-4f3f-8d21-bbaa31a4ba7d.png" alt="" /&gt;
+&lt;/a&gt; 可见，管用了.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;外加一些小tips:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;如果rook-ceph配置有误需要还原重新配置,一定要遵循官方的清理步骤 &lt;a class="link" href="https://rook.github.io/docs/rook/v1.0/ceph-teardown.html" target="_blank" rel="noopener"
+ &gt;https://rook.github.io/docs/rook/v1.0/ceph-teardown.html&lt;/a&gt; 切记要删除掉所有k8s的node上配置的data文件夹,不然会导致新集群无法初始化.&lt;/p&gt;
+&lt;p&gt;创建不出pod很多都是权限原因或者node无法调度,需要检查下rbac权限设置或者各个node的情况.&lt;/p&gt;
+&lt;p&gt;最后附上rook项目的github地址: &lt;a class="link" href="https://github.com/rook/rook" target="_blank" rel="noopener"
+ &gt;https://github.com/rook/rook&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="历史评论-2-条"&gt;历史评论 (2 条)
+&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;&lt;strong&gt;huan&lt;/strong&gt; (2019-05-28 16:30)&lt;/p&gt;
+&lt;p&gt;大佬又开始搞K8S，我要跟着学习学习&lt;/p&gt;
+
+ &lt;/blockquote&gt;
+
+ &lt;blockquote&gt;
+ &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-05-29 17:06)&lt;/p&gt;
+&lt;p&gt;学学学,建议买课,极客时间张磊博士的深入剖析k8s很好&lt;/p&gt;
+
+ &lt;/blockquote&gt;</description></item></channel></rss>

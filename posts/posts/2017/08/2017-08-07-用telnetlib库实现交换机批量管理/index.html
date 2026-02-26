@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python telnetlib库实现了交换机的批量管理(交换机型号为思科2960x)\n">
+<title>用telnetlib库实现交换机批量管理</title>
+
+
+<link rel="canonical" href="http://localhost:1313/posts/posts/2017/08/2017-08-07-%E7%94%A8telnetlib%E5%BA%93%E5%AE%9E%E7%8E%B0%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%89%B9%E9%87%8F%E7%AE%A1%E7%90%86/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="用telnetlib库实现交换机批量管理">
+<meta property='og:description' content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python telnetlib库实现了交换机的批量管理(交换机型号为思科2960x)\n">
+<meta property='og:url' content='http://localhost:1313/posts/posts/2017/08/2017-08-07-%E7%94%A8telnetlib%E5%BA%93%E5%AE%9E%E7%8E%B0%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%89%B9%E9%87%8F%E7%AE%A1%E7%90%86/'>
+<meta property='og:site_name' content='cAlm的个人Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='python' /><meta property='article:tag' content='telnetlib' /><meta property='article:published_time' content='2017-08-07T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2017-08-07T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="用telnetlib库实现交换机批量管理">
+<meta name="twitter:description" content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python telnetlib库实现了交换机的批量管理(交换机型号为思科2960x)\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">cAlm的个人Blog</a></h1>
+            <h2 class="site-description">随手记录些东西</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives' >
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/categories' >
+                
+                <span>分类</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about' >
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/" style="background-color: hsl(208, 60%, 84%); color: hsl(208, 60%, 15%);">
+                计算机
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/posts/posts/2017/08/2017-08-07-%E7%94%A8telnetlib%E5%BA%93%E5%AE%9E%E7%8E%B0%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%89%B9%E9%87%8F%E7%AE%A1%E7%90%86/">用telnetlib库实现交换机批量管理</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2017-08-07T00:00:00Z'>Monday, August 7, 2017</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+
+    <section class="article-content">
+    
+    
+    <p>在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python telnetlib库实现了交换机的批量管理(交换机型号为思科2960x)</p>
+<p>实现代码如下： switch_telnet.py</p>
+<pre tabindex="0"><code>#encoding=utf-8
+import sys
+import telnetlib
+import time
+
+def tel(ip,user,password):
+    tn = telnetlib.Telnet(ip,port=23)
+    tn.read_until(&#39;Verification\r\n\r\nUsername: &#39;)
+    tn.write(user+&#39;\n&#39;)
+#   tn.set_debuglevel(2)
+    #password
+    tn.read_until(&#39;Password: &#39;)
+    tn.write(password+&#39;\n&#39;)
+    #login fail
+    if tn.read_some()==&#39;\r\nPassword: &#39;:
+        print &#39;\033[1;31;40m&#39;+ip+&#39;\033[0m&#39;+&#39;     password is wrong,login false!&#39;
+        tn.close()
+        return 1
+    #login successs
+    tn.write(&#39;enable\n&#39;)
+    #password
+    tn.read_until(&#39;Password: &#39;)
+    tn.write(password+&#39;\n&#39;)
+    #enable susccess set terimal length
+    tn.read_until(&#39;Switch#&#39;)
+    tn.write(&#39;ter len 0\n&#39;)
+    time.sleep(1)
+    if tn.read_some()==&#39;ter len 0\r\nSwitch#&#39;:
+        print ip+&#39;     telnet login susccess&#39;
+        return tn
+    print ip+&#39;     terminal length 0 false!&#39;
+    return 1
+
+def comm(tn,ip,cmd):
+    tn.write(cmd+&#39;\n&#39;)
+    time.sleep(.2)
+    result = tn.read_very_eager()
+    print (&#39;\033[1;31;40m&#39;+ip+&#39;\033[0m&#39;+&#39;   &#39;+result)
+
+ip_list = []
+user_list = []
+password_list = []
+tn = []
+ip_fp = open(&#39;ip_list&#39;,&#39;r&#39;)
+ip_fs = ip_fp.read()
+ip_fp.close()
+fa = ip_fs.split(&#39;\n&#39;)
+
+for i in range(0,len(fa)-1):
+    f_res = fa[i].split(&#39;,&#39;)
+    ip_list.append(f_res[0])
+    user_list.append(f_res[1])
+    password_list.append(f_res[2])
+
+for i in range(0,len(fa)-1):
+    tn.append(tel(ip_list[i],user_list[i],password_list[i]))
+
+while 1:
+    cmd = raw_input(&#34;input the command: &#34;)
+    if cmd == &#39;quit&#39;:
+        for i in range(0,len(fa)-1):
+            tn[i].write(&#39;quit\n&#39;)
+        break
+
+    for i in range(0,len(fa)-1):
+        comm(tn[i],ip_list[i],cmd+&#39;\n&#39;)
+</code></pre><p>脚本详解：</p>
+<p>主要使用了python的telnetlib库，下面概述常见的几个方法。</p>
+<p>telnetlib.Telnet([host[, port[, timeout]]]) 此方法返回一个client对象，可操作</p>
+<p>Telnet.read_until(expected[, timeout]) 此方法阻塞读取缓存区输出，匹配expected才继续</p>
+<p>Telnet.read_all() 读取所有输出，读取到结束符或者连接中断</p>
+<p>Telnet.read_some() 读取至少一个输出</p>
+<p>Telnet.read_very_eager() 读取尽量多的输出，但记得要time.sleep()一定时间，不然会因为来不及读取所有数据导致数据丢失</p>
+<p>Telnet.write(buffer) 向client对象写入数据，记得换行符\n</p>
+<p>Telnet.close() 关闭连接</p>
+<p> </p>
+<p>操作指南：</p>
+<p>使用时在同路径下编辑ip_list文件，格式为ip,username,password既可，一个交换机占一行，如下例：</p>
+<pre tabindex="0"><code>10.32.19.9,cisco,123456
+10.32.19.10,cisco,654321
+</code></pre><p>运行 python ./switch_telnet.py</p>
+<p><img src="/posts/posts/2017/08/2017-08-07-%E7%94%A8telnetlib%E5%BA%93%E5%AE%9E%E7%8E%B0%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%89%B9%E9%87%8F%E7%AE%A1%E7%90%86/images/TdCoxrKTPjmnsPncPk6g.png"
+	width="470"
+	height="45"
+	loading="lazy"
+	
+    
+	
+		class="gallery-image" 
+		data-flex-grow="1044"
+		data-flex-basis="2506px"
+	
+></p>
+<p>显示所有交换机IP的登陆情况，然后输入命令交互即可（类似ansible）</p>
+<p><img src="/posts/posts/2017/08/2017-08-07-%E7%94%A8telnetlib%E5%BA%93%E5%AE%9E%E7%8E%B0%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%89%B9%E9%87%8F%E7%AE%A1%E7%90%86/images/69tpvwdEhq4CEDx3XQohhQ.png"
+	width="806"
+	height="926"
+	loading="lazy"
+	
+    
+	
+		class="gallery-image" 
+		data-flex-grow="87"
+		data-flex-basis="208px"
+	
+></p>
+<p>可以随意使用exit命令，但直接退出脚本指令为quit</p>
+<p> </p>
+<p>其他：</p>
+<p>同类可用库还有pexpect，非常强大 如果是SSH登陆的交换机，可以使用netmiko，还可以用fabric批量管理，不再赘述</p>
+<p>项目源码已上传github <a class="link" href="https://github.com/calmkart/switch_telnet"  target="_blank" rel="noopener"
+    >https://github.com/calmkart/switch_telnet</a></p>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/python/">Python</a>
+        
+            <a href="/tags/telnetlib/">Telnetlib</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
+<div id="tcomment"></div>
+<style>
+    .twikoo {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+    :root[data-scheme="dark"] {
+        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
+        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
+    }
+    .twikoo .el-input-group__prepend,
+    .twikoo .tk-action-icon,
+    .twikoo .tk-submit-action-icon,
+    .twikoo .tk-time,
+    .twikoo .tk-comments-no,
+    .twikoo .tk-comments-count {
+        color: var(--twikoo-body-text-color);
+    }
+    .twikoo .el-input__inner,
+    .twikoo .el-textarea__inner,
+    .twikoo .tk-preview-container,
+    .twikoo .tk-content,
+    .twikoo .tk-nick,
+    .twikoo .tk-send,
+    .twikoo .tk-comments-no,
+    .twikoo .el-input__count,
+    .twikoo .tk-submit-action-icon {
+        color: var(--twikoo-body-text-color-main)!important;
+    }
+    .twikoo .el-button{
+        color: var(--twikoo-body-text-color)!important;
+    }
+    .twikoo .el-input__count {
+        color: var(--twikoo-body-text-color) !important;
+    }
+    .OwO .OwO-body {
+        background-color: var(--body-background) !important;
+        color: var(--body-text-color) !important;
+    }
+</style><script>
+    twikoo.init({
+        envId: '',
+        el: '#tcomment',})
+</script>
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 cAlm的个人Blog
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.2d3f4e9dd7b2453cd71ff8971f18724ef8b4f783f2e8c70b9a281707db74e8a5.js" defer></script>
+
+
+    </body>
+</html>

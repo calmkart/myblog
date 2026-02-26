@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Vim on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/vim/</link><description>Recent content in Vim on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 20 Nov 2017 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/vim/index.xml" rel="self" type="application/rss+xml"/><item><title>vim/nginx语法高亮插件</title><link>https://www.calmkart.com/posts/2017/11/2017-11-20-vim-nginx%E8%AF%AD%E6%B3%95%E9%AB%98%E4%BA%AE%E6%8F%92%E4%BB%B6/</link><pubDate>Mon, 20 Nov 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/11/2017-11-20-vim-nginx%E8%AF%AD%E6%B3%95%E9%AB%98%E4%BA%AE%E6%8F%92%E4%BB%B6/</guid><description>&lt;p&gt;1.vim语法高亮插件molokai&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;cd ~/.vim/
+mkdir ./colors
+cd ./colos
+wget https://raw.githubusercontent.com/tomasr/molokai/master/colors/molokai.vim
+echo colorscheme molokai &amp;gt;&amp;gt; ~/.vimrc
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.nginx语法高亮插件nginx.vim&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;mkdir -pv ~/.vim/syntax
+cd ~/.vim/syntax
+wget -O nginx.vim http://www.vim.org/scripts/download_script.php?src_id=19394
+echo &amp;#34;au BufRead,BufNewFile /etc/nginx/*,/usr/local/nginx/conf/* if &amp;amp;ft == &amp;#39;&amp;#39; | setfiletype nginx | endif &amp;#34; &amp;gt;&amp;gt; ~/.vim/filetype.vim
+&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>自用简易VIM配置</title><link>https://www.calmkart.com/posts/2017/08/2017-08-24-%E8%87%AA%E7%94%A8%E7%AE%80%E6%98%93vim%E9%85%8D%E7%BD%AE/</link><pubDate>Thu, 24 Aug 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/08/2017-08-24-%E8%87%AA%E7%94%A8%E7%AE%80%E6%98%93vim%E9%85%8D%E7%BD%AE/</guid><description>&lt;p&gt;最常用到的编辑器VIM，记录一下自用简易配置方式，方便需要的时候使用。&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;cd
+./.vimrc
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;./.vimrc&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;&amp;#34;去掉vi的一致性&amp;#34;
+set nocompatible
+&amp;#34; 隐藏滚动条&amp;#34;
+set guioptions-=r
+set guioptions-=L
+set guioptions-=b
+&amp;#34;隐藏顶部标签栏&amp;#34;
+set showtabline=0
+&amp;#34;设置字体&amp;#34;
+set guifont=Monaco:h13
+syntax on &amp;#34;开启语法高亮&amp;#34;
+set background=dark &amp;#34;设置背景色&amp;#34;
+set fileformat=unix &amp;#34;设置以unix的格式保存文件&amp;#34;
+set tabstop=4 &amp;#34;设置table长度&amp;#34;
+set shiftwidth=4 &amp;#34;同上&amp;#34;
+set showmatch &amp;#34;显示匹配的括号&amp;#34;
+set scrolloff=5 &amp;#34;距离顶部和底部5行&amp;#34;
+set laststatus=2 &amp;#34;命令行为两行&amp;#34;
+set fenc=utf-8 &amp;#34;文件编码&amp;#34;
+set backspace=2
+set mouse=n &amp;#34;启用鼠标&amp;#34;
+set selection=exclusive
+set selectmode=mouse,key
+set matchtime=5
+set ignorecase &amp;#34;忽略大小写&amp;#34;
+set incsearch
+set hlsearch &amp;#34;高亮搜索项&amp;#34;
+set expandtab &amp;#34;不允许扩展table&amp;#34;
+set autoread
+set list
+set listchars=tab:&amp;gt;-
+set nu
+
+map :w:!python %
+
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin &amp;#39;VundleVim/Vundle.vim&amp;#39;
+Plugin &amp;#39;vim-airline/vim-airline&amp;#39;
+call vundle#end()
+
+let g:airline_powerline_fonts = 1
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后安装插件 这里主要安装Vundle管理插件以及界面美化插件vim-airline&lt;/p&gt;
+&lt;p&gt;1.安装Vundle&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;VIM下运行 :BundleInstall 进行安装插件 :BundleClean 卸载没有写在./.vimrc中的插件&lt;/p&gt;
+&lt;p&gt;2.安装vim-airline Plugin &amp;lsquo;vim-airline/vim-airline&amp;rsquo; 既可&lt;/p&gt;
+&lt;p&gt; &lt;/p&gt;
+&lt;p&gt; &lt;/p&gt;
+&lt;p&gt;配置已上传github: &lt;a class="link" href="https://github.com/calmkart/vim_config" target="_blank" rel="noopener"
+ &gt;https://github.com/calmkart/vim_config&lt;/a&gt;&lt;/p&gt;</description></item></channel></rss>
