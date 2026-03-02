@@ -6,9 +6,8 @@ categories:
   - "计算机"
 tags: 
   - "golang"
-  - "k8s"
-  - "kubectl-debug"
   - "kubernetes"
+  - "kubectl-debug"
   - "sidecar"
   - "云原生"
   - "容器"

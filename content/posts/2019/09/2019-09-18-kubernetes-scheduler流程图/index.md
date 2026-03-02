@@ -6,7 +6,6 @@ categories:
   - "计算机"
   - "读书笔记"
 tags: 
-  - "k8s"
   - "kubernetes"
   - "scheduler"
   - "调度器"

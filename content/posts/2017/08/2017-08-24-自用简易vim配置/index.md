@@ -13,7 +13,7 @@ tags:
 
 <!--more-->
 
- 
+
 
 ```bash
 cd
@@ -82,8 +82,8 @@ VIM下运行 :BundleInstall 进行安装插件 :BundleClean 卸载没有写在./
 
 2.安装vim-airline Plugin 'vim-airline/vim-airline' 既可
 
- 
 
- 
+
+
 
 配置已上传github: [https://github.com/calmkart/vim_config](https://github.com/calmkart/vim_config)

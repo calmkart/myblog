@@ -8,7 +8,6 @@ tags:
   - "cicd"
   - "devops"
   - "jenkins"
-  - "k8s"
   - "kubernetes"
   - "自定义slave"
 ---
@@ -47,7 +46,7 @@ spec:
 
 ```
 
-2\. 创建 rbac
+2. 创建 rbac
 
 ```yaml
 # vim rbac.yaml

@@ -19,11 +19,12 @@ tags:
 
 ```bash
 pip install pycrypto
+
 ```
 
 然后代码如下 <!--more-->
 
- 
+
 
 ```python
 # -*- coding:utf-8 -*-

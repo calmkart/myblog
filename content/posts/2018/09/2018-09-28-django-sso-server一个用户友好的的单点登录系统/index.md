@@ -36,6 +36,7 @@ user_info = "{0}|||||{1}".format(ldap_username, now)
 ```python
 response.set_cookie('sso_user', rsa.crypto(
                 public_key, user_info), domain=options.objects.all()[0].cookie_domain)
+
 ```
 
 其他需要接入sso系统的子系统可以通过sso系统的api，来判断用户是否可以登录
@@ -87,17 +88,17 @@ sso系统的登录鉴权api为"http://sso域名/api/auth"(如"http://sso.calmkar
 
 在管理后台配置企业微信扫码登陆相关参数，通过企业微信相关js api，生成二维码，用户扫码后，企业微信后台将用户请求重定向到/api/wxlogin  (method:get)上，并加上携带有用户username信息的code参数，成功则写cookie。
 
- 
+
 
 ### 2.common相关模块原理
 
 参见本blog其他博文
 
-#### <1>[关于django的图片验证码](http://www.calmkart.com/?p=332)
+#### <1>[关于django的图片验证码](/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/)
 
-#### <2>[关于python操作ldap](http://www.calmkart.com/?p=355)
+#### <2>[关于python操作ldap](/posts/2018/09/2018-09-28-python%E6%93%8D%E4%BD%9Cldap/)
 
-#### <3>[关于python操作rsa,aes加解密](http://www.calmkart.com/?p=353)
+#### <3>[关于python操作rsa,aes加解密](/posts/2018/09/2018-09-28-python%E6%93%8D%E4%BD%9Crsa%E5%92%8Caes%E5%8A%A0%E8%A7%A3%E5%AF%86/)
 
 <div class="archived-comments">
 

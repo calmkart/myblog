@@ -5,7 +5,7 @@ description: "saltstack可用于批量管理集群,用的是c/s架构，master�
 categories: 
   - "计算机"
 tags: 
-  - "saltstack"
+  - "salt"
   - "自动化"
   - "运维"
   - "集群管理"
@@ -21,6 +21,7 @@ saltstack可用于批量管理集群,用的是c/s架构，master管理多个mini
 
 ```bash
 wget -O - https://repo.saltstack.com/apt/debian/8/amd64/latest/SALTSTACK-GPG-KEY.pub | sudo apt-key add -
+
 ```
 
 <!--more--> 2.将saltstack源添加进apt源
@@ -29,12 +30,14 @@ wget -O - https://repo.saltstack.com/apt/debian/8/amd64/latest/SALTSTACK-GPG-KEY
 vi /etc/apt/sources.list
 #添加saltstack源
 deb http://repo.saltstack.com/apt/debian/8/amd64/latest jessie main
+
 ```
 
 3.更新apt
 
 ```bash
 apt-get update
+
 ```
 
 4.安装master端相关组件
@@ -87,12 +90,14 @@ file_roots:
 pillar_roots:
   base:
     - /srv/pillar
+
 ```
 
 6.启动master
 
 ```bash
 systemctl start salt-master
+
 ```
 
 **二.安装minion**
@@ -101,6 +106,7 @@ systemctl start salt-master
 
 ```bash
 apt-get install salt-minion
+
 ```
 
 2.配置minion相关信息
@@ -141,12 +147,14 @@ file_roots:
 pillar_roots:
   base:
     - /data/salt/minion/pillar
+
 ```
 
 3.启动minion
 
 ```bash
 systemctl start salt-minion
+
 ```
 
 **三.通过master管理minion**
@@ -168,6 +176,7 @@ salt-key -D
 
 #删除某个key
 salt-key -d minion_id
+
 ```
 
 2.测试是否连通
@@ -178,6 +187,7 @@ salt '*' test.ping
 
 #测试某个minion的连通性
 salt 'minion_id' test.ping
+
 ```
 
 3.常用命令

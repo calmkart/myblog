@@ -6,7 +6,6 @@ categories:
   - "计算机"
 tags: 
   - "kubernetes"
-  - "k8s"
   - "云原生"
   - "SRE"
 ---

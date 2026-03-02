@@ -21,11 +21,13 @@ vi /etc/exports
 ########添加如下#######
 /opt/nfs *(ro,sync,no_subtree_check)
 #NFS共享路径 IP(只读，同步，不检查父目录)
+
 ```
 
 ```bash
 service nfs-kernel-server restart 
 service rpcbind restart
+
 ```
 
 测试：showmount -e <!--more-->
@@ -35,9 +37,10 @@ service rpcbind restart
 ```bash
 apt-get install nfs-common
 mount 远程nfs_ip:/路径 /本地路径
+
 ```
 
- 
+
 
 二.NFS服务端口控制
 
@@ -52,6 +55,7 @@ mount 远程nfs_ip:/路径 /本地路径
 
  # /etc/default/quota
  RPCRQUOTADOPTS="-p 32769"
+
 ```
 
 ```bash
@@ -59,12 +63,14 @@ mount 远程nfs_ip:/路径 /本地路径
 fs.nfs.nfs_callback_tcpport = 32764
 fs.nfs.nlm_tcpport = 32768
 fs.nfs.nlm_udpport = 32768
+
 ```
 
 ```bash
 sysctl --system
 service nfs-kernel-server restart
 service rpcbind restart
+
 ```
 
 则可以将服务端端口限制为:

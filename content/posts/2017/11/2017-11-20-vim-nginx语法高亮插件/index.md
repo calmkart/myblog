@@ -18,6 +18,7 @@ mkdir ./colors
 cd ./colos
 wget https://raw.githubusercontent.com/tomasr/molokai/master/colors/molokai.vim
 echo colorscheme molokai  >> ~/.vimrc
+
 ```
 
 <!--more-->
@@ -29,4 +30,5 @@ mkdir -pv  ~/.vim/syntax
 cd ~/.vim/syntax
 wget -O nginx.vim  http://www.vim.org/scripts/download_script.php?src_id=19394
 echo "au BufRead,BufNewFile /etc/nginx/*,/usr/local/nginx/conf/* if &ft == '' | setfiletype nginx | endif " >> ~/.vim/filetype.vim
+
 ```

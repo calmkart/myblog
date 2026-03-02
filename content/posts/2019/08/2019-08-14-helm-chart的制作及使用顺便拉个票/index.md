@@ -8,11 +8,11 @@ tags:
   - "chart"
   - "golang"
   - "helm"
-  - "k8s"
+  - "kubernetes"
   - "template"
 ---
 
-首先拉个票 \[阿里云开发者社区-云原生应用大赛\] [https://developer.aliyun.com/hub](https://developer.aliyun.com/hub) 麻烦不反感拉票的,有兴趣有空的,给我提交的下面三个应用点个星星，多谢了。(阿里云普通账号即可投票,支付宝登录亦可) ![](images/C0B4B70807593CFFFD06C612FCE18009.jpg) <!--more--> 在k8s的容器云环境中,应用的部署方式通常是编写对应的api对象申明文件来完成. 比如比较简单的应用,如简单的django应用,我们通常就需要首先编写deployment用于控制replicaset->pod，然后编写service控制deployment，最后编写ingress做服务暴露. 而比较复杂的应用,如prometheus,我们通常就要用到用户定义api对象crd,然后编写对应的循环和控制,最后完成上面的那一套部署方式.
+首先拉个票 [阿里云开发者社区-云原生应用大赛] [https://developer.aliyun.com/hub](https://developer.aliyun.com/hub) 麻烦不反感拉票的,有兴趣有空的,给我提交的下面三个应用点个星星，多谢了。(阿里云普通账号即可投票,支付宝登录亦可) ![](images/C0B4B70807593CFFFD06C612FCE18009.jpg) <!--more--> 在k8s的容器云环境中,应用的部署方式通常是编写对应的api对象申明文件来完成. 比如比较简单的应用,如简单的django应用,我们通常就需要首先编写deployment用于控制replicaset->pod，然后编写service控制deployment，最后编写ingress做服务暴露. 而比较复杂的应用,如prometheus,我们通常就要用到用户定义api对象crd,然后编写对应的循环和控制,最后完成上面的那一套部署方式.
 
 显然,这挺复杂的,而且特别多的东西感觉都可以用模板传变量来代替.那么我们是否需要自己编写一个系统用以根据参数自动生成这些复杂的yaml文件呢?答案基本上是没必要的(当然一切特殊情况还是需要),我们有helm来帮我们做这一切.
 

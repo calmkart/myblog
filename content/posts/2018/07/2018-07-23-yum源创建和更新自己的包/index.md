@@ -18,6 +18,7 @@ tags:
 wget https://github.com/alibaba/tengine/archive/tengine-2.2.2.tar.gz
 tar xzvf tengine-2.2.2.tar.gz
 cd tengine-tengine-2.2.2/
+
 ```
 
 然后安装打包工具fpm
@@ -26,6 +27,7 @@ cd tengine-tengine-2.2.2/
 yum -y install ruby rubygems ruby-devel rpm-build
 gem sources -a http://ruby.taobao.org/
 gem install fpm
+
 ```
 
 编译安装到其他文件夹下
@@ -52,6 +54,7 @@ fpm -s dir -t rpm -n tengine -v 2.2.0 --iteration 1.el6 -C /tmp/installdir/ -p /
 
 ```bash
 createrepo --update {{ path }}
+
 ```
 
 客户端刷新centos yum缓存即可

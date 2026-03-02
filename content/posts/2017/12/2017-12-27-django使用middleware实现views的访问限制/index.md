@@ -44,6 +44,7 @@ location .... {
     proxy_set_header Host $http_host;
     proxy_set_header X-NginX-Proxy true;
 }
+
 ```
 
 最后在settings.py中将这个class添加进去
@@ -52,6 +53,7 @@ location .... {
 MIDDLEWARE_CLASSES = [
         'appname.middleware.checkIPMiddleware'
 ]
+
 ```
 
 重启django之后，则/api后的restful api只允许10.10.10.10和11.11.11.11访问，其他时候就会返回"you are not allowed"

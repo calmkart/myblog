@@ -12,11 +12,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="kubernetes+jenkins实现现代cicd流水线(一)">
+<link rel="stylesheet" href="/scss/style.min.d938302c9c68b5f1fda0a78ef59a80f98a22f71eeffb56a5408c148f22d8c7d5.css"><meta property='og:title' content="kubernetes+jenkins实现现代cicd流水线(一)">
 <meta property='og:description' content="前面几篇文章已经谈过在k8s中如何实现rook/ceph持久化存储和服务发现/负载均衡/服务暴露策略，接下来几篇文章将以springboot项目为例，详解如何利用kubernetes容器编排平台实现cicd流水线(devops)。">
 <meta property='og:url' content='http://localhost:1313/posts/2019/06/2019-06-13-kubernetesjenkins%E5%AE%9E%E7%8E%B0%E7%8E%B0%E4%BB%A3cicd%E6%B5%81%E6%B0%B4%E7%BA%BF%E4%B8%80/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
-<meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='cicd' /><meta property='article:tag' content='devops' /><meta property='article:tag' content='jenkins' /><meta property='article:tag' content='k8s' /><meta property='article:tag' content='kubernetes' /><meta property='article:tag' content='自定义slave' /><meta property='article:published_time' content='2019-06-13T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2019-06-13T00:00:00&#43;00:00'/>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='cicd' /><meta property='article:tag' content='devops' /><meta property='article:tag' content='jenkins' /><meta property='article:tag' content='kubernetes' /><meta property='article:tag' content='自定义slave' /><meta property='article:published_time' content='2019-06-13T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2019-06-13T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="kubernetes+jenkins实现现代cicd流水线(一)">
 <meta name="twitter:description" content="前面几篇文章已经谈过在k8s中如何实现rook/ceph持久化存储和服务发现/负载均衡/服务暴露策略，接下来几篇文章将以springboot项目为例，详解如何利用kubernetes容器编排平台实现cicd流水线(devops)。">
     </head>
@@ -240,7 +240,9 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">storage</span><span class="p">:</span><span class="w"> </span><span class="l">100Gi</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="c"># kubectl apply -f jenkins-master-pvc.yaml </span><span class="w">
-</span></span></span></code></pre></div><p>2. 创建 rbac</p>
+</span></span></span></code></pre></div><ol start="2">
+<li>创建 rbac</li>
+</ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># vim rbac.yaml</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
@@ -551,8 +553,6 @@
         
             <a href="/tags/jenkins/">Jenkins</a>
         
-            <a href="/tags/k8s/">K8s</a>
-        
             <a href="/tags/kubernetes/">Kubernetes</a>
         
             <a href="/tags/%E8%87%AA%E5%AE%9A%E4%B9%89slave/">自定义slave</a>
@@ -605,6 +605,17 @@
 
         <div class="article-details">
             <h2 class="article-title">kubernetes搭建并使用rook/ceph的pv存储</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/posts/2018/12/2018-12-29-macvlan%E5%AE%9E%E7%8E%B0k8s%E6%89%81%E5%B9%B32%E5%B1%82%E7%BD%91%E7%BB%9C/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">macvlan实现k8s扁平2层网络</h2>
         </div>
     </a>
 </article>

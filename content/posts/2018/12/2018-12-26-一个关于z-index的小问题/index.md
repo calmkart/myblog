@@ -2,8 +2,10 @@
 title: "一个关于z-index的小问题"
 date: 2018-12-26
 description: "最近一直在忙,没空写blog.刚好今天写前端的时候碰到一个挺有意思的问题,记录一下. 问题描述:在bootstrap的modal框里popover没反应."
-categories: 
+categories:
   - "计算机"
+tags:
+  - "前端"
 ---
 
 最近一直在忙,没空写blog.刚好今天写前端的时候碰到一个挺有意思的问题,记录一下.
@@ -12,11 +14,12 @@ categories:
 
 ```text
 $("[data-toggle='popover']").popover();
+
 ```
 
 没任何作用。
 
-然后在浏览器中调试,发现选择$("\[data-toggle='popover'\]")都是没问题的,查了focus事件,也是有绑定的.
+然后在浏览器中调试,发现选择$("[data-toggle='popover']")都是没问题的,查了focus事件,也是有绑定的.
 
 很奇怪,怀疑是不是ystep插件有啥问题,于是把div从模态框里弄了出来,发现popover弹窗恢复正常.
 
@@ -28,6 +31,7 @@ $("[data-toggle='popover']").popover();
 z-index: 2099;
 }
 </style>
+
 ```
 
 瞬间管用了,问题解决.

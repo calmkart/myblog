@@ -6,7 +6,6 @@ categories:
   - "计算机"
 tags: 
   - "kubernetes"
-  - "k8s"
   - "云原生"
   - "监控"
 ---
@@ -43,13 +42,15 @@ kuberhealthy支持多种巡检结果输出，如`khstate` cr对象就是用来�
 ## 简单使用
 
 1. 部署 kuberhealthy
-    
+
     ```bash
     git clone https://github.com/Comcast/kuberhealthy.git
     cd kuberhealthy
     kubectl apply -f deploy/kuberhealthy.yaml
+
 ```
-    
+
+
 
 我们将创建一个replicas为2的kuberhealthy deployment。(实际工作的只有一个pod，另一个为保证高可用，kuberhealthy会进行选主操作，但过程实际上有bug)
 
@@ -57,6 +58,7 @@ kuberhealthy支持多种巡检结果输出，如`khstate` cr对象就是用来�
 
 ```bash
 kubectl get khchecks -n kuberhealthy
+
 ```
 
 进行查询，不需要的可以删除
@@ -93,6 +95,7 @@ spec:
           cpu: 25m
       restartPolicy: Always
     terminationGracePeriodSeconds: 5
+
 ```
 
 我们apply之后，会创建一个khcheck对象，同时kuberhealthy deployment pod会根据khcheck cr中的描述，创建出巡检pod。
@@ -103,6 +106,7 @@ spec:
 
 ```bash
 kubectl get pod -n kuberhealthy
+
 ```
 
 我们也可以通过查看khstate自定义资源对象查询当前巡检结果
@@ -110,6 +114,7 @@ kubectl get pod -n kuberhealthy
 ```bash
 kubectl get khstate -n kuberhealthy
 kubectl get khstate -n kuberhealthy <example> -o yaml
+
 ```
 
 我们还可以通过kuberhealthy service/pod提供的http接口查询巡检结果 _访问kuberhealthy service 80端口或 kuberhealthy master pod 8080端口_
@@ -158,6 +163,7 @@ kubectl get khstate -n kuberhealthy <example> -o yaml
     },
     "CurrentMaster": "kuberhealthy-7cf79bdc86-m78qr"
 }
+
 ```
 
 ## 编写自定义巡检
@@ -231,6 +237,7 @@ func main() {
 
     os.Exit(0)
 }
+
 ```
 
 其实其中除了巡检逻辑，和kuberhealthy相关的方法只有两个
@@ -244,6 +251,7 @@ kh.ReportSuccess()
 
 // 如果巡检失败，调用ReportFailure方法上报失败
 kh.ReportFailure([]string{})
+
 ```
 
 然后将其build成一个镜像
@@ -269,6 +277,7 @@ USER user
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /build/cmd/http-check/http-check /app/http-check
 ENTRYPOINT ["/app/http-check"]
+
 ```
 
 _Makefile_
@@ -279,6 +288,7 @@ build:
 
 push:
     docker push kuberhealthy/http-check:v1.2.2
+
 ```
 
 这样就完成了一个自定义巡检用例的全部编写和打包
@@ -289,7 +299,7 @@ push:
 
 1. 读取`KH_REPORTING_URL`环境变量
 2. 将如下`JSON巡检结果`通过`POST方法`发送到`KH_REPORTING_URL`地址上
-    
+
     ```yaml
     {
     "Errors": [
@@ -298,8 +308,10 @@ push:
     ],
     "OK": false
     }
+
 ```
-    
+
+
 
 ## kuberhealthy代码详解
 
@@ -351,6 +363,7 @@ _不重要的目录和文件已省略_
     ├── kubeClient
     ├── masterCalculation
     └── metrics
+
 ```
 
 其实最核心的只有两个目录
@@ -386,6 +399,7 @@ func main() {
     log.Errorln("shutdown: main loop was ready for shutdown for too long. exiting.")
     os.Exit(1)
 }
+
 ```
 
 这里新建了一个Kuberhealthy对象，并调用Start方法。
@@ -445,6 +459,7 @@ func (k *Kuberhealthy) Start(ctx context.Context) {
         }
     }
 }
+
 ```
 
 这里的流程大概如下
@@ -458,7 +473,7 @@ func (k *Kuberhealthy) Start(ctx context.Context) {
 
 ### 细节
 
-#### 1\. StartWebServer方法
+#### 1. StartWebServer方法
 
 ```go
 // StartWebServer starts a JSON status web server at the specified listener.
@@ -497,21 +512,22 @@ func (k *Kuberhealthy) StartWebServer() {
         time.Sleep(time.Second / 2)
     }
 }
+
 ```
 
 我们可以看到，http server共有三个api
 
 - /metrics
-    
+
     为prometheus暴露监控数据
 - /externalCheckStatus
-    
+
     接收巡检pod的巡检结果返回(巡检pod会往这个api里post json数据)
 - /
-    
+
     为我们查看当前集群巡检结果提供接口(返回json数据)
 
-#### 2\. monitorExternalChecks方法
+#### 2. monitorExternalChecks方法
 
 ```go
 // monitorExternalChecks watches for changes to the external check CRDs
@@ -522,6 +538,7 @@ func (k *Kuberhealthy) monitorExternalChecks(ctx context.Context, notify chan st
 
     ...
 }
+
 ```
 
 核心是一个`watchForKHCheckChanges`方法
@@ -585,6 +602,7 @@ func (k *Kuberhealthy) watchForKHCheckChanges(ctx context.Context, c chan struct
         }
     }
 }
+
 ```
 
 `watchForKHCheckChanges`将监听khcheck cr的 Added/Modified/Deleted等事件，如果监听到有任何事件，则无差别的通知`monitorExternalChecks`方法中的for循环。在for循环中将List所有khcheck对象，与内存中已保存的`knownSettings`做对比，只要发现有任意变化，就会通过channel通知`Start`方法中的`notifyChanLimiter`方法，如果没有触发`notifyChanLimiter`中的流速限制，就会通知`Start`方法中的for循环,触发以下执行巡检逻辑
@@ -603,9 +621,10 @@ func (k *Kuberhealthy) watchForKHCheckChanges(ctx context.Context, c chan struct
             }
         }
     }
+
 ```
 
-#### 3\. RestartChecks方法
+#### 3. RestartChecks方法
 
 当发现有任意khcheck cr变化就会调用`RestartChecks`方法
 
@@ -615,6 +634,7 @@ func (k *Kuberhealthy) RestartChecks() {
     k.StopChecks()
     k.StartChecks()
 }
+
 ```
 
 我们发现，kuberhealthy会先停掉所有正在运行的巡检，然后重新开启所有正在运行的巡检。
@@ -627,7 +647,7 @@ func (k *Kuberhealthy) RestartChecks() {
 
 _注意，这里的RestartChecks流程是同步逻辑，所以如果在这个流程中因为某些原因卡住，kuberhealthy主流程会直接卡死，只能重启解决。_
 
-#### 4\. external checker的Run方法
+#### 4. external checker的Run方法
 
 kuberhealthy主流程中，`StartChecks()`方法会运行每一个external checker的`Run()`方法
 
@@ -665,6 +685,7 @@ func (ext *Checker) Run(client *kubernetes.Clientset) error {
 
     return nil
 }
+
 ```
 
 我们会发现调用了`RunOnce()`方法，而`RunOnce()`方法非常长，内部逻辑非常复杂，大致流程是先等待当前巡检pod结束，然后运行一个巡检pod，接着等待这个创建出来的pod返回巡检结果。
@@ -679,29 +700,29 @@ _这里用了waitgroup等待pod创建和结束完毕，却因为逻辑复杂，w
 
 总结以下kuberhealthy的缺点主要是以下几点
 
-#### 1\. 监听khcheck的变化但不区分变化类型
+#### 1. 监听khcheck的变化但不区分变化类型
 
 这种设计导致了，任何一个khcheck对象发生变化，哪怕是修改，也会让所有巡检全部Shutdown再Start，从而使得khcheck的周期设置形同虚设。(例如：当你修改了a巡检的配置，会发现bcdef巡检都重启并运行了一次)
 
-#### 2\. 同步流程重启全部khchecks有可能导致主流程卡死
+#### 2. 同步流程重启全部khchecks有可能导致主流程卡死
 
 因为监听khcheck不区分变化类型的设计，所以带来了所谓的流控策略，专门编写了一个方法用于对变化信号控流，并且主流程的重启全部khchecks是同步流程，如果在重启过程中因为种种原因无法实现shutdown或者run就会主流程卡死，不再响应任何后续指令。出了删pod重建别无他法。
 
 这个问题带来的bug是很多的，并且为了配合这个流程，在khcheck的run流程中使用了极多的信号传递和waitgroup等待，非常容易出问题。我已经修了一些严重的主流程卡死bug但发现只是治标不治本，这种无区分事件监听和全量重启机制不改，这里的主流程卡死bug几乎是不可避免的。无非是触发bug难易程度有差别。
 
-#### 3\. 不支持单次触发型巡检
+#### 3. 不支持单次触发型巡检
 
 kuberhealthy在设计上天生就不支持单次触发型巡检，甚至对巡检配置做改动都不应该频繁。
 
-#### 4\. khstate自定义对象设计冗余,巡检历史无记录
+#### 4. khstate自定义对象设计冗余,巡检历史无记录
 
 kuberhealthy的khstate自定义资源对象用于记录当前巡检结果，但无法查询历史巡检记录。并且khstate这个cr的设计是比较冗余而无意义的，反而平添了很多复杂度。
 
-#### 5\. 废弃的巡检pod/khchecks/khstate/无法得到正确的清理
+#### 5. 废弃的巡检pod/khchecks/khstate/无法得到正确的清理
 
 原生的kuberhealthy创建的巡检pod完成任务后不会被正确删除，所以运行一次检查就会增加一个pod。官方的处理方式是增加一个新cr对象对废弃的巡检pod做cronjob删除。这本身就不是一个非常良好的解决方案。并且khstate其实和khcheck是绑定关系，但并没有采用ownerreferences的方式集联删除，反而在kuberhealhty master pod中启了一个goroutine不停轮询khchecks对象和内存中保存的状态做对比并删除khstate，容易经常性的导致bug。
 
-#### 6\. 高可用选主不稳定
+#### 6. 高可用选主不稳定
 
 还是因为缺点1中的不区分khcheck对象变化类型重启全部巡检的设计，所以容易导致选主流程中出现主流程卡死的问题。根因在缺点1，基本上改变不了。
 

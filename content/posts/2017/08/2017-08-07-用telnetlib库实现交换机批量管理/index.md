@@ -89,9 +89,9 @@ while 1:
 
 主要使用了python的telnetlib库，下面概述常见的几个方法。
 
-telnetlib.Telnet(\[host\[, port\[, timeout\]\]\]) 此方法返回一个client对象，可操作
+telnetlib.Telnet([host[, port[, timeout]]]) 此方法返回一个client对象，可操作
 
-Telnet.read_until(expected\[, timeout\]) 此方法阻塞读取缓存区输出，匹配expected才继续
+Telnet.read_until(expected[, timeout]) 此方法阻塞读取缓存区输出，匹配expected才继续
 
 Telnet.read_all() 读取所有输出，读取到结束符或者连接中断
 
@@ -103,7 +103,7 @@ Telnet.write(buffer) 向client对象写入数据，记得换行符\\n
 
 Telnet.close() 关闭连接
 
- 
+
 
 操作指南：
 
@@ -125,7 +125,7 @@ Telnet.close() 关闭连接
 
 可以随意使用exit命令，但直接退出脚本指令为quit
 
- 
+
 
 其他：
 

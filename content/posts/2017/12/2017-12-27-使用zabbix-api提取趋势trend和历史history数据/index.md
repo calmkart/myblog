@@ -19,6 +19,7 @@ zabbix restful api说明见官网文档 [https://www.zabbix.com/documentation/4.
 
 ```bash
 pip install pyzabbix
+
 ```
 
 具体实现获取trend和history代码如下:

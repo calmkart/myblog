@@ -80,6 +80,7 @@ Unicode标准也在不断发展，但最常用的是用两个字节表示一个�
 ```python
 >>> print('包含中文的str')
 包含中文的str
+
 ```
 
 对于单个字符的编码，Python提供了`ord()`函数获取字符的整数表示，`chr()`函数把编码转换为对应的字符：
@@ -93,6 +94,7 @@ Unicode标准也在不断发展，但最常用的是用两个字节表示一个�
 'B'
 >>> chr(25991)
 '文'
+
 ```
 
 如果知道字符的整数编码，还可以用十六进制这么写`str`：
@@ -100,6 +102,7 @@ Unicode标准也在不断发展，但最常用的是用两个字节表示一个�
 ```python
 >>> '\u4e2d\u6587'
 '中文'
+
 ```
 
 两种写法完全是等价的。
@@ -110,6 +113,7 @@ Python对`bytes`类型的数据用带`b`前缀的单引号或双引号表示：
 
 ```python
 x = b'ABC'
+
 ```
 
 要注意区分`'ABC'`和`b'ABC'`，前者是`str`，后者虽然内容显示得和前者一样，但`bytes`的每个字符都只占用一个字节。
@@ -125,6 +129,7 @@ b'\xe4\xb8\xad\xe6\x96\x87'
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-1: ordinal not in range(128)
+
 ```
 
 纯英文的`str`可以用`ASCII`编码为`bytes`，内容是一样的，含有中文的`str`可以用`UTF-8`编码为`bytes`。含有中文的`str`无法用`ASCII`编码，因为中文编码的范围超过了`ASCII`编码的范围，Python会报错。
@@ -138,6 +143,7 @@ UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-1: ordin
 'ABC'
 >>> b'\xe4\xb8\xad\xe6\x96\x87'.decode('utf-8')
 '中文'
+
 ```
 
 要计算`str`包含多少个字符，可以用`len()`函数：
@@ -147,6 +153,7 @@ UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-1: ordin
 3
 >>> len('中文')
 2
+
 ```
 
 `len()`函数计算的是`str`的字符数，如果换成`bytes`，`len()`函数就计算字节数：
@@ -158,6 +165,7 @@ UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-1: ordin
 6
 >>> len('中文'.encode('utf-8'))
 6
+
 ```
 
 可见，1个中文字符经过UTF-8编码后通常会占用3个字节，而1个英文字符只占用1个字节。
@@ -169,6 +177,7 @@ UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-1: ordin
 ```python
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 ```
 
 第一行注释是为了告诉Linux/OS X系统，这是一个Python可执行程序，Windows系统会忽略这个注释；

@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="gunicorn中一个同步任务的坑">
+<link rel="stylesheet" href="/scss/style.min.d938302c9c68b5f1fda0a78ef59a80f98a22f71eeffb56a5408c148f22d8c7d5.css"><meta property='og:title' content="gunicorn中一个同步任务的坑">
 <meta property='og:description' content="最近有些django定时任务要跑，又懒的做异步celery worker tasks了，就是普通的同步任务，用的django crontab，其中django用的是gunicorn-nginx的部署方式。但几天下来...">
 <meta property='og:url' content='http://localhost:1313/posts/2018/06/2018-06-15-gunicorn%E4%B8%AD%E4%B8%80%E4%B8%AA%E5%90%8C%E6%AD%A5%E4%BB%BB%E5%8A%A1%E7%9A%84%E5%9D%91/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
@@ -214,7 +214,6 @@
     
     
     <p>最近有些django定时任务要跑，又懒的做异步celery worker tasks了，就是普通的同步任务，用的django crontab，其中django用的是gunicorn-&gt;nginx的部署方式。但几天下来，发现任务总是执行到一半就停了，排错发现一个偶尔会出现的坑</p>
-<p> </p>
 <p>&hellip;</p>
 <p>检测到用curl请求接口，每到31秒就停止，后续同步任务不再继续</p>
 <p>检查gonicorn参数，发现默认的timeout值为30s，既客户端请求30s后超时</p>
@@ -273,6 +272,17 @@
     <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/posts/2018/05/2018-05-28-django%E7%AC%94%E8%AE%B0crontab%E5%BC%82%E5%B8%B8%E6%8D%95%E8%8E%B7%E5%92%8C%E6%89%93%E5%8D%B0log/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">[django笔记]crontab,异常捕获和打印log</h2>
+        </div>
+    </a>
+</article>
             
                 
 <article class="">

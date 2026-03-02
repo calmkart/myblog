@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="virt-manager libxml2 module bug解决">
+<link rel="stylesheet" href="/scss/style.min.d938302c9c68b5f1fda0a78ef59a80f98a22f71eeffb56a5408c148f22d8c7d5.css"><meta property='og:title' content="virt-manager libxml2 module bug解决">
 <meta property='og:description' content="virt-manager是一个kvm的管理工具，在自己用的小型环境里还是很方便的，我也用了挺久。因为是mac所以是用homebrew-virt-manager。之前一直用的老版本，最近mac更新...">
 <meta property='og:url' content='http://localhost:1313/posts/2019/09/2019-09-19-virt-manager-libxml2-module-bug%E8%A7%A3%E5%86%B3/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
@@ -233,12 +233,11 @@
 </span></span><span class="line"><span class="cl"><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.7</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">libxml2</span><span class="o">.</span><span class="n">py</span>
 </span></span></code></pre></div><p>然后将libxml2包和相关包从系统python3的默认site-packages拷贝到virt-manager的site-packages中即可</p>
 <p>参考上面显示的路径，既是将</p>
-<p><strong>/usr/local/lib/python3.7/site-packages/libxml*</strong> </p>
+<p><strong>/usr/local/lib/python3.7/site-packages/libxml*</strong></p>
 <p>拷贝到</p>
 <p><strong>/usr/local/Cellar/virt-manager/2.2.1_2/libexec/lib/python3.7/site-packages</strong></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">cp</span> <span class="o">-</span><span class="n">r</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.7</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">libxml</span><span class="o">*</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">virt</span><span class="o">-</span><span class="n">manager</span><span class="o">/</span><span class="mf">2.2.1_2</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.7</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span>
-</span></span></code></pre></div><p> </p>
-<p>TIPS:</p>
+</span></span></code></pre></div><p>TIPS:</p>
 <p>1，注意要拷贝libxml*而不仅仅是libxml2.py，因为libxml2还依赖libxml2mod。拷贝少了还是会报找不到包。</p>
 <p>2，我们也可以将python3的package添加到默认PYTHONPATH中去，也可以解决这个问题。</p>
 <p>3，顺便记录一个virt / virt-manager使用的问题，更换默认存储池后新建的默认存储池必须设置名称为default，不然会自动在/var/lib/libvirt/目录下重建默认存储池</p>

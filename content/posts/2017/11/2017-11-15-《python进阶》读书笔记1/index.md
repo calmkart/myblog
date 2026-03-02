@@ -9,17 +9,18 @@ tags:
   - "python"
 ---
 
-#### **1.\*args与\*\*kwargs传参(不定长传参)**
+#### **1.*args与**kwargs传参(不定长传参)**
 
-其中\*args是列表传参,\*\*kwargs是字典传参
+其中*args是列表传参,**kwargs是字典传参
 
 使用举例：
 
 ```python
 function(fargs, *args, **kwargs)
+
 ```
 
-可以用function(1)，function(\[1,2\])，function({a:1})调用函数，都没问题。 <!--more-->
+可以用function(1)，function([1,2])，function({a:1})调用函数，都没问题。 <!--more-->
 
 #### **2.生成器yield**
 
@@ -36,6 +37,7 @@ for item in generation_function():
 #generation_function是生成器，可被迭代的
     print item
 #输出是0->9，但并不需要建立一个list，节省了内存
+
 ```
 
 #### **3.匿名函数**
@@ -48,6 +50,7 @@ lambda，可减少无需重复函数
 
 ```python
 lambda x : x+1
+
 ```
 
 #### **4.map()**
@@ -56,12 +59,14 @@ lambda x : x+1
 
 ```python
 map(function, list)
+
 ```
 
 也支持多参数:
 
 ```python
 map(function, list1, list2, list3....)
+
 ```
 
 常结合lambda匿名函数一起使用
@@ -71,9 +76,10 @@ map(function, list1, list2, list3....)
 ```python
 items=[1,2,3,4,5]
 print map(lambda x : x**2, items)
+
 ```
 
-输出\[1,4,9,16,25\]
+输出[1,4,9,16,25]
 
 map的本质既将一个函数映射到若干列表的所有元素上。
 
@@ -86,15 +92,17 @@ map的本质既将一个函数映射到若干列表的所有元素上。
 ```python
 number_list = range(-5,5)
 less_than_zero = filter(lambda x : x<0, number_list)
+
 ```
 
-输出\[-5,-4,-3,-2,-1\]
+输出[-5,-4,-3,-2,-1]
 
 #### 6.reduce()
 
 ```python
 from functools import reduce)
 product = reduce((lambda x,y:x*y),[1,2,3,4])
+
 ```
 
 输出24
@@ -109,12 +117,14 @@ product = reduce((lambda x,y:x*y),[1,2,3,4])
 
 ```python
 print (set1.intersection(set2))
+
 ```
 
 差集：
 
 ```python
 print (set1.difference(set2))
+
 ```
 
 #### 8.三元运算符
@@ -124,8 +134,9 @@ print (set1.difference(set2))
 ```python
 is_fat = True
 state = "fat" if is_fat else "not fat"
+
 ```
 
- 
 
-[《Python进阶》读书笔记(2)](http://www.calmkart.com/?p=139) [《Python进阶》读书笔记(3)](http://www.calmkart.com/?p=150)
+
+[《Python进阶》读书笔记(2)](/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02/) [《Python进阶》读书笔记(3)](/posts/2017/11/2017-11-16-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03/)

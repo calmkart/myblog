@@ -29,6 +29,7 @@ def requires_auth(f):
             authenticate()
         return f(*args, **kwargs)
     return decorated
+
 ```
 
 <!--more-->
@@ -51,6 +52,7 @@ print a  #---->[1]
 b = a
 b.append(2)
 print a #----->[1,2]
+
 ```
 
 因为list为可变数据类型，而a和b指向同一片内存。当对b做+=操作时，只是向后扩充内存内容，而不会修改内存位置。所以a也改变了。
@@ -59,7 +61,7 @@ print a #----->[1,2]
 
 #### 11.__slots__
 
-在类的定义中使用__slots__=\["name","age"\]，则只有__slots__这个set中的属性可以被分配内存，不在其中的不可被分配内存。
+在类的定义中使用__slots__=["name","age"]，则只有__slots__这个set中的属性可以被分配内存，不在其中的不可被分配内存。
 
 #### 12.容器collections
 
@@ -76,6 +78,7 @@ favourite_colors = defaultdict(list)
 for name,color in colors:
     favourite_colors[name].append(color)
     #默认用name这个list作为KEY
+
 ```
 
 2.counter计数器
@@ -85,12 +88,14 @@ from collections import counter
 c= counter(...)#为内部元素计数
 favs = counter(name for name,color in colors)
 #为name计数,以dict返回
+
 ```
 
 3.deque双向链表
 
 ```python
 from collections import deque
+
 ```
 
 4.namedtuple命名元组
@@ -105,6 +110,7 @@ print perry.name
 #输出perry
 #可将命名元组转换为dict，用_asdict()方法
 perry._asdict()
+
 ```
 
 #### 13.dir()
@@ -116,6 +122,7 @@ perry._asdict()
 ```python
 a = [1,2,3]
 print dir(a)
+
 ```
 
 #### 14.type()和id()
@@ -133,6 +140,7 @@ type()返回对象类型，id()返回不同种类对象唯一ID
 ```python
 m=[i for i in range(30) if i%3 is 0]
 #------------这是list-----这是条件-----
+
 ```
 
 语法：
@@ -140,14 +148,16 @@ m=[i for i in range(30) if i%3 is 0]
 ```python
 variable = [out_exp for out_exp in input_list if out_exp==2]
 #----------------------------------这是list------这是条件----
+
 ```
 
 2.字典推导式
 
 ```python
 dict = {v:k for k,v in some_dict.items()}
+
 ```
 
- 
 
-[《Python进阶》读书笔记(1)](http://www.calmkart.com/?p=124) [《Python进阶》读书笔记(3)](http://www.calmkart.com/?p=150)
+
+[《Python进阶》读书笔记(1)](/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01/) [《Python进阶》读书笔记(3)](/posts/2017/11/2017-11-16-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03/)

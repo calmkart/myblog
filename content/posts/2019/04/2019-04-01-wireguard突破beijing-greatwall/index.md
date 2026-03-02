@@ -24,7 +24,7 @@ wireguard是一种比较新的vpn，基于udp，速度可以说秒杀其他vpn(�
 
 所以，很推荐现在用不了ss的朋友试试这个新东西，下面开始配置过程。
 
- 
+
 
 首先配置服务端
 
@@ -58,6 +58,7 @@ systemctl status wg-quick@wg0.service
 #然后生成客户端配置文件
 wg showconf wg0
 #客户端配置文件将自动生成为/etc/wireguard/wg0.conf
+
 ```
 
 服务端这就已经配置完毕了，接着配置客户端(客户端用的Tunsafe，下载在文末)
@@ -73,9 +74,10 @@ Endpoint = [服务端ip地址]:[服务端配置的ip端口号]
 #点击import,导入下载下来的配置文件
 #然后点击connect即可
 enjoy it
+
 ```
 
- 
+
 
 总的来说，用了也一段时间了，wireguard的稳定性和可靠性还是很棒的，但是还是有些缺点。
 

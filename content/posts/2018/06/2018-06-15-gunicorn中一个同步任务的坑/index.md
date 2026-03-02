@@ -11,7 +11,7 @@ tags:
 
 最近有些django定时任务要跑，又懒的做异步celery worker tasks了，就是普通的同步任务，用的django crontab，其中django用的是gunicorn->nginx的部署方式。但几天下来，发现任务总是执行到一半就停了，排错发现一个偶尔会出现的坑
 
- 
+
 
 ...
 

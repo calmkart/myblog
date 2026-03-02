@@ -7,7 +7,6 @@ categories:
 tags: 
   - "alertmanager"
   - "grafana"
-  - "k8s"
   - "kubernetes"
   - "prometheus"
   - "云原生"
@@ -254,7 +253,7 @@ prometheus-pushgateway    19d
 
 ```
 
-我们创建一个新的serviceMonitor,将calm-server的/metrics作为target \# calm-server-serviceMonitor.yaml
+我们创建一个新的serviceMonitor,将calm-server的/metrics作为target # calm-server-serviceMonitor.yaml
 
 ```yaml
 apiVersion: monitoring.coreos.com/v1

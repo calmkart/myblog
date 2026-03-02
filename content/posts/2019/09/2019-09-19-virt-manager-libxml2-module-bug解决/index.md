@@ -16,6 +16,7 @@ tags:
 File "/usr/local/Cellar/virt-manager/2.2.1_2/libexec/share/virt-manager/virtinst/xmlapi.py", line 7, in <module>
     import libxml2
 ModuleNotFoundError: No module named 'libxml2'
+
 ```
 
 原因是默认的包从python2升级到了python3。
@@ -24,6 +25,7 @@ ModuleNotFoundError: No module named 'libxml2'
 
 ```bash
 pip3 install libxml2-python3
+
 ```
 
 然后查询安装位置
@@ -36,13 +38,14 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> import libxml2
 >>> print(libxml2.__file__)
 /usr/local/lib/python3.7/site-packages/libxml2.py
+
 ```
 
 然后将libxml2包和相关包从系统python3的默认site-packages拷贝到virt-manager的site-packages中即可
 
 参考上面显示的路径，既是将
 
-**/usr/local/lib/python3.7/site-packages/libxml\*** 
+**/usr/local/lib/python3.7/site-packages/libxml\***
 
 拷贝到
 
@@ -50,13 +53,14 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 ```python
 cp -r /usr/local/lib/python3.7/site-packages/libxml* /usr/local/Cellar/virt-manager/2.2.1_2/libexec/lib/python3.7/site-packages
+
 ```
 
- 
+
 
 TIPS:
 
-1，注意要拷贝libxml\*而不仅仅是libxml2.py，因为libxml2还依赖libxml2mod。拷贝少了还是会报找不到包。
+1，注意要拷贝libxml*而不仅仅是libxml2.py，因为libxml2还依赖libxml2mod。拷贝少了还是会报找不到包。
 
 2，我们也可以将python3的package添加到默认PYTHONPATH中去，也可以解决这个问题。
 

@@ -10,7 +10,7 @@ tags:
 
 服务器系统为ubuntu16.04 server <!--more-->
 
-# 网络结构:
+## 网络结构:
 
 ![](images/20170803_163110.jpg)
 
@@ -20,7 +20,7 @@ Client1(ubuntu16.04)：单网卡，enp0s3内网网卡（无法上外网，IP169.
 
 Client2(WIN7)：单网卡，内网网卡（无法上外网，IP169.254.39.53/16）
 
-# 1.首先配源
+## 1.首先配源
 
 Vi  /etc/apt/source.list
 
@@ -144,6 +144,6 @@ Iptables -t nat -A POSTROUTING -s 172.168.0.0/24 -o enp0s8 -j MASQUERADE
 
 ```
 
- 
+
 
 把172.168段的伪装到enp0s8外网网卡上。既可拨上外网。

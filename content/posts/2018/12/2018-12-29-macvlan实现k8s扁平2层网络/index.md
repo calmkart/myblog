@@ -4,6 +4,9 @@ date: 2018-12-29
 description: "最近有一批旧服务器待用，没有用iaas，打算把docker当vm来用，还想采用k8s的编排方案。这样用户就可以很方便的通过ip直连docker，就像虚拟机一样。 原生的docker网络方案是不行的..."
 categories:
   - "计算机"
+tags:
+  - "kubernetes"
+  - "容器"
 ---
 
 最近有一批旧服务器待用，没有用iaas，打算把docker当vm来用，还想采用k8s的编排方案。这样用户就可以很方便的通过ip直连docker，就像虚拟机一样。
@@ -30,6 +33,7 @@ systemctl disable firewalld
 setenforce 0
 sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 swapoff -a
+
 ```
 
 配置k8s国内源,设置系统bridge参数
@@ -52,6 +56,7 @@ net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 EOF
 sysctl --system
+
 ```
 
 用国内源下载k8s相关镜像，重新打tag成k8s.gcr.io(就算可以翻墙，这一步也可以加速很多)
@@ -78,6 +83,7 @@ EOF
 
 #下载镜像
 bash ~/get_image.sh
+
 ```
 
 下载cni网络插件包 [https://github.com/containernetworking/plugins/releases](https://github.com/containernetworking/plugins/releases) 当前0.7.4版下载地址是 [https://github.com/containernetworking/plugins/releases/download/v0.7.4/cni-plugins-amd64-v0.7.4.tgz](https://github.com/containernetworking/plugins/releases/download/v0.7.4/cni-plugins-amd64-v0.7.4.tgz)
@@ -87,6 +93,7 @@ mkdir -p /opt/cni/bin/
 cd /opt/cni/bin
 wget https://github.com/containernetworking/plugins/releases/download/v0.7.4/cni-plugins-amd64-v0.7.4.tgz
 tar xzvf cni-plugins-amd64-v0.7.4.tgz
+
 ```
 
 安装k8s全家桶
@@ -94,12 +101,14 @@ tar xzvf cni-plugins-amd64-v0.7.4.tgz
 ```bash
 yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 systemctl enable kubelet && systemctl start kubelet
+
 ```
 
 kubeadm做k8s初始化,记录node用来join的token连接(当然用crt也行)
 
 ```yaml
 kubeadm init
+
 ```
 
 最后配置网络插件macvlan
@@ -135,6 +144,7 @@ vim /etc/cni/net.d/10-macvlan.conf
 
 #特别贴士---->在使用DHCP插件之前，需要先启动dhcp daemon
 /opt/cni/bin/dhcp daemon &
+
 ```
 
 看下主节点是否ok
@@ -157,12 +167,14 @@ kubectl get nodes
 kubectl get pods --all-namespaces
 #如果有问题,就用describe自己查查吧,一般都不难解决
 kubectl describe pod
+
 ```
 
 让master也可以运行pod
 
 ```bash
 kubectl taint nodes --all node-role.kubernetes.io/master-
+
 ```
 
 然后随便弄个pod试试管用了没
@@ -190,6 +202,7 @@ spec:
 kubectl create -f pod-macvlan.yaml
 #查看下pod情况
 kubectl get pods -o wide
+
 ```
 
 一般情况下是没问题，pod已经和宿主机在同一个2层网络了，同2层的其他网络也可以到该pod直通。 这时候就可以直接把pod当vm用了,和桥接的vm几乎没啥区别。
@@ -202,6 +215,7 @@ kubectl get pods -o wide
 #举例
 kubeadm join 10.52.101.28:6443 --token b7eber.9e26oenyos7j17v8 --discovery-token-ca-cert-hash sha256:9faeb9f6ce6281d2ae149c9424ec34297e6809ce1f88c920281f1e5da8b1b1f8
 之外，其他不用变化啥。(确实多pull了几个kubeapi啥的镜像，不过无所谓了，不pull也行)
+
 ```
 
 最终结果 nodes ![](images/nodes.jpg) pods ![](images/pods.jpg)

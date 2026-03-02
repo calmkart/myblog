@@ -19,6 +19,7 @@ linux进程管理器supervisor是会经常被用到的，但服务器多了之�
 apt-get install supervisor
 #pip install supervisor
 echo_supervisord_conf > /etc/supervisor/supervisord.conf
+
 ```
 
 关于supervisor配置文件
@@ -88,6 +89,7 @@ members = 118,calmkart,121
 database = /root/cesi/userinfo.db
 activity_log = /var/log/cesi.log
 host = 0.0.0.0
+
 ```
 
 用supervisor运行cesi,配置文件如下
@@ -103,12 +105,14 @@ startretries = 3
 user = root
 redirect_stderr = true
 stdout_logfile = /var/log/cesi1.log
+
 ```
 
 开启任务
 
 ```bash
 supervisorctl start cesi
+
 ```
 
 默认账号密码：admin,admin 端口需要改的自己去web.py里面改 you get it

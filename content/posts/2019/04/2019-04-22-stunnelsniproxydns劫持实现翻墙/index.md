@@ -2,8 +2,11 @@
 title: "stunnel+sniproxy+dns劫持实现翻墙"
 date: 2019-04-22
 description: "原理其实挺简单的,懂得都懂,不多说了.配置过程也简单,懒的记细节了,留个图备个份.(文章无内容) --"
-categories: 
+categories:
   - "计算机"
+tags:
+  - "翻墙"
+  - "vpn"
 ---
 
 原理其实挺简单的,懂得都懂,不多说了.配置过程也简单,懒的记细节了,留个图备个份.(文章无内容)![](images/YWRtaW4_037343.png)

@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="openstack部署指南(devstack/newton)">
+<link rel="stylesheet" href="/scss/style.min.d938302c9c68b5f1fda0a78ef59a80f98a22f71eeffb56a5408c148f22d8c7d5.css"><meta property='og:title' content="openstack部署指南(devstack/newton)">
 <meta property='og:description' content="1.部署环境 本次openstack部署环境为三台服务器，系统统一为ubuntu16.04 server。三台服务器分别为R730，R720，R710，其中R730作为控制节点+网络节点+计算节点，R710与R720作为计算节点。">
 <meta property='og:url' content='http://localhost:1313/posts/2017/08/2017-08-03-openstack%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97devstacknewton/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
@@ -154,6 +154,9 @@
             <nav class="toc-nav" id="TableOfContents">
                 
   <ol>
+    <li><a href="#1部署环境">1.部署环境</a></li>
+    <li><a href="#2控制节点网络拓扑">2.控制节点网络拓扑</a></li>
+    <li><a href="#3部署过程细节">3.部署过程细节</a></li>
     <li><a href="#1为各台服务器配置网卡参数">1.为各台服务器配置网卡参数</a></li>
     <li><a href="#2配置devstack相关环境">2.配置devstack相关环境</a>
       <ol>
@@ -165,9 +168,7 @@
       </ol>
     </li>
     <li><a href="#3部署过程">3.部署过程</a></li>
-  </ol>
-
-  <ol>
+    <li><a href="#4其他杂项">4.其他杂项</a></li>
     <li><a href="#1部署过程中出错的解决方案">1.部署过程中出错的解决方案</a></li>
     <li><a href="#2更改devstack部署配置localconf">2.更改devstack部署配置local.conf</a></li>
     <li><a href="#3重启服务器导致所有服务全部宕机">3.重启服务器导致所有服务全部宕机</a></li>
@@ -273,6 +274,9 @@
             <nav class="toc-nav">
                 
   <ol>
+    <li><a href="#1部署环境">1.部署环境</a></li>
+    <li><a href="#2控制节点网络拓扑">2.控制节点网络拓扑</a></li>
+    <li><a href="#3部署过程细节">3.部署过程细节</a></li>
     <li><a href="#1为各台服务器配置网卡参数">1.为各台服务器配置网卡参数</a></li>
     <li><a href="#2配置devstack相关环境">2.配置devstack相关环境</a>
       <ol>
@@ -284,9 +288,7 @@
       </ol>
     </li>
     <li><a href="#3部署过程">3.部署过程</a></li>
-  </ol>
-
-  <ol>
+    <li><a href="#4其他杂项">4.其他杂项</a></li>
     <li><a href="#1部署过程中出错的解决方案">1.部署过程中出错的解决方案</a></li>
     <li><a href="#2更改devstack部署配置localconf">2.更改devstack部署配置local.conf</a></li>
     <li><a href="#3重启服务器导致所有服务全部宕机">3.重启服务器导致所有服务全部宕机</a></li>
@@ -304,24 +306,23 @@
     <section class="article-content">
     
     
-    <h1 id="1部署环境">1.部署环境
-</h1><p>本次openstack部署环境为三台服务器，系统统一为ubuntu16.04 server。三台服务器分别为R730，R720，R710，其中R730作为控制节点+网络节点+计算节点，R710与R720作为计算节点。</p>
+    <h2 id="1部署环境">1.部署环境
+</h2><p>本次openstack部署环境为三台服务器，系统统一为ubuntu16.04 server。三台服务器分别为R730，R720，R710，其中R730作为控制节点+网络节点+计算节点，R710与R720作为计算节点。</p>
 <p>部署环境如下图所示： <img src="images/QerThQ3lh1t69wOLWlXP3g.png" alt="" />
  其中各机器eth1网卡为管理及API网络（同时也是部署与下载网络），eth2网卡为虚拟机内部租户网络，控制节点R730服务器的eth2网卡为用来上网的外部网络。</p>
 <p>其中各节点安装服务列表如下： (R730)Devstack-controller：Keystone,Glance,Cinder,Neutron,Nova&hellip;.. (R720)Devstack-compute-1：KVM Hypervisor,Nova,Neutron agent&hellip;. (R710)Devstack-compute-2：KVM Hypervisor,Nova,Neutron agent&hellip;.</p>
-<h1 id="2控制节点网络拓扑">2.控制节点网络拓扑
-</h1><p><img src="images/%e7%81%ab%e6%98%9f%e5%9b%be%e7%89%87_20170803_141421.jpg" alt="" />
+<h2 id="2控制节点网络拓扑">2.控制节点网络拓扑
+</h2><p><img src="images/%e7%81%ab%e6%98%9f%e5%9b%be%e7%89%87_20170803_141421.jpg" alt="" />
 </p>
 <p>外网网卡eth2绑定OVS外部网络网桥Br-ex，再通过虚拟路由器连接内部OVS网桥Br-int与Br-ex，实现内部虚拟机与外部的通信。 但由于虚拟路由默认自带DHCP功能，会污染外部网络，所以目前的做法是将虚拟路由的DHCP功能关闭，为内部一台跳板机手动配置IP，然后所有内部虚拟机通过此跳板机访问。</p>
-<h1 id="3部署过程细节">3.部署过程细节
-</h1><h2 id="1为各台服务器配置网卡参数">1.为各台服务器配置网卡参数
+<h2 id="3部署过程细节">3.部署过程细节
+</h2><h2 id="1为各台服务器配置网卡参数">1.为各台服务器配置网卡参数
 </h2><p>/etc/network/interfaces</p>
 <p>R730： <img src="images/1.png" alt="" />
  R720： <img src="images/2.png" alt="" />
  R710： <img src="images/3.png" alt="" />
 </p>
 <p>重启机器</p>
-<p> </p>
 <h2 id="2配置devstack相关环境">2.配置devstack相关环境
 </h2><h3 id="1配置中国的镜像源">1.配置中国的镜像源
 </h3><p>Vi /etc/apt/sources.list</p>
@@ -489,8 +490,8 @@
 </h2><p>首先在R730控制节点运行 ./stack.sh 等待部署完成，差不多2钟头内就会完成</p>
 <p>然后把外网网卡eno2绑定到外部网络网桥br-ex上，把eno2的ip交给br-ex网桥。接着把/etc/neutron/l3_agent.ini中external_network_bridge选项改为br-ex。 同时，修改/etc/neutron/plugins/ml2/ml2_conf.ini文件，把br-ex对应的项目选择正确，同时记录flat_networks的名称，与下面的外网网桥对应，此名称即为horizon中FLAT网络类型的物理网络名称，一定不可填错。最后通过screen -x stack进入neutron服务，重启之，即可。</p>
 <p>然后在R710和R720计算节点运行 ./stack.sh 既可（计算节点部署时间在30分钟以内，可随时按上述操作步骤新增计算节点）</p>
-<h1 id="4其他杂项">4.其他杂项
-</h1><h2 id="1部署过程中出错的解决方案">1.部署过程中出错的解决方案
+<h2 id="4其他杂项">4.其他杂项
+</h2><h2 id="1部署过程中出错的解决方案">1.部署过程中出错的解决方案
 </h2><p>首先查看错误类型，常见的错误是网络问题导致下载失败 然后运行 ./unstack.sh 解除安装</p>
 <p>再运行 ./clean.sh 清理环境</p>
 <p>然后重试安装，如果还是出BUG的话，删除/opt/stack/目录，删除stack用户，重新git clone一个devstack包，创建stack用户进行安装(记得查看python-pip有无安装，没有安装一定要先安装好)</p>

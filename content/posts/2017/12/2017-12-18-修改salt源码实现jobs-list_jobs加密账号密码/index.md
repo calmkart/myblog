@@ -27,6 +27,7 @@ import re
 def encry_pass(target):
     result = re.sub(r"(?<=--password )\w+", "*", target)
     return result
+
 ```
 
 并在list_job()函数，list_jobs()函数，list_jobs_filter()函数，print_job()函数末尾分别加入如下代码
@@ -56,6 +57,7 @@ return ret
 
 ```bash
 ret = eval(encry_pass(str(ret)))
+
 ```
 
 因为ret是dict类型，得先把dict类型转换成str类型再写入encry_pass()正则匹配函数的参数里，然后encry_pass()正则匹配函数返回一个str对象，而ret需要的是dict对象，所以需要再用eval()转回来,也就是 ret(dict)---->str(ret)----->ret(str)----->result(str)----->eval(result)----->result(dict)----->ret(dict)

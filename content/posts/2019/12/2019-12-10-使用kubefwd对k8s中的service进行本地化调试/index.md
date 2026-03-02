@@ -5,9 +5,8 @@ description: "大家都知道,k8s中的服务(service)是对k8s中的deployment�
 categories: 
   - "计算机"
 tags: 
-  - "k8s"
-  - "kubefwd"
   - "kubernetes"
+  - "kubefwd"
 ---
 
 大家都知道,k8s中的服务(service)是对k8s中的deployment等对象的一个一致访问点.所以service会有一个vip(headless service没有).无论是普通service的vip或者headless service的pod ip其实都是k8s集群中的内部ip,在集群内访问它是非常容易的.比如有一个service叫nginx,我们在集群内的另一个pod里既可以对这个nginx service的vip进行get访问,也可以通过coredns对这个nginx service的域名如(nginx, nginx.default等)进行访问.但是在集群外呢?这就麻烦了.
@@ -162,7 +161,7 @@ spec:
 
 ```
 
- 
+
 
 ```bash
 ➜  ~ kubectl apply -f nginx2.yaml

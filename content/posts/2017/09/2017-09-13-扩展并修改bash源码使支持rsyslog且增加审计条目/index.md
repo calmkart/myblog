@@ -22,17 +22,19 @@ tags:
 
 ```bash
 #define SSH_SOURCE_BASHRC
+
 ```
 
 的注释 二.116行，取消
 
 ```bash
 #define SYSLOG_HISTORY
+
 ```
 
 的注释
 
- 
+
 
 然后编辑bashhist.c源码文件，主要关注750行->800行。 未经修改的原文件：
 

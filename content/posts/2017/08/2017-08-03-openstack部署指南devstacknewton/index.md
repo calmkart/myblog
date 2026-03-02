@@ -10,7 +10,7 @@ tags:
   - "虚拟化"
 ---
 
-# 1.部署环境
+## 1.部署环境
 
 本次openstack部署环境为三台服务器，系统统一为ubuntu16.04 server。三台服务器分别为R730，R720，R710，其中R730作为控制节点+网络节点+计算节点，R710与R720作为计算节点。 <!--more-->
 
@@ -18,13 +18,13 @@ tags:
 
 其中各节点安装服务列表如下： (R730)Devstack-controller：Keystone,Glance,Cinder,Neutron,Nova..... (R720)Devstack-compute-1：KVM Hypervisor,Nova,Neutron agent.... (R710)Devstack-compute-2：KVM Hypervisor,Nova,Neutron agent....
 
-# 2.控制节点网络拓扑
+## 2.控制节点网络拓扑
 
 ![](images/火星图片_20170803_141421.jpg)
 
 外网网卡eth2绑定OVS外部网络网桥Br-ex，再通过虚拟路由器连接内部OVS网桥Br-int与Br-ex，实现内部虚拟机与外部的通信。 但由于虚拟路由默认自带DHCP功能，会污染外部网络，所以目前的做法是将虚拟路由的DHCP功能关闭，为内部一台跳板机手动配置IP，然后所有内部虚拟机通过此跳板机访问。
 
-# 3.部署过程细节
+## 3.部署过程细节
 
 ## 1.为各台服务器配置网卡参数
 
@@ -34,7 +34,7 @@ R730： ![](images/1.png) R720： ![](images/2.png) R710： ![](images/3.png)
 
 重启机器
 
- 
+
 
 ## 2.配置devstack相关环境
 
@@ -64,6 +64,7 @@ Vi /root/.pip/pip.conf
 timeout = 60
 index-url = http://pypi.douban.com/simple
 trusted-host = pypi.douban.com
+
 ```
 
 ### 3.下载devstack代码
@@ -250,7 +251,7 @@ SPICE_REPO=http://git.trystack.cn/git/spice/spice-html5.git
 
 然后在R710和R720计算节点运行 ./stack.sh 既可（计算节点部署时间在30分钟以内，可随时按上述操作步骤新增计算节点）
 
-# 4.其他杂项
+## 4.其他杂项
 
 ## 1.部署过程中出错的解决方案
 

@@ -6,14 +6,13 @@ categories:
   - "计算机"
 tags: 
   - "ceph"
-  - "k8s"
   - "kubernetes"
   - "rook"
   - "分布式存储"
   - "运维开发"
 ---
 
-k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下. <!--more--> 首先有一个三个节点的k8s集群 ![](images/111.png) 首先创建rook-ceph-common 
+k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下. <!--more--> 首先有一个三个节点的k8s集群 ![](images/111.png) 首先创建rook-ceph-common
 
 ```bash
 wget https://raw.githubusercontent.com/rook/rook/master/cluster/examples/kubernetes/ceph/common.yaml
@@ -73,9 +72,10 @@ spec:
 
 ```bash
 kubectl apply -f cluster.yaml
+
 ```
 
-查看部署情况 ![](images/2.png) 这样就基本上没问题了,k8s中的每个Node会启两个pod(rook-ceph-agent和rook-discover),并且mgr和osd都没问题。 然后给ceph-dashboard提供NodePort的外部访问service 
+查看部署情况 ![](images/2.png) 这样就基本上没问题了,k8s中的每个Node会启两个pod(rook-ceph-agent和rook-discover),并且mgr和osd都没问题。 然后给ceph-dashboard提供NodePort的外部访问service
 
 ```yaml
 vim dashboard-external-http.yaml
@@ -99,6 +99,7 @@ spec:
     rook_cluster: rook-ceph
   sessionAffinity: None
   type: NodePort
+
 ```
 
 ```bash
@@ -112,6 +113,7 @@ kubectl apply -f dashboard-external-https.yaml
 
 ```bash
 kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath="{['data']['password']}" | base64 --decode && echo
+
 ```
 
 但是admin登陆进去了之后，肯定会疯狂500错误，查了下官方的issue，这里有bug。
@@ -141,6 +143,7 @@ parameters:
   blockPool: replicapool
   clusterNamespace: rook-ceph
   fstype: xfs
+
 ```
 
 ```bash
@@ -167,6 +170,7 @@ spec:
   resources:
     requests:
       storage: 20Gi
+
 ```
 
 ![](images/企业微信截图_dd2a2f8b-10fb-4f3f-8d21-bbaa31a4ba7d.png) 可见，管用了.

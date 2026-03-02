@@ -8,7 +8,6 @@ tags:
   - "dns"
   - "externalip"
   - "ingress"
-  - "k8s"
   - "kubernetes"
   - "nginx"
   - "服务发现"

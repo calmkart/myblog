@@ -30,6 +30,7 @@ class login(View):
     def get(self, request, username):
         #....func...
         return render(request, 'login.html', {"displayName":username, "admin_flag":admin_flag})
+
 ```
 
 <!--more-->
@@ -51,6 +52,7 @@ class login(View):
     def get(self, request, username):
         #....func...
         return render(request, 'login.html', {"displayName":username, "admin_flag":admin_flag})
+
 ```
 
 需要稍微注意的是，csrf_exempt跨站排除装饰器，只能修饰在类视图的dispatch方法上，既原始写法如下：
@@ -65,6 +67,7 @@ class login(View):
     def get(self, request, username):
         #....func...
         return render(request, 'login.html', {"displayName":username, "admin_flag":admin_flag})
+
 ```
 
 但其实直接用类方法装饰器装饰视图类，传入参数name=dispatch就行了，不需要重写dispatch方法。

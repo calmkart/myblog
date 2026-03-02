@@ -7,7 +7,6 @@ categories:
 tags: 
   - "django"
   - "salt"
-  - "saltstack"
 ---
 
 salt的webui,官方的是halite,但已经被放弃了，不维护很久了 尝试过其他几个star比较的开源实现,比如saltpad,但要么就是bug满天飞,要么就是技能栈不符难以二次开发 最后发现了一个开源实现叫saltshaker的不错,最终效果如下 ![](images/企业微信截图_82481f1c-b153-4fb5-928f-2b98163e9635.png) <!--more-->

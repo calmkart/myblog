@@ -25,6 +25,7 @@ pid = os.popen("lsof -i:82|grep python|awk '{print $2}'").read()
 if len(pid):
     subprocess.check_output("kill -9 "+str(int(pid)), shell=True)
 #注意，这里一定要用subprocess库来kill进程。用os.system运行kill -9或os.kill()都会导致新进程产生
+
 ```
 
 这样虽然可行，但是比较麻烦。其实占用端口的原因是flask/django服务器自动reload造成的，只需要在supervisor/gosuv的启动指令里，加上--noreload参数就不会产生这个"BUG"了，举例如下：
@@ -34,6 +35,7 @@ if len(pid):
 python manage.py runserver 0.0.0.0:82
 #更新启动指令
 python manage.py runserver 0.0.0.0:82 --noreload
+
 ```
 
 搞定

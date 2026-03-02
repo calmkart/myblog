@@ -92,6 +92,7 @@ class get_captcha(View):
             return HttpResponse(f.getvalue())
         except Exception as e:
             log().error(str(e))
+
 ```
 
 3.login.html
@@ -112,6 +113,7 @@ class get_captcha(View):
         $("#captcha_img").attr("src",$("#captcha_img")[0].src + '?');
     };
 </script>
+
 ```
 
 4.url.py

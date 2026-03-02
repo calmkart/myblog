@@ -16,6 +16,7 @@ tags:
 git clone https://github.com/cfsego/file-md5.git
 git clone https://github.com/aperezdc/ngx-fancyindex.git
 wget https://github.com/nginx/nginx/archive/release-1.6.2.tar.gz
+
 ```
 
 修改/ngx-fancyindex/template.h文件
@@ -32,6 +33,7 @@ wget https://github.com/nginx/nginx/archive/release-1.6.2.tar.gz
 "<th style=\"width:35%\"><a href=\"?C=S&O=A\">File Size</a>&nbsp;<a href=\"?C=S&O=D\">&nbsp;&darr;&nbsp;</a></th>"
 "<th style=\"width:25%\"><a href=\"?C=M&O=A\">Date</a>&nbsp;<a href=\"?C=M&O=D\">&nbsp;&darr;&nbsp;</a></th>"
 "</tr>"
+
 ```
 
 接着执行
@@ -40,6 +42,7 @@ wget https://github.com/nginx/nginx/archive/release-1.6.2.tar.gz
 cd ./nginx-release-1.6.2
 ./auto/configure --prefix=/usr/local/nginx --with-pcre --with-http_stub_status_module --with-http_ssl_module --with-http_gzip_static_module --add-module=../file-md5-master --add-module=../ngx-fancyindex
 make
+
 ```
 
 然后修改nginx配置文件
@@ -60,6 +63,7 @@ location / {
  40         fancyindex_ignore "static";
  41         add_header Content-MD5 $file_md5;
  42     }
+
 ```
 
 在需要分享的路径创建文件./static/md5.js，测试机中是/var/www/

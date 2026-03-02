@@ -35,9 +35,6 @@
     <loc>http://localhost:1313/tags/%E5%93%B2%E5%AD%A6/</loc>
     <lastmod>2025-11-03T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/k8s/</loc>
-    <lastmod>2022-03-05T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/tags/kubernetes/</loc>
     <lastmod>2022-03-05T00:00:00+00:00</lastmod>
   </url><url>
@@ -62,10 +59,13 @@
     <loc>http://localhost:1313/posts/2020/04/2020-04-20-%E4%B8%8D%E8%A6%81%E5%81%9C%E6%AD%A2%E5%AD%A6%E4%B9%A0/</loc>
     <lastmod>2020-04-20T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/%E8%AF%BB%E4%B9%A6/</loc>
-    <lastmod>2019-12-25T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/tags/%E6%84%9F%E6%82%9F/</loc>
+    <lastmod>2020-04-20T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/%E6%9D%82%E8%B0%88/</loc>
+    <lastmod>2020-04-20T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/%E8%AF%BB%E4%B9%A6/</loc>
     <lastmod>2019-12-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/2019/12/2019-12-25-%E7%90%90%E4%BA%8B%E7%B9%81%E5%A4%9A%E6%98%AF%E4%B8%8D%E6%98%AF%E4%B8%80%E5%AE%9A%E4%B8%8D%E5%A5%BD/</loc>
@@ -251,19 +251,19 @@
     <loc>http://localhost:1313/posts/2019/04/2019-04-22-stunnelsniproxydns%E5%8A%AB%E6%8C%81%E5%AE%9E%E7%8E%B0%E7%BF%BB%E5%A2%99/</loc>
     <lastmod>2019-04-22T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>http://localhost:1313/tags/vpn/</loc>
+    <lastmod>2019-04-22T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/%E7%BF%BB%E5%A2%99/</loc>
+    <lastmod>2019-04-22T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>http://localhost:1313/posts/2019/04/2019-04-02-myip-calmkart-com%E8%8E%B7%E5%8F%96%E8%87%AA%E5%B7%B1%E7%9A%84%E5%87%BA%E5%8F%A3ip/</loc>
     <lastmod>2019-04-02T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/shadowsocks/</loc>
     <lastmod>2019-04-01T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/vpn/</loc>
-    <lastmod>2019-04-01T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/posts/2019/04/2019-04-01-wireguard%E7%AA%81%E7%A0%B4beijing-greatwall/</loc>
-    <lastmod>2019-04-01T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/%E7%BF%BB%E5%A2%99/</loc>
     <lastmod>2019-04-01T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/2018/12/2018-12-29-macvlan%E5%AE%9E%E7%8E%B0k8s%E6%89%81%E5%B9%B32%E5%B1%82%E7%BD%91%E7%BB%9C/</loc>
@@ -378,9 +378,6 @@
     <lastmod>2018-07-06T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/2018/07/2018-07-06-saltshaker-%E4%B8%80%E4%B8%AAsalt%E7%9A%84webui/</loc>
-    <lastmod>2018-07-06T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/saltstack/</loc>
     <lastmod>2018-07-06T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/gunicorn/</loc>

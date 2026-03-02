@@ -57,6 +57,7 @@ export C_FORCE_ROOT="true"
 
 #最后创建用户
 sentry createuser
+
 ```
 
 在upgrade过程中可能会出现错误，根据具体错误类型判断如何排错，然后删掉数据库后重建数据库，再upgrade即可，一般都是数据库权限问题。
@@ -87,16 +88,18 @@ sentry run web
 ```bash
 #找到venv的虚拟环境，用虚拟环境的bin运行项目
 ./venv/bin/python runserver.py
+
 ```
 
 #### 3.sentry web的应用和配置
 
 默认起的sentry web占用的是9000端口，也可以自己修改端口号。 登陆ip:9000，输入刚才设置的邮箱账号密码进入sentry，填一下相关设置 点击右上角new project,选择你需要监控错误的对象，这里选择flask，然后会出现 ![](images/sentry4.jpg) 主要关注这个DSN key，在已有的项目可以在这里查看 ![](images/sentry5.jpg)
 
-然后首先在客户端安装maven\[flask\]
+然后首先在客户端安装maven[flask]
 
 ```bash
 pip install raven[flask]
+
 ```
 
 最后在flask程序里添加如下
@@ -129,6 +132,7 @@ def auto_raise():
 def log():
     sentry.captureMessage('hello, world!')
     return 'logging'
+
 ```
 
 类似如图结构： ![](images/flask.jpg)

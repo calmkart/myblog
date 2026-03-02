@@ -16,6 +16,7 @@ tags:
 
 ```bash
 pip install python-ldap
+
 ```
 
 然后开始代码部分 <!--more-->
@@ -145,6 +146,7 @@ class MyLdap():
 
 ```python
 ldap_client = MyLdap(ldap_url, base_dn, admin, password)
+
 ```
 
 代码注释已经写的很清楚了感觉,不再写详情了,本文做个备忘

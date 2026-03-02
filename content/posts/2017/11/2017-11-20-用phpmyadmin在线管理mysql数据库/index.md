@@ -24,6 +24,7 @@ tags:
 ```sql
 $cfg[‘Servers’][$i][‘controluser’] = ‘您的数据库名称’;
 $cfg[‘Servers’][$i][‘controlpass’] = ‘您的数据库密码’;
+
 ```
 
 **注意：**
@@ -35,6 +36,7 @@ mysql -uroot -p
 CREATE USER 'phpmyadmin'@'localhost' IDENTIFIED BY 'some_pass';
 GRANT ALL PRIVILEGES ON *.* TO 'phpmyadmin'@'localhost' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
+
 ```
 
 5.把phpMyAdmin文件夹复制到nginx配置的server主目录，我这里是/var/www/html/

@@ -4,6 +4,9 @@ date: 2018-05-28
 description: "记录一些django常见功能的用法。 这次主要关注点是crontab定时任务,django/python的异常捕获,以及django/python的打印log功能"
 categories:
   - "计算机"
+tags:
+  - "django"
+  - "python"
 ---
 
 记录一些django常见功能的用法。 这次主要关注点是crontab定时任务,django/python的异常捕获,以及django/python的打印log功能 <!--more-->
@@ -14,6 +17,7 @@ categories:
 
 ```bash
 pip install django-crontab
+
 ```
 
 然后在django项目的settings.py里添加django-crontab模块
@@ -23,6 +27,7 @@ INSTALLED_APPS = [
     ...,
     'django_crontab',
 ]
+
 ```
 
 然后编写相关的cron定时任务程序，一般放在project/app/views里，命名为cron.py
@@ -34,6 +39,7 @@ CRONJOBS = [
     ('0 12 1 * *', 'app.views.cron.cron1'),
     ('0 12 * * 1-5', 'app.views.cron.cron2'),
 ]
+
 ```
 
 定时设置参数为 (分 小时 日 月 星期),具体可参考google资料
@@ -66,6 +72,7 @@ try:
     pass
 except:
     pass
+
 ```
 
 ###### 2.常见异常类型
@@ -74,7 +81,7 @@ except:
 - IOError         输入输出异常；基本是无法打开文件错误
 - ImportError      无法引入模块或者包；基本上是路径问题或者名称错误
 - IndentationError   语法错误；代码没有正确的对齐
-- IndexError:       下标索引超出序列边界，比如当x只有三个元素，却试图访问x\[5\]
+- IndexError:       下标索引超出序列边界，比如当x只有三个元素，却试图访问x[5]
 - KeyError         试图访问字典里不存在的键
 - NameError        使用一个还未赋值的变量
 - SyntaxError       代码非法，
@@ -89,12 +96,14 @@ Exception
 
 ```python
 except Exception:
+
 ```
 
 或者:
 
 ```python
 except Exception as e:
+
 ```
 
 ###### 4.traceback获取异常详情
@@ -109,6 +118,7 @@ traceback.print_exc()
  
 #配合logging模块使用
 logging.getLogger().error(traceback.format_exc())
+
 ```
 
 #### 三.django/python的log打印
