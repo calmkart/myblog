@@ -56,59 +56,59 @@
 &lt;h3 id="python的字符串"&gt;Python的字符串
 &lt;/h3&gt;&lt;p&gt;搞清楚了令人头疼的字符编码问题后，我们再来研究Python的字符串。&lt;/p&gt;
 &lt;p&gt;在最新的Python 3版本中，字符串是以Unicode编码的，也就是说，Python的字符串支持多语言，例如：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; print(&amp;#39;包含中文的str&amp;#39;)
-包含中文的str
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;对于单个字符的编码，Python提供了&lt;code&gt;ord()&lt;/code&gt;函数获取字符的整数表示，&lt;code&gt;chr()&lt;/code&gt;函数把编码转换为对应的字符：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; ord(&amp;#39;A&amp;#39;)
-65
-&amp;gt;&amp;gt;&amp;gt; ord(&amp;#39;中&amp;#39;)
-20013
-&amp;gt;&amp;gt;&amp;gt; chr(66)
-&amp;#39;B&amp;#39;
-&amp;gt;&amp;gt;&amp;gt; chr(25991)
-&amp;#39;文&amp;#39;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果知道字符的整数编码，还可以用十六进制这么写&lt;code&gt;str&lt;/code&gt;：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; &amp;#39;\u4e2d\u6587&amp;#39;
-&amp;#39;中文&amp;#39;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;两种写法完全是等价的。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;包含中文的str&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;包含中文的str&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;对于单个字符的编码，Python提供了&lt;code&gt;ord()&lt;/code&gt;函数获取字符的整数表示，&lt;code&gt;chr()&lt;/code&gt;函数把编码转换为对应的字符：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;ord&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;A&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mi"&gt;65&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;ord&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;中&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mi"&gt;20013&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;chr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;66&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;&amp;#39;B&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;chr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;25991&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;&amp;#39;文&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果知道字符的整数编码，还可以用十六进制这么写&lt;code&gt;str&lt;/code&gt;：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="se"&gt;\u4e2d\u6587&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;&amp;#39;中文&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;两种写法完全是等价的。&lt;/p&gt;
 &lt;p&gt;由于Python的字符串类型是&lt;code&gt;str&lt;/code&gt;，在内存中以Unicode表示，一个字符对应若干个字节。如果要在网络上传输，或者保存到磁盘上，就需要把&lt;code&gt;str&lt;/code&gt;变为以字节为单位的&lt;code&gt;bytes&lt;/code&gt;。&lt;/p&gt;
 &lt;p&gt;Python对&lt;code&gt;bytes&lt;/code&gt;类型的数据用带&lt;code&gt;b&lt;/code&gt;前缀的单引号或双引号表示：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;x = b&amp;#39;ABC&amp;#39;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;要注意区分&lt;code&gt;'ABC'&lt;/code&gt;和&lt;code&gt;b'ABC'&lt;/code&gt;，前者是&lt;code&gt;str&lt;/code&gt;，后者虽然内容显示得和前者一样，但&lt;code&gt;bytes&lt;/code&gt;的每个字符都只占用一个字节。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sa"&gt;b&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;ABC&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;要注意区分&lt;code&gt;'ABC'&lt;/code&gt;和&lt;code&gt;b'ABC'&lt;/code&gt;，前者是&lt;code&gt;str&lt;/code&gt;，后者虽然内容显示得和前者一样，但&lt;code&gt;bytes&lt;/code&gt;的每个字符都只占用一个字节。&lt;/p&gt;
 &lt;p&gt;以Unicode表示的&lt;code&gt;str&lt;/code&gt;通过&lt;code&gt;encode()&lt;/code&gt;方法可以编码为指定的&lt;code&gt;bytes&lt;/code&gt;，例如：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; &amp;#39;ABC&amp;#39;.encode(&amp;#39;ascii&amp;#39;)
-b&amp;#39;ABC&amp;#39;
-&amp;gt;&amp;gt;&amp;gt; &amp;#39;中文&amp;#39;.encode(&amp;#39;utf-8&amp;#39;)
-b&amp;#39;\xe4\xb8\xad\xe6\x96\x87&amp;#39;
-&amp;gt;&amp;gt;&amp;gt; &amp;#39;中文&amp;#39;.encode(&amp;#39;ascii&amp;#39;)
-Traceback (most recent call last):
- File &amp;#34;&amp;lt;stdin&amp;gt;&amp;#34;, line 1, in &amp;lt;module&amp;gt;
-UnicodeEncodeError: &amp;#39;ascii&amp;#39; codec can&amp;#39;t encode characters in position 0-1: ordinal not in range(128)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;纯英文的&lt;code&gt;str&lt;/code&gt;可以用&lt;code&gt;ASCII&lt;/code&gt;编码为&lt;code&gt;bytes&lt;/code&gt;，内容是一样的，含有中文的&lt;code&gt;str&lt;/code&gt;可以用&lt;code&gt;UTF-8&lt;/code&gt;编码为&lt;code&gt;bytes&lt;/code&gt;。含有中文的&lt;code&gt;str&lt;/code&gt;无法用&lt;code&gt;ASCII&lt;/code&gt;编码，因为中文编码的范围超过了&lt;code&gt;ASCII&lt;/code&gt;编码的范围，Python会报错。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;ABC&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;encode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;ascii&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sa"&gt;b&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;ABC&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;中文&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;encode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sa"&gt;b&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="se"&gt;\xe4\xb8\xad\xe6\x96\x87&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;中文&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;encode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;ascii&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;Traceback&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;most&lt;/span&gt; &lt;span class="n"&gt;recent&lt;/span&gt; &lt;span class="n"&gt;call&lt;/span&gt; &lt;span class="n"&gt;last&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;File&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&amp;lt;stdin&amp;gt;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;module&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="ne"&gt;UnicodeEncodeError&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;ascii&amp;#39;&lt;/span&gt; &lt;span class="n"&gt;codec&lt;/span&gt; &lt;span class="n"&gt;can&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;t encode characters in position 0-1: ordinal not in range(128)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;纯英文的&lt;code&gt;str&lt;/code&gt;可以用&lt;code&gt;ASCII&lt;/code&gt;编码为&lt;code&gt;bytes&lt;/code&gt;，内容是一样的，含有中文的&lt;code&gt;str&lt;/code&gt;可以用&lt;code&gt;UTF-8&lt;/code&gt;编码为&lt;code&gt;bytes&lt;/code&gt;。含有中文的&lt;code&gt;str&lt;/code&gt;无法用&lt;code&gt;ASCII&lt;/code&gt;编码，因为中文编码的范围超过了&lt;code&gt;ASCII&lt;/code&gt;编码的范围，Python会报错。&lt;/p&gt;
 &lt;p&gt;在&lt;code&gt;bytes&lt;/code&gt;中，无法显示为ASCII字符的字节，用&lt;code&gt;\x##&lt;/code&gt;显示。&lt;/p&gt;
 &lt;p&gt;反过来，如果我们从网络或磁盘上读取了字节流，那么读到的数据就是&lt;code&gt;bytes&lt;/code&gt;。要把&lt;code&gt;bytes&lt;/code&gt;变为&lt;code&gt;str&lt;/code&gt;，就需要用&lt;code&gt;decode()&lt;/code&gt;方法：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; b&amp;#39;ABC&amp;#39;.decode(&amp;#39;ascii&amp;#39;)
-&amp;#39;ABC&amp;#39;
-&amp;gt;&amp;gt;&amp;gt; b&amp;#39;\xe4\xb8\xad\xe6\x96\x87&amp;#39;.decode(&amp;#39;utf-8&amp;#39;)
-&amp;#39;中文&amp;#39;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;要计算&lt;code&gt;str&lt;/code&gt;包含多少个字符，可以用&lt;code&gt;len()&lt;/code&gt;函数：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; len(&amp;#39;ABC&amp;#39;)
-3
-&amp;gt;&amp;gt;&amp;gt; len(&amp;#39;中文&amp;#39;)
-2
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;len()&lt;/code&gt;函数计算的是&lt;code&gt;str&lt;/code&gt;的字符数，如果换成&lt;code&gt;bytes&lt;/code&gt;，&lt;code&gt;len()&lt;/code&gt;函数就计算字节数：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; len(b&amp;#39;ABC&amp;#39;)
-3
-&amp;gt;&amp;gt;&amp;gt; len(b&amp;#39;\xe4\xb8\xad\xe6\x96\x87&amp;#39;)
-6
-&amp;gt;&amp;gt;&amp;gt; len(&amp;#39;中文&amp;#39;.encode(&amp;#39;utf-8&amp;#39;))
-6
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;可见，1个中文字符经过UTF-8编码后通常会占用3个字节，而1个英文字符只占用1个字节。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="sa"&gt;b&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;ABC&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;decode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;ascii&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;&amp;#39;ABC&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="sa"&gt;b&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="se"&gt;\xe4\xb8\xad\xe6\x96\x87&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;decode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;&amp;#39;中文&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;要计算&lt;code&gt;str&lt;/code&gt;包含多少个字符，可以用&lt;code&gt;len()&lt;/code&gt;函数：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;ABC&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mi"&gt;3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;中文&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mi"&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;len()&lt;/code&gt;函数计算的是&lt;code&gt;str&lt;/code&gt;的字符数，如果换成&lt;code&gt;bytes&lt;/code&gt;，&lt;code&gt;len()&lt;/code&gt;函数就计算字节数：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;b&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;ABC&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mi"&gt;3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;b&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="se"&gt;\xe4\xb8\xad\xe6\x96\x87&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mi"&gt;6&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;中文&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;encode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mi"&gt;6&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;可见，1个中文字符经过UTF-8编码后通常会占用3个字节，而1个英文字符只占用1个字节。&lt;/p&gt;
 &lt;p&gt;在操作字符串时，我们经常遇到&lt;code&gt;str&lt;/code&gt;和&lt;code&gt;bytes&lt;/code&gt;的互相转换。为了避免乱码问题，应当始终坚持使用UTF-8编码对&lt;code&gt;str&lt;/code&gt;和&lt;code&gt;bytes&lt;/code&gt;进行转换。&lt;/p&gt;
 &lt;p&gt;由于Python源代码也是一个文本文件，所以，当你的源代码中包含中文的时候，在保存源代码时，就需要务必指定保存为UTF-8编码。当Python解释器读取源代码时，为了让它按UTF-8编码读取，我们通常在文件开头写上这两行：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;第一行注释是为了告诉Linux/OS X系统，这是一个Python可执行程序，Windows系统会忽略这个注释；&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="ch"&gt;#!/usr/bin/env python3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;第一行注释是为了告诉Linux/OS X系统，这是一个Python可执行程序，Windows系统会忽略这个注释；&lt;/p&gt;
 &lt;p&gt;第二行注释是为了告诉Python解释器，按照UTF-8编码读取源代码，否则，你在源代码中写的中文输出可能会有乱码。&lt;/p&gt;
 &lt;p&gt;申明了UTF-8编码并不意味着你的&lt;code&gt;.py&lt;/code&gt;文件就是UTF-8编码的，必须并且要确保文本编辑器正在使用UTF-8 without BOM编码：&lt;/p&gt;
 &lt;p&gt;&lt;img src="images/001427719248811c5f9fd37acf54f6f93d7affbd80dd79b000" alt="set-encoding-in-notepad&amp;#43;&amp;#43;" /&gt;

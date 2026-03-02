@@ -6,7 +6,6 @@
  &lt;img src="images/2.jpg" alt="" /&gt;
 &lt;/p&gt;
 &lt;p&gt;前后端数据交互采用了由后端渲染的方式，用了flask的jinja2模板。&lt;/p&gt;
-&lt;p&gt; &lt;/p&gt;
 &lt;p&gt;这里采用jinja2模板渲染之后又一个可以考虑的地方，是用户每次切换一个单词就去服务器查询一次结果还是服务器直接查询出该用户字典所有单词结果直接传给用户，用户切词等于完全在本地通过JS操作，和服务器完全脱离关系。 在这里采用了后一种方式，直接把用户词典的所有翻译结果传给客户端，然后用户切词完全依靠JS操作，不需要再去服务器做查询，这样应该是比较快的，而且也能给服务器减轻负担。&lt;/p&gt;
 &lt;p&gt;前端是采用了bootstrap框架，bootstrap的布局是分成12格，挺好用的。&lt;/p&gt;
 &lt;p&gt;项目地址：&lt;a class="link" href="http://www.calmkart.com/learn" target="_blank" rel="noopener"
@@ -15,12 +14,11 @@
 &lt;p&gt;&lt;a class="link" href="https://github.com/calmkart/learn_english" target="_blank" rel="noopener"
  &gt;https://github.com/calmkart/learn_english&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;自行使用时请先修改setting文件中的路径，用于与本地匹配。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="历史评论-1-条"&gt;历史评论 (1 条)
-&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;郭昊旻&lt;/strong&gt; (2017-09-08 15:54)&lt;/p&gt;
-&lt;p&gt;我日，这个功能屌，强无敌，妈妈再也不用担心我的英语了。&lt;/p&gt;
-
- &lt;/blockquote&gt;</description></item></channel></rss>
+&lt;div class="archived-comments"&gt;
+&lt;h2&gt;历史评论 (1 条)&lt;/h2&gt;
+&lt;p class="comment-notice"&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/p&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;郭昊旻&lt;/strong&gt; (2017-09-08 15:54)&lt;/div&gt;
+&lt;div class="comment-body"&gt;我日，这个功能屌，强无敌，妈妈再也不用担心我的英语了。&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item></channel></rss>

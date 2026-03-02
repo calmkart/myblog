@@ -1,217 +1,207 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>读书笔记 on cAlm的个人Blog</title><link>https://www.calmkart.com/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</link><description>Recent content in 读书笔记 on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 18 Sep 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml"/><item><title>kubernetes scheduler流程图</title><link>https://www.calmkart.com/posts/2019/09/2019-09-18-kubernetes-scheduler%E6%B5%81%E7%A8%8B%E5%9B%BE/</link><pubDate>Wed, 18 Sep 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/09/2019-09-18-kubernetes-scheduler%E6%B5%81%E7%A8%8B%E5%9B%BE/</guid><description>&lt;p&gt;最近在跟着&lt;a class="link" href="https://github.com/farmer-hutao/k8s-source-code-analysis" target="_blank" rel="noopener"
  &gt;《k8s-1.13版本源码分析》&lt;/a&gt;读k8s源码，顺着流程把scheduler调度器模块过了一遍，文中有一幅k8s  scheduler调度器工作流程图画的不错，这里做个记录备忘。&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/09/kube-scheduler-workflow.png" target="_blank" rel="noopener"
- &gt;&lt;img src="images/kube-scheduler-workflow.png" alt="" /&gt;
-&lt;/a&gt;&lt;/p&gt;</description></item><item><title>《Python进阶》读书笔记(3)</title><link>https://www.calmkart.com/posts/2017/11/2017-11-16-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03/</link><pubDate>Thu, 16 Nov 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/11/2017-11-16-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03/</guid><description>&lt;h4 id="16异常处理"&gt;16.异常处理
+&lt;p&gt;&lt;img src="images/kube-scheduler-workflow.png" alt="" /&gt;
+&lt;/p&gt;</description></item><item><title>《Python进阶》读书笔记(3)</title><link>https://www.calmkart.com/posts/2017/11/2017-11-16-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03/</link><pubDate>Thu, 16 Nov 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/11/2017-11-16-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03/</guid><description>&lt;h4 id="16异常处理"&gt;16.异常处理
 &lt;/h4&gt;&lt;p&gt;捕获所有异常：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;except Exception as e:
- print e
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;try/except/finally语句:&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;try:
- #首先执行
- pass
-except:
- #异常的话执行
- pass
-finally:
- #无论是否异常，在最后都执行
- pass
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;try/else语句：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;try:
- #首先执行
- pass
-else:
- #异常的话执行,且不被捕获异常
- pass
-finally:
- #无论是否异常，在最后都执行
- pass
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id="17简易webserver"&gt;17.简易webserver
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;Exception&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;print&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;try/except/finally语句:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;#首先执行&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;pass&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;except&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;#异常的话执行&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;pass&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;finally&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;#无论是否异常，在最后都执行&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;pass&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;try/else语句：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;#首先执行&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;pass&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;#异常的话执行,且不被捕获异常&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;pass&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;finally&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;#无论是否异常，在最后都执行&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;pass&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="17简易webserver"&gt;17.简易webserver
 &lt;/h4&gt;&lt;p&gt;python2:&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;python -m SimpleHTTPServer 8888
-#在当前文件夹建立简易http服务器，端口为8888
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;python3:&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;python -m http.server 8888
-#在当前文件夹建立简易http服务器，端口为8888
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;注意，在python2中SimpleHTTPServer是处理GET和HEAD请求的，而CGIHTTPServer处理POST请求。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="n"&gt;SimpleHTTPServer&lt;/span&gt; &lt;span class="mi"&gt;8888&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#在当前文件夹建立简易http服务器，端口为8888&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;python3:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="n"&gt;http&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;server&lt;/span&gt; &lt;span class="mi"&gt;8888&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#在当前文件夹建立简易http服务器，端口为8888&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;注意，在python2中SimpleHTTPServer是处理GET和HEAD请求的，而CGIHTTPServer处理POST请求。&lt;/p&gt;
 &lt;h4 id="18pprint"&gt;18.pprint
 &lt;/h4&gt;&lt;p&gt;可以用于打印dict等数据结构，比较漂亮&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;from pprint import pprint
- pprint({a:1,b:2})
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id="19forelse从句"&gt;19.for/else从句
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pprint&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;pprint&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;pprint&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="19forelse从句"&gt;19.for/else从句
 &lt;/h4&gt;&lt;p&gt;else仅在for循环正常结束时才会执行，当for循环被break时，不执行else&lt;/p&gt;
 &lt;p&gt;举例说明：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;for item in container:
- if search_something(item):
- # Found it!
- process(item)
- break
-else:
- # Didn&amp;#39;t find anything..
- not_found_in_container()
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id="20用with块自动释放句柄"&gt;20.用with块自动释放句柄
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;for&lt;/span&gt; item in container:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;if&lt;/span&gt; search_something&lt;span class="o"&gt;(&lt;/span&gt;item&lt;span class="o"&gt;)&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;# Found it!&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; process&lt;span class="o"&gt;(&lt;/span&gt;item&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;break&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;else&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;# Didn&amp;#39;t find anything..&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; not_found_in_container&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="20用with块自动释放句柄"&gt;20.用with块自动释放句柄
 &lt;/h4&gt;&lt;p&gt;with块可在有异常时，自动释放句柄&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;with open(&amp;#39;a.txt&amp;#39;,&amp;#39;r+&amp;#39;) as f:
-#打开成功才会获得句柄，有异常则自动释放
- file = f.read()
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;用io.open可制定编码方式：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;import io 
-with io.open(&amp;#39;a.txt&amp;#39;, &amp;#39;w&amp;#39;, encoding=&amp;#39;utf-8&amp;#39;) as f:
- f.write(.......)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;而直接使用open(),do,close()的方式，可能因为各种error而导致没有释放资源。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;a.txt&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;r+&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#打开成功才会获得句柄，有异常则自动释放&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;file&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;用io.open可制定编码方式：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;io&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="n"&gt;io&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;a.txt&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;w&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;encoding&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;.......&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;而直接使用open(),do,close()的方式，可能因为各种error而导致没有释放资源。&lt;/p&gt;
 &lt;h4 id="21协程"&gt;21.协程
 &lt;/h4&gt;&lt;p&gt;与生成器有点像，但生成器是返回可迭代对象的生产者，而携程是接受参数的消费者。&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;def grep(pattern):
- print(&amp;#34;Searching for&amp;#34;, pattern)
- while True:
- line = (yield)
- if pattern in line:
- print(line)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;我们通过send方法传送给协程数据，然后用close()方法来关闭&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;search = grep(&amp;#39;coroutine&amp;#39;)
-next(search)
-#output: Searching for coroutine
-search.send(&amp;#34;I love you&amp;#34;)
-search.send(&amp;#34;Don&amp;#39;t you love me?&amp;#34;)
-search.send(&amp;#34;I love coroutine instead!&amp;#34;)
-#output: I love coroutine instead!
-search = grep(&amp;#39;coroutine&amp;#39;)
-search.close()
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt; &lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="http://www.calmkart.com/?p=124" target="_blank" rel="noopener"
- &gt;《Python进阶》读书笔记(1)&lt;/a&gt; &lt;a class="link" href="http://www.calmkart.com/?p=139" target="_blank" rel="noopener"
- &gt;《Python进阶》读书笔记(2)&lt;/a&gt;&lt;/p&gt;</description></item><item><title>《Python进阶》读书笔记(1)</title><link>https://www.calmkart.com/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01/</link><pubDate>Wed, 15 Nov 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01/</guid><description>&lt;h4 id="1args与kwargs传参不定长传参"&gt;&lt;strong&gt;1.*args与**kwargs传参(不定长传参)&lt;/strong&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;grep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pattern&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Searching for&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pattern&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;yield&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;pattern&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;我们通过send方法传送给协程数据，然后用close()方法来关闭&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;search&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;grep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;coroutine&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;next&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;search&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#output: Searching for coroutine&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;search&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;send&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;I love you&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;search&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;send&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Don&amp;#39;t you love me?&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;search&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;send&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;I love coroutine instead!&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#output: I love coroutine instead!&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;search&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;grep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;coroutine&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;search&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;close&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;a class="link" href="https://www.calmkart.com/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01/" &gt;《Python进阶》读书笔记(1)&lt;/a&gt; &lt;a class="link" href="https://www.calmkart.com/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02/" &gt;《Python进阶》读书笔记(2)&lt;/a&gt;&lt;/p&gt;</description></item><item><title>《Python进阶》读书笔记(1)</title><link>https://www.calmkart.com/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01/</link><pubDate>Wed, 15 Nov 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01/</guid><description>&lt;h4 id="1kwargs传参不定长传参"&gt;&lt;strong&gt;1.*args与&lt;/strong&gt;kwargs传参(不定长传参)**
 &lt;/h4&gt;&lt;p&gt;其中*args是列表传参,**kwargs是字典传参&lt;/p&gt;
 &lt;p&gt;使用举例：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;function(fargs, *args, **kwargs)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;可以用function(1)，function([1,2])，function({a:1})调用函数，都没问题。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fargs&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;可以用function(1)，function([1,2])，function({a:1})调用函数，都没问题。&lt;/p&gt;
 &lt;h4 id="2生成器yield"&gt;&lt;strong&gt;2.生成器yield&lt;/strong&gt;
 &lt;/h4&gt;&lt;p&gt;可理解为只能被迭代一次的迭代器，可以节省内存&lt;/p&gt;
 &lt;p&gt;使用举例：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;def generation_function():
- for i in range(10):
- yield i
-
-for item in generation_function():
-#generation_function是生成器，可被迭代的
- print item
-#输出是0-&amp;gt;9，但并不需要建立一个list，节省了内存
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id="3匿名函数"&gt;&lt;strong&gt;3.匿名函数&lt;/strong&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;generation_function&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;yield&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;item&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;generation_function&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#generation_function是生成器，可被迭代的&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nb"&gt;print&lt;/span&gt; &lt;span class="n"&gt;item&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#输出是0-&amp;gt;9，但并不需要建立一个list，节省了内存&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="3匿名函数"&gt;&lt;strong&gt;3.匿名函数&lt;/strong&gt;
 &lt;/h4&gt;&lt;p&gt;lambda，可减少无需重复函数&lt;/p&gt;
 &lt;p&gt;格式：lambda 参数:操作&lt;/p&gt;
 &lt;p&gt;使用举例：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;lambda x : x+1
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id="4map"&gt;&lt;strong&gt;4.map()&lt;/strong&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="4map"&gt;&lt;strong&gt;4.map()&lt;/strong&gt;
 &lt;/h4&gt;&lt;p&gt;将function应用于后面参数的所有LIST元素中，返回结果。(python2返回list,python3返回迭代器)&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;map(function, list)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;也支持多参数:&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;map(function, list1, list2, list3....)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;常结合lambda匿名函数一起使用&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;map&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;function&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;也支持多参数:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;map&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;function&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;list1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;list2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;list3&lt;/span&gt;&lt;span class="o"&gt;....&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;常结合lambda匿名函数一起使用&lt;/p&gt;
 &lt;p&gt;使用举例：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;items=[1,2,3,4,5]
-print map(lambda x : x**2, items)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;输出[1,4,9,16,25]&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;items&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;print&lt;/span&gt; &lt;span class="nb"&gt;map&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;items&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;输出[1,4,9,16,25]&lt;/p&gt;
 &lt;p&gt;map的本质既将一个函数映射到若干列表的所有元素上。&lt;/p&gt;
 &lt;h4 id="5filter"&gt;5.filter()
 &lt;/h4&gt;&lt;p&gt;过滤list中的元素，返回符合条件元素的list&lt;/p&gt;
 &lt;p&gt;使用举例：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;number_list = range(-5,5)
-less_than_zero = filter(lambda x : x&amp;lt;0, number_list)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;输出[-5,-4,-3,-2,-1]&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;number_list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;less_than_zero&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;number_list&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;输出[-5,-4,-3,-2,-1]&lt;/p&gt;
 &lt;h4 id="6reduce"&gt;6.reduce()
-&lt;/h4&gt;&lt;pre tabindex="0"&gt;&lt;code&gt;from functools import reduce)
-product = reduce((lambda x,y:x*y),[1,2,3,4])
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;输出24&lt;/p&gt;
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;functools&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;reduce&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;product&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;reduce&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;),[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;输出24&lt;/p&gt;
 &lt;h4 id="7set"&gt;7.set
 &lt;/h4&gt;&lt;p&gt;集合既不能包含重复值(其他行为与list相似)&lt;/p&gt;
 &lt;p&gt;语法：set(list)&lt;/p&gt;
 &lt;p&gt;交集：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;print (set1.intersection(set2))
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;差集：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;print (set1.difference(set2))
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id="8三元运算符"&gt;8.三元运算符
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;print&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;set1&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;intersection&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;set2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;差集：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;print&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;set1&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;difference&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;set2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="8三元运算符"&gt;8.三元运算符
 &lt;/h4&gt;&lt;p&gt;使用举例：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;is_fat = True
-state = &amp;#34;fat&amp;#34; if is_fat else &amp;#34;not fat&amp;#34;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt; &lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="http://www.calmkart.com/?p=139" target="_blank" rel="noopener"
- &gt;《Python进阶》读书笔记(2)&lt;/a&gt; &lt;a class="link" href="http://www.calmkart.com/?p=150" target="_blank" rel="noopener"
- &gt;《Python进阶》读书笔记(3)&lt;/a&gt;&lt;/p&gt;</description></item><item><title>《Python进阶》读书笔记(2)</title><link>https://www.calmkart.com/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02/</link><pubDate>Wed, 15 Nov 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02/</guid><description>&lt;h4 id="9装饰器"&gt;9.装饰器
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;is_fat&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;fat&amp;#34;&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;is_fat&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;not fat&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;a class="link" href="https://www.calmkart.com/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02/" &gt;《Python进阶》读书笔记(2)&lt;/a&gt; &lt;a class="link" href="https://www.calmkart.com/posts/2017/11/2017-11-16-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03/" &gt;《Python进阶》读书笔记(3)&lt;/a&gt;&lt;/p&gt;</description></item><item><title>《Python进阶》读书笔记(2)</title><link>https://www.calmkart.com/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02/</link><pubDate>Wed, 15 Nov 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02/</guid><description>&lt;h4 id="9装饰器"&gt;9.装饰器
 &lt;/h4&gt;&lt;p&gt;既将函数传参给装饰器函数，在函数执行的上下文作某些通用操作。&lt;/p&gt;
-&lt;p&gt;记得要用@wraps复制函数名称(__name__)，等等属性&lt;/p&gt;
+&lt;p&gt;记得要用@wraps复制函数名称(&lt;strong&gt;name&lt;/strong&gt;)，等等属性&lt;/p&gt;
 &lt;p&gt;使用举例：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;from functools import wraps
-
-def requires_auth(f):
- @wraps(f)
- def decorated(*args, **kwargs):
- auth = request.authorization
- if not auth or not check_auth(auth.username, auth.password):
- #若未登录，返回401
- authenticate()
- return f(*args, **kwargs)
- return decorated
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id="10可变数据类型和不可变数据类型"&gt;10.可变数据类型和不可变数据类型
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;functools&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;wraps&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;requires_auth&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nd"&gt;@wraps&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;decorated&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;auth&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;authorization&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="n"&gt;auth&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="n"&gt;check_auth&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;auth&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;auth&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;password&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#若未登录，返回401&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;authenticate&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;decorated&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="10可变数据类型和不可变数据类型"&gt;10.可变数据类型和不可变数据类型
 &lt;/h4&gt;&lt;p&gt;可变数据类型：list,dict&lt;/p&gt;
 &lt;p&gt;不可变数据类型：int,float,string,tuple&lt;/p&gt;
 &lt;p&gt;可变不可变，指的是变量指向的值：可变，就是说可以改变指向的值而地址不变。不可变，就是说改变变量的值必然改变地址。&lt;/p&gt;
 &lt;p&gt;python中的赋值(=)，就是左侧得到右侧内存的引用。&lt;/p&gt;
 &lt;p&gt;举例说明：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;a = [1]
-print a #----&amp;gt;[1]
-b = a
-b.append(2)
-print a #-----&amp;gt;[1,2]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;因为list为可变数据类型，而a和b指向同一片内存。当对b做+=操作时，只是向后扩充内存内容，而不会修改内存位置。所以a也改变了。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;print&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="c1"&gt;#----&amp;gt;[1]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;print&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="c1"&gt;#-----&amp;gt;[1,2]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;因为list为可变数据类型，而a和b指向同一片内存。当对b做+=操作时，只是向后扩充内存内容，而不会修改内存位置。所以a也改变了。&lt;/p&gt;
 &lt;p&gt;同时要注意，python函数被定义时，默认参数只会被计算一次，不会每次都计算。所以，默认参数最好不要用可变数据类型，就算要用，也要注意在之后不要对其做修改。&lt;/p&gt;
-&lt;h4 id="11__slots__"&gt;11.__slots__
+&lt;h4 id="11slots"&gt;11.&lt;strong&gt;slots&lt;/strong&gt;
 &lt;/h4&gt;&lt;p&gt;在类的定义中使用__slots__=[&amp;ldquo;name&amp;rdquo;,&amp;ldquo;age&amp;rdquo;]，则只有__slots__这个set中的属性可以被分配内存，不在其中的不可被分配内存。&lt;/p&gt;
 &lt;h4 id="12容器collections"&gt;12.容器collections
 &lt;/h4&gt;&lt;p&gt;1.defaultdict&lt;/p&gt;
 &lt;p&gt;调用不存在的key时，会用默认的工厂方法作为key默认值.&lt;/p&gt;
 &lt;p&gt;举例说明：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;from collections import defaultdic
-
-favourite_colors = defaultdict(list)
-for name,color in colors:
- favourite_colors[name].append(color)
- #默认用name这个list作为KEY
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.counter计数器&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;from collections import counter
-c= counter(...)#为内部元素计数
-favs = counter(name for name,color in colors)
-#为name计数,以dict返回
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.deque双向链表&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;from collections import deque
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.namedtuple命名元组&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;from collections import namedtuple
-
-animal = namedtuple(&amp;#39;animal&amp;#39;, &amp;#39;name age type&amp;#39;)
-perry = animal(name=&amp;#34;perry&amp;#34;, age=31, type=&amp;#34;cat&amp;#34;)
-#可以访问perry.name这样访问属性
-print perry.name
-#输出perry
-#可将命名元组转换为dict，用_asdict()方法
-perry._asdict()
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id="13dir"&gt;13.dir()
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;collections&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;defaultdic&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;favourite_colors&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;defaultdict&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;color&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;colors&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;favourite_colors&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;color&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#默认用name这个list作为KEY&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;2.counter计数器&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;collections&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;counter&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;counter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="c1"&gt;#为内部元素计数&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;favs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;counter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;color&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;colors&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#为name计数,以dict返回&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;3.deque双向链表&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;collections&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;deque&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;4.namedtuple命名元组&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;collections&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;namedtuple&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;animal&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;namedtuple&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;animal&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;name age type&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;perry&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;animal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;perry&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;age&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;cat&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#可以访问perry.name这样访问属性&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;print&lt;/span&gt; &lt;span class="n"&gt;perry&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#输出perry&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#可将命名元组转换为dict，用_asdict()方法&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;perry&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_asdict&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="13dir"&gt;13.dir()
 &lt;/h4&gt;&lt;p&gt;返回对象所有属性和方法&lt;/p&gt;
 &lt;p&gt;举例：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;a = [1,2,3]
-print dir(a)
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id="14type和id"&gt;14.type()和id()
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;print&lt;/span&gt; &lt;span class="nb"&gt;dir&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="14type和id"&gt;14.type()和id()
 &lt;/h4&gt;&lt;p&gt;type()返回对象类型，id()返回不同种类对象唯一ID&lt;/p&gt;
 &lt;h4 id="15推导式"&gt;15.推导式
 &lt;/h4&gt;&lt;p&gt;1.列表推导式&lt;/p&gt;
 &lt;p&gt;通过for和if生成list&lt;/p&gt;
 &lt;p&gt;举例说明：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;m=[i for i in range(30) if i%3 is 0]
-#------------这是list-----这是条件-----
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;语法：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;variable = [out_exp for out_exp in input_list if out_exp==2]
-#----------------------------------这是list------这是条件----
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.字典推导式&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;dict = {v:k for k,v in some_dict.items()}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt; &lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="http://www.calmkart.com/?p=124" target="_blank" rel="noopener"
- &gt;《Python进阶》读书笔记(1)&lt;/a&gt; &lt;a class="link" href="http://www.calmkart.com/?p=150" target="_blank" rel="noopener"
- &gt;《Python进阶》读书笔记(3)&lt;/a&gt;&lt;/p&gt;</description></item></channel></rss>
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;30&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#------------这是list-----这是条件-----&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;语法：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;variable&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;out_exp&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;out_exp&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;input_list&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;out_exp&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#----------------------------------这是list------这是条件----&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;2.字典推导式&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;dict&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;v&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;some_dict&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;items&lt;/span&gt;&lt;span class="p"&gt;()}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;a class="link" href="https://www.calmkart.com/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01/" &gt;《Python进阶》读书笔记(1)&lt;/a&gt; &lt;a class="link" href="https://www.calmkart.com/posts/2017/11/2017-11-16-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03/" &gt;《Python进阶》读书笔记(3)&lt;/a&gt;&lt;/p&gt;</description></item></channel></rss>

@@ -1,78 +1,80 @@
-<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python telnetlib库实现了交换机的批量管理(交换机型号为思科2960x)\n"><title>用telnetlib库实现交换机批量管理</title><link rel=canonical href=https://www.calmkart.com/posts/2017/08/2017-08-07-%E7%94%A8telnetlib%E5%BA%93%E5%AE%9E%E7%8E%B0%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%89%B9%E9%87%8F%E7%AE%A1%E7%90%86/><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=preload as=style href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap"><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap"><link rel=stylesheet href=/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css><meta property='og:title' content="用telnetlib库实现交换机批量管理"><meta property='og:description' content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python telnetlib库实现了交换机的批量管理(交换机型号为思科2960x)\n"><meta property='og:url' content='https://www.calmkart.com/posts/2017/08/2017-08-07-%E7%94%A8telnetlib%E5%BA%93%E5%AE%9E%E7%8E%B0%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%89%B9%E9%87%8F%E7%AE%A1%E7%90%86/'><meta property='og:site_name' content='cAlm的个人Blog'><meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='python'><meta property='article:tag' content='telnetlib'><meta property='article:published_time' content='2017-08-07T00:00:00+00:00'><meta property='article:modified_time' content='2017-08-07T00:00:00+00:00'><meta name=twitter:title content="用telnetlib库实现交换机批量管理"><meta name=twitter:description content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python telnetlib库实现了交换机的批量管理(交换机型号为思科2960x)\n"></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
-<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><div class=site-meta><h1 class=site-name><a href=/>cAlm的个人Blog</a></h1><h2 class=site-description>随手记录些东西</h2></div></header><ol class=menu id=main-menu><li><a href=/><span>首页</span></a></li><li><a href=/archives><span>归档</span></a></li><li><a href=/categories><span>分类</span></a></li><li><a href=/about><span>关于</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python..."><title>用telnetlib库实现交换机批量管理</title><link rel=canonical href=https://www.calmkart.com/posts/2017/08/2017-08-07-%E7%94%A8telnetlib%E5%BA%93%E5%AE%9E%E7%8E%B0%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%89%B9%E9%87%8F%E7%AE%A1%E7%90%86/><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=preload as=style href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap"><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap"><link rel=stylesheet href=/scss/style.min.d938302c9c68b5f1fda0a78ef59a80f98a22f71eeffb56a5408c148f22d8c7d5.css><meta property='og:title' content="用telnetlib库实现交换机批量管理"><meta property='og:description' content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python..."><meta property='og:url' content='https://www.calmkart.com/posts/2017/08/2017-08-07-%E7%94%A8telnetlib%E5%BA%93%E5%AE%9E%E7%8E%B0%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%89%B9%E9%87%8F%E7%AE%A1%E7%90%86/'><meta property='og:site_name' content='cAlm的个人Blog'><meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='python'><meta property='article:tag' content='telnetlib'><meta property='article:published_time' content='2017-08-07T00:00:00+00:00'><meta property='article:modified_time' content='2017-08-07T00:00:00+00:00'><meta name=twitter:title content="用telnetlib库实现交换机批量管理"><meta name=twitter:description content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python..."></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><div class=site-meta><h1 class=site-name><a href=/>cAlm的个人Blog</a></h1><h2 class=site-description>随手记录些东西</h2></div></header><ol class=menu id=main-menu><li><a href=/><span>首页</span></a></li><li><a href=/archives><span>归档</span></a></li><li><a href=/categories><span>分类</span></a></li><li><a href=/search><span>搜索</span></a></li><li><a href=/about><span>关于</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
 <svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
-<span>Dark Mode</span></li></ol></li></ol></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/ style=background-color:#bed8ef;color:#0f283d>计算机</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/posts/2017/08/2017-08-07-%E7%94%A8telnetlib%E5%BA%93%E5%AE%9E%E7%8E%B0%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%89%B9%E9%87%8F%E7%AE%A1%E7%90%86/>用telnetlib库实现交换机批量管理</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
-<time class=article-time--published datetime=2017-08-07T00:00:00Z>Monday, August 7, 2017</time></div></footer></div></header><section class=article-content><p>在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python telnetlib库实现了交换机的批量管理(交换机型号为思科2960x)</p><p>实现代码如下： switch_telnet.py</p><pre tabindex=0><code>#encoding=utf-8
-import sys
-import telnetlib
-import time
-
-def tel(ip,user,password):
-    tn = telnetlib.Telnet(ip,port=23)
-    tn.read_until(&#39;Verification\r\n\r\nUsername: &#39;)
-    tn.write(user+&#39;\n&#39;)
-#   tn.set_debuglevel(2)
-    #password
-    tn.read_until(&#39;Password: &#39;)
-    tn.write(password+&#39;\n&#39;)
-    #login fail
-    if tn.read_some()==&#39;\r\nPassword: &#39;:
-        print &#39;\033[1;31;40m&#39;+ip+&#39;\033[0m&#39;+&#39;     password is wrong,login false!&#39;
-        tn.close()
-        return 1
-    #login successs
-    tn.write(&#39;enable\n&#39;)
-    #password
-    tn.read_until(&#39;Password: &#39;)
-    tn.write(password+&#39;\n&#39;)
-    #enable susccess set terimal length
-    tn.read_until(&#39;Switch#&#39;)
-    tn.write(&#39;ter len 0\n&#39;)
-    time.sleep(1)
-    if tn.read_some()==&#39;ter len 0\r\nSwitch#&#39;:
-        print ip+&#39;     telnet login susccess&#39;
-        return tn
-    print ip+&#39;     terminal length 0 false!&#39;
-    return 1
-
-def comm(tn,ip,cmd):
-    tn.write(cmd+&#39;\n&#39;)
-    time.sleep(.2)
-    result = tn.read_very_eager()
-    print (&#39;\033[1;31;40m&#39;+ip+&#39;\033[0m&#39;+&#39;   &#39;+result)
-
-ip_list = []
-user_list = []
-password_list = []
-tn = []
-ip_fp = open(&#39;ip_list&#39;,&#39;r&#39;)
-ip_fs = ip_fp.read()
-ip_fp.close()
-fa = ip_fs.split(&#39;\n&#39;)
-
-for i in range(0,len(fa)-1):
-    f_res = fa[i].split(&#39;,&#39;)
-    ip_list.append(f_res[0])
-    user_list.append(f_res[1])
-    password_list.append(f_res[2])
-
-for i in range(0,len(fa)-1):
-    tn.append(tel(ip_list[i],user_list[i],password_list[i]))
-
-while 1:
-    cmd = raw_input(&#34;input the command: &#34;)
-    if cmd == &#39;quit&#39;:
-        for i in range(0,len(fa)-1):
-            tn[i].write(&#39;quit\n&#39;)
-        break
-
-    for i in range(0,len(fa)-1):
-        comm(tn[i],ip_list[i],cmd+&#39;\n&#39;)
-</code></pre><p>脚本详解：</p><p>主要使用了python的telnetlib库，下面概述常见的几个方法。</p><p>telnetlib.Telnet([host[, port[, timeout]]]) 此方法返回一个client对象，可操作</p><p>Telnet.read_until(expected[, timeout]) 此方法阻塞读取缓存区输出，匹配expected才继续</p><p>Telnet.read_all() 读取所有输出，读取到结束符或者连接中断</p><p>Telnet.read_some() 读取至少一个输出</p><p>Telnet.read_very_eager() 读取尽量多的输出，但记得要time.sleep()一定时间，不然会因为来不及读取所有数据导致数据丢失</p><p>Telnet.write(buffer) 向client对象写入数据，记得换行符\n</p><p>Telnet.close() 关闭连接</p><p> </p><p>操作指南：</p><p>使用时在同路径下编辑ip_list文件，格式为ip,username,password既可，一个交换机占一行，如下例：</p><pre tabindex=0><code>10.32.19.9,cisco,123456
-10.32.19.10,cisco,654321
-</code></pre><p>运行 python ./switch_telnet.py</p><p><img src=images/TdCoxrKTPjmnsPncPk6g.png alt></p><p>显示所有交换机IP的登陆情况，然后输入命令交互即可（类似ansible）</p><p><img src=images/69tpvwdEhq4CEDx3XQohhQ.png alt></p><p>可以随意使用exit命令，但直接退出脚本指令为quit</p><p> </p><p>其他：</p><p>同类可用库还有pexpect，非常强大 如果是SSH登陆的交换机，可以使用netmiko，还可以用fabric批量管理，不再赘述</p><p>项目源码已上传github <a class=link href=https://github.com/calmkart/switch_telnet target=_blank rel=noopener>https://github.com/calmkart/switch_telnet</a></p></section><footer class=article-footer><section class=article-tags><a href=/tags/python/>Python</a>
-<a href=/tags/telnetlib/>Telnetlib</a></section></footer></article><div id=tcomment></div><script src=https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js></script><script>twikoo.init({envId:"calmblog.vercel.app",el:"#tcomment",lang:"zh-CN"})</script><footer class=site-footer><section class=copyright>&copy;
-2026 cAlm的个人Blog</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=4.0.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><script type=module>
+<span>暗色模式</span></li></ol></li></ol></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/ style=background-color:#bed8ef;color:#0f283d>计算机</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/posts/2017/08/2017-08-07-%E7%94%A8telnetlib%E5%BA%93%E5%AE%9E%E7%8E%B0%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%89%B9%E9%87%8F%E7%AE%A1%E7%90%86/>用telnetlib库实现交换机批量管理</a></h2><h3 class=article-subtitle>在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python...</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2017-08-07T00:00:00Z>2017年8月7日星期一</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 2 分钟</time></div></footer></div></header><section class=article-content><p>在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python telnetlib库实现了交换机的批量管理(交换机型号为思科2960x)</p><p>实现代码如下： switch_telnet.py</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1>#encoding=utf-8</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>sys</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>telnetlib</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>time</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>tel</span><span class=p>(</span><span class=n>ip</span><span class=p>,</span><span class=n>user</span><span class=p>,</span><span class=n>password</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>tn</span> <span class=o>=</span> <span class=n>telnetlib</span><span class=o>.</span><span class=n>Telnet</span><span class=p>(</span><span class=n>ip</span><span class=p>,</span><span class=n>port</span><span class=o>=</span><span class=mi>23</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>tn</span><span class=o>.</span><span class=n>read_until</span><span class=p>(</span><span class=s1>&#39;Verification</span><span class=se>\r\n\r\n</span><span class=s1>Username: &#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>tn</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=n>user</span><span class=o>+</span><span class=s1>&#39;</span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1>#   tn.set_debuglevel(2)</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#password</span>
+</span></span><span class=line><span class=cl>    <span class=n>tn</span><span class=o>.</span><span class=n>read_until</span><span class=p>(</span><span class=s1>&#39;Password: &#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>tn</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=n>password</span><span class=o>+</span><span class=s1>&#39;</span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#login fail</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>tn</span><span class=o>.</span><span class=n>read_some</span><span class=p>()</span><span class=o>==</span><span class=s1>&#39;</span><span class=se>\r\n</span><span class=s1>Password: &#39;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span> <span class=s1>&#39;</span><span class=se>\033</span><span class=s1>[1;31;40m&#39;</span><span class=o>+</span><span class=n>ip</span><span class=o>+</span><span class=s1>&#39;</span><span class=se>\033</span><span class=s1>[0m&#39;</span><span class=o>+</span><span class=s1>&#39;     password is wrong,login false!&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=n>tn</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#login successs</span>
+</span></span><span class=line><span class=cl>    <span class=n>tn</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=s1>&#39;enable</span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#password</span>
+</span></span><span class=line><span class=cl>    <span class=n>tn</span><span class=o>.</span><span class=n>read_until</span><span class=p>(</span><span class=s1>&#39;Password: &#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>tn</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=n>password</span><span class=o>+</span><span class=s1>&#39;</span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#enable susccess set terimal length</span>
+</span></span><span class=line><span class=cl>    <span class=n>tn</span><span class=o>.</span><span class=n>read_until</span><span class=p>(</span><span class=s1>&#39;Switch#&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>tn</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=s1>&#39;ter len 0</span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>time</span><span class=o>.</span><span class=n>sleep</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>tn</span><span class=o>.</span><span class=n>read_some</span><span class=p>()</span><span class=o>==</span><span class=s1>&#39;ter len 0</span><span class=se>\r\n</span><span class=s1>Switch#&#39;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span> <span class=n>ip</span><span class=o>+</span><span class=s1>&#39;     telnet login susccess&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>tn</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span> <span class=n>ip</span><span class=o>+</span><span class=s1>&#39;     terminal length 0 false!&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>comm</span><span class=p>(</span><span class=n>tn</span><span class=p>,</span><span class=n>ip</span><span class=p>,</span><span class=n>cmd</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>tn</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=n>cmd</span><span class=o>+</span><span class=s1>&#39;</span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>time</span><span class=o>.</span><span class=n>sleep</span><span class=p>(</span><span class=mf>.2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>result</span> <span class=o>=</span> <span class=n>tn</span><span class=o>.</span><span class=n>read_very_eager</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span> <span class=p>(</span><span class=s1>&#39;</span><span class=se>\033</span><span class=s1>[1;31;40m&#39;</span><span class=o>+</span><span class=n>ip</span><span class=o>+</span><span class=s1>&#39;</span><span class=se>\033</span><span class=s1>[0m&#39;</span><span class=o>+</span><span class=s1>&#39;   &#39;</span><span class=o>+</span><span class=n>result</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>ip_list</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl><span class=n>user_list</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl><span class=n>password_list</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl><span class=n>tn</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl><span class=n>ip_fp</span> <span class=o>=</span> <span class=nb>open</span><span class=p>(</span><span class=s1>&#39;ip_list&#39;</span><span class=p>,</span><span class=s1>&#39;r&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>ip_fs</span> <span class=o>=</span> <span class=n>ip_fp</span><span class=o>.</span><span class=n>read</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>ip_fp</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>fa</span> <span class=o>=</span> <span class=n>ip_fs</span><span class=o>.</span><span class=n>split</span><span class=p>(</span><span class=s1>&#39;</span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=nb>len</span><span class=p>(</span><span class=n>fa</span><span class=p>)</span><span class=o>-</span><span class=mi>1</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>f_res</span> <span class=o>=</span> <span class=n>fa</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>.</span><span class=n>split</span><span class=p>(</span><span class=s1>&#39;,&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>ip_list</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>f_res</span><span class=p>[</span><span class=mi>0</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>    <span class=n>user_list</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>f_res</span><span class=p>[</span><span class=mi>1</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>    <span class=n>password_list</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>f_res</span><span class=p>[</span><span class=mi>2</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=nb>len</span><span class=p>(</span><span class=n>fa</span><span class=p>)</span><span class=o>-</span><span class=mi>1</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>tn</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>tel</span><span class=p>(</span><span class=n>ip_list</span><span class=p>[</span><span class=n>i</span><span class=p>],</span><span class=n>user_list</span><span class=p>[</span><span class=n>i</span><span class=p>],</span><span class=n>password_list</span><span class=p>[</span><span class=n>i</span><span class=p>]))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>while</span> <span class=mi>1</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>cmd</span> <span class=o>=</span> <span class=n>raw_input</span><span class=p>(</span><span class=s2>&#34;input the command: &#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>cmd</span> <span class=o>==</span> <span class=s1>&#39;quit&#39;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=nb>len</span><span class=p>(</span><span class=n>fa</span><span class=p>)</span><span class=o>-</span><span class=mi>1</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>tn</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=s1>&#39;quit</span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>break</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=nb>len</span><span class=p>(</span><span class=n>fa</span><span class=p>)</span><span class=o>-</span><span class=mi>1</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>comm</span><span class=p>(</span><span class=n>tn</span><span class=p>[</span><span class=n>i</span><span class=p>],</span><span class=n>ip_list</span><span class=p>[</span><span class=n>i</span><span class=p>],</span><span class=n>cmd</span><span class=o>+</span><span class=s1>&#39;</span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span></code></pre></div><p>脚本详解：</p><p>主要使用了python的telnetlib库，下面概述常见的几个方法。</p><p>telnetlib.Telnet([host[, port[, timeout]]]) 此方法返回一个client对象，可操作</p><p>Telnet.read_until(expected[, timeout]) 此方法阻塞读取缓存区输出，匹配expected才继续</p><p>Telnet.read_all() 读取所有输出，读取到结束符或者连接中断</p><p>Telnet.read_some() 读取至少一个输出</p><p>Telnet.read_very_eager() 读取尽量多的输出，但记得要time.sleep()一定时间，不然会因为来不及读取所有数据导致数据丢失</p><p>Telnet.write(buffer) 向client对象写入数据，记得换行符\n</p><p>Telnet.close() 关闭连接</p><p>操作指南：</p><p>使用时在同路径下编辑ip_list文件，格式为ip,username,password既可，一个交换机占一行，如下例：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>10.32.19.9,cisco,123456
+</span></span><span class=line><span class=cl>10.32.19.10,cisco,654321
+</span></span></code></pre></div><p>运行 python ./switch_telnet.py</p><p><img src=images/TdCoxrKTPjmnsPncPk6g.png alt></p><p>显示所有交换机IP的登陆情况，然后输入命令交互即可（类似ansible）</p><p><img src=images/69tpvwdEhq4CEDx3XQohhQ.png alt></p><p>可以随意使用exit命令，但直接退出脚本指令为quit</p><p>其他：</p><p>同类可用库还有pexpect，非常强大 如果是SSH登陆的交换机，可以使用netmiko，还可以用fabric批量管理，不再赘述</p><p>项目源码已上传github <a class=link href=https://github.com/calmkart/switch_telnet target=_blank rel=noopener>https://github.com/calmkart/switch_telnet</a></p></section><footer class=article-footer><section class=article-tags><a href=/tags/python/>Python</a>
+<a href=/tags/telnetlib/>Telnetlib</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><div id=tcomment></div><script src=https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js></script><script>twikoo.init({envId:"",el:"#tcomment",lang:"zh-CN"})</script><footer class=site-footer><section class=copyright>&copy;
+2026 cAlm的个人Blog</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=4.0.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><script type=module>
     import gallery from '\/ts\/gallery.js';
 
     const articleContent = document.querySelector('.article-content');

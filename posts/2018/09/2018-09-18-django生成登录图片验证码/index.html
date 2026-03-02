@@ -1,95 +1,97 @@
-<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="最近在做一个好玩的通用django单点登录系统，登录系统少不了验证码，参考了一下别人的做法和开源项目，总结一下。\n结果如下：\n"><title>django生成图片验证码</title><link rel=canonical href=https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=preload as=style href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap"><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap"><link rel=stylesheet href=/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css><meta property='og:title' content="django生成图片验证码"><meta property='og:description' content="最近在做一个好玩的通用django单点登录系统，登录系统少不了验证码，参考了一下别人的做法和开源项目，总结一下。\n结果如下：\n"><meta property='og:url' content='https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/'><meta property='og:site_name' content='cAlm的个人Blog'><meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='django'><meta property='article:tag' content='django验证码'><meta property='article:tag' content='python验证码'><meta property='article:tag' content='运维开发'><meta property='article:tag' content='验证码'><meta property='article:published_time' content='2018-09-18T00:00:00+00:00'><meta property='article:modified_time' content='2018-09-18T00:00:00+00:00'><meta name=twitter:title content="django生成图片验证码"><meta name=twitter:description content="最近在做一个好玩的通用django单点登录系统，登录系统少不了验证码，参考了一下别人的做法和开源项目，总结一下。\n结果如下：\n"></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
-<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><div class=site-meta><h1 class=site-name><a href=/>cAlm的个人Blog</a></h1><h2 class=site-description>随手记录些东西</h2></div></header><ol class=menu id=main-menu><li><a href=/><span>首页</span></a></li><li><a href=/archives><span>归档</span></a></li><li><a href=/categories><span>分类</span></a></li><li><a href=/about><span>关于</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="最近在做一个好玩的通用django单点登录系统，登录系统少不了验证码，参考了一下别人的做法和开源项目，总结一下。 结果如下："><title>django生成图片验证码</title><link rel=canonical href=https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=preload as=style href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap"><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap"><link rel=stylesheet href=/scss/style.min.d938302c9c68b5f1fda0a78ef59a80f98a22f71eeffb56a5408c148f22d8c7d5.css><meta property='og:title' content="django生成图片验证码"><meta property='og:description' content="最近在做一个好玩的通用django单点登录系统，登录系统少不了验证码，参考了一下别人的做法和开源项目，总结一下。 结果如下："><meta property='og:url' content='https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/'><meta property='og:site_name' content='cAlm的个人Blog'><meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='django'><meta property='article:tag' content='django验证码'><meta property='article:tag' content='python验证码'><meta property='article:tag' content='运维开发'><meta property='article:tag' content='验证码'><meta property='article:published_time' content='2018-09-18T00:00:00+00:00'><meta property='article:modified_time' content='2018-09-18T00:00:00+00:00'><meta name=twitter:title content="django生成图片验证码"><meta name=twitter:description content="最近在做一个好玩的通用django单点登录系统，登录系统少不了验证码，参考了一下别人的做法和开源项目，总结一下。 结果如下："></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><div class=site-meta><h1 class=site-name><a href=/>cAlm的个人Blog</a></h1><h2 class=site-description>随手记录些东西</h2></div></header><ol class=menu id=main-menu><li><a href=/><span>首页</span></a></li><li><a href=/archives><span>归档</span></a></li><li><a href=/categories><span>分类</span></a></li><li><a href=/search><span>搜索</span></a></li><li><a href=/about><span>关于</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
 <svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
-<span>Dark Mode</span></li></ol></li></ol></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/ style=background-color:#bed8ef;color:#0f283d>计算机</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/>django生成图片验证码</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
-<time class=article-time--published datetime=2018-09-18T00:00:00Z>Tuesday, September 18, 2018</time></div></footer></div></header><section class=article-content><p>最近在做一个好玩的通用django单点登录系统，登录系统少不了验证码，参考了一下别人的做法和开源项目，总结一下。</p><p>结果如下：</p><p><img src=images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_837b19bb-98df-4c26-afae-6678c91ff47a.png alt></p><p>主要思路流程是，后端根据随机码绘图，然后做混淆(我这里几乎没做模糊之类的混淆)，最后将随机验证码写进后端session里，前端获取图像后，提交时与session里的验证码做比较。流程还是比较简单的，大致代码如下。</p><p>1.captcha_handle.py</p><pre tabindex=0><code>captcha_handle.py
-#用于生成随机字符串以及生成验证码图片
-
-# -*- coding:utf-8 -*-
-import random,string
-from PIL import Image,ImageDraw,ImageFont,ImageFilter
-
-#生成随机字符串
-def _getRandomChar():
-    #string模块包含各种字符串，以下为小写字母加数字
-    ran = string.ascii_lowercase+string.digits
-    char = &#39;&#39;
-    for i in range(4):
-        char += random.choice(ran)
-    return char
-
-#返回一个随机的RGB颜色
-def _getRandomColor():
-    return (random.randint(50,150),random.randint(50,150),random.randint(50,150))
-
-def create_captcha():
-
-    #创建图片，模式，大小，背景色
-    img = Image.new(&#39;RGB&#39;, (120,30), (255,255,255))
-    #创建画布
-    draw = ImageDraw.Draw(img)
-    #设置字体
-    font = ImageFont.truetype(&#39;Arial.ttf&#39;, 25)
-
-    code = _getRandomChar()
-    #将生成的字符画在画布上
-    for t in range(4):
-        draw.text((30*t+5,0),code[t],_getRandomColor(),font)
-
-    #生成干扰点
-    for _ in range(random.randint(0,50)):
-        #位置，颜色
-        draw.point((random.randint(0, 120), random.randint(0, 30)),fill=_getRandomColor())
-
-    #使用模糊滤镜使图片模糊
-    # img = img.filter(ImageFilter.BLUR)
-    #保存
-    #img.save(&#39;&#39;.join(code)+&#39;.jpg&#39;,&#39;jpeg&#39;)
-    return img,code
-
-if __name__ == &#39;__main__&#39;:
-    create_code()
-</code></pre><p>2.views.py</p><pre tabindex=0><code>views.py
-#视图，生成验证码图片和code，返回图片，code存进session
-class get_captcha(View):
-
-    def get(self, request):
-        &#39;&#39;&#39;
-        生成验证码图片和验证码code,返回验证码图片,并以形式将验证码存放在session里
-        &#39;&#39;&#39;
-        try:
-            f = BytesIO()
-            img, code = create_captcha()
-            request.session[&#34;captcha&#34;] = code
-            img.save(f,&#39;PNG&#39;)
-            return HttpResponse(f.getvalue())
-        except Exception as e:
-            log().error(str(e))
-</code></pre><p>3.login.html</p><pre tabindex=0><code>{# html #}
-&lt;div class=&#34;col-xs-4&#34;&gt;
-    &lt;img id=&#34;captcha_img&#34; src=&#34;{% url &#39;get_captcha&#39; %}&#34; onclick=&#34;refresh_captcha()&#34; style=&#34;margin-top: 28px;&#34;&gt;
-    &lt;p class=&#34;help-block&#34; onclick=&#34;refresh_captcha()&#34;&gt;
-    看不清楚?换一张!
-    &lt;/p&gt;
-&lt;/div&gt;
-
-{# js #}
-&lt;script&gt;
-    //刷新验证码
-    function refresh_captcha() {
-        $(&#34;#captcha_img&#34;).attr(&#34;src&#34;,$(&#34;#captcha_img&#34;)[0].src + &#39;?&#39;);
-    };
-&lt;/script&gt;
-</code></pre><p>4.url.py</p><pre tabindex=0><code>url(r&#39;^get_captcha/$&#39;,cas_views.get_captcha.as_view(), name=&#34;get_captcha&#34;),
-</code></pre><p>5.views.py</p><pre tabindex=0><code>#校验验证码是否正确
-if request.session[&#34;captcha&#34;].lower() != captcha.lower():
-    return JsonResponse({&#34;status&#34;:False, &#34;msg&#34;:&#34;验证码错误!&#34;})
-</code></pre><p>一些代码是参考网络上其他开源代码，不过其实也挺简单的，熟悉request.session就差不多了。做个记录。</p></section><footer class=article-footer><section class=article-tags><a href=/tags/django/>Django</a>
+<span>暗色模式</span></li></ol></li></ol></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/ style=background-color:#bed8ef;color:#0f283d>计算机</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/>django生成图片验证码</a></h2><h3 class=article-subtitle>最近在做一个好玩的通用django单点登录系统，登录系统少不了验证码，参考了一下别人的做法和开源项目，总结一下。 结果如下：</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2018-09-18T00:00:00Z>2018年9月18日星期二</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 2 分钟</time></div></footer></div></header><section class=article-content><p>最近在做一个好玩的通用django单点登录系统，登录系统少不了验证码，参考了一下别人的做法和开源项目，总结一下。</p><p>结果如下：</p><p><img src=images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_837b19bb-98df-4c26-afae-6678c91ff47a.png alt></p><p>主要思路流程是，后端根据随机码绘图，然后做混淆(我这里几乎没做模糊之类的混淆)，最后将随机验证码写进后端session里，前端获取图像后，提交时与session里的验证码做比较。流程还是比较简单的，大致代码如下。</p><p>1.captcha_handle.py</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>captcha_handle</span><span class=o>.</span><span class=n>py</span>
+</span></span><span class=line><span class=cl><span class=c1>#用于生成随机字符串以及生成验证码图片</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># -*- coding:utf-8 -*-</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>random</span><span class=o>,</span><span class=nn>string</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>PIL</span> <span class=kn>import</span> <span class=n>Image</span><span class=p>,</span><span class=n>ImageDraw</span><span class=p>,</span><span class=n>ImageFont</span><span class=p>,</span><span class=n>ImageFilter</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>#生成随机字符串</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>_getRandomChar</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#string模块包含各种字符串，以下为小写字母加数字</span>
+</span></span><span class=line><span class=cl>    <span class=n>ran</span> <span class=o>=</span> <span class=n>string</span><span class=o>.</span><span class=n>ascii_lowercase</span><span class=o>+</span><span class=n>string</span><span class=o>.</span><span class=n>digits</span>
+</span></span><span class=line><span class=cl>    <span class=n>char</span> <span class=o>=</span> <span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>4</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>char</span> <span class=o>+=</span> <span class=n>random</span><span class=o>.</span><span class=n>choice</span><span class=p>(</span><span class=n>ran</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>char</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>#返回一个随机的RGB颜色</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>_getRandomColor</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=p>(</span><span class=n>random</span><span class=o>.</span><span class=n>randint</span><span class=p>(</span><span class=mi>50</span><span class=p>,</span><span class=mi>150</span><span class=p>),</span><span class=n>random</span><span class=o>.</span><span class=n>randint</span><span class=p>(</span><span class=mi>50</span><span class=p>,</span><span class=mi>150</span><span class=p>),</span><span class=n>random</span><span class=o>.</span><span class=n>randint</span><span class=p>(</span><span class=mi>50</span><span class=p>,</span><span class=mi>150</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>create_captcha</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>#创建图片，模式，大小，背景色</span>
+</span></span><span class=line><span class=cl>    <span class=n>img</span> <span class=o>=</span> <span class=n>Image</span><span class=o>.</span><span class=n>new</span><span class=p>(</span><span class=s1>&#39;RGB&#39;</span><span class=p>,</span> <span class=p>(</span><span class=mi>120</span><span class=p>,</span><span class=mi>30</span><span class=p>),</span> <span class=p>(</span><span class=mi>255</span><span class=p>,</span><span class=mi>255</span><span class=p>,</span><span class=mi>255</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#创建画布</span>
+</span></span><span class=line><span class=cl>    <span class=n>draw</span> <span class=o>=</span> <span class=n>ImageDraw</span><span class=o>.</span><span class=n>Draw</span><span class=p>(</span><span class=n>img</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#设置字体</span>
+</span></span><span class=line><span class=cl>    <span class=n>font</span> <span class=o>=</span> <span class=n>ImageFont</span><span class=o>.</span><span class=n>truetype</span><span class=p>(</span><span class=s1>&#39;Arial.ttf&#39;</span><span class=p>,</span> <span class=mi>25</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>code</span> <span class=o>=</span> <span class=n>_getRandomChar</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#将生成的字符画在画布上</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>t</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>4</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>draw</span><span class=o>.</span><span class=n>text</span><span class=p>((</span><span class=mi>30</span><span class=o>*</span><span class=n>t</span><span class=o>+</span><span class=mi>5</span><span class=p>,</span><span class=mi>0</span><span class=p>),</span><span class=n>code</span><span class=p>[</span><span class=n>t</span><span class=p>],</span><span class=n>_getRandomColor</span><span class=p>(),</span><span class=n>font</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>#生成干扰点</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>_</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>random</span><span class=o>.</span><span class=n>randint</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=mi>50</span><span class=p>)):</span>
+</span></span><span class=line><span class=cl>        <span class=c1>#位置，颜色</span>
+</span></span><span class=line><span class=cl>        <span class=n>draw</span><span class=o>.</span><span class=n>point</span><span class=p>((</span><span class=n>random</span><span class=o>.</span><span class=n>randint</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=mi>120</span><span class=p>),</span> <span class=n>random</span><span class=o>.</span><span class=n>randint</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=mi>30</span><span class=p>)),</span><span class=n>fill</span><span class=o>=</span><span class=n>_getRandomColor</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>#使用模糊滤镜使图片模糊</span>
+</span></span><span class=line><span class=cl>    <span class=c1># img = img.filter(ImageFilter.BLUR)</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#保存</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#img.save(&#39;&#39;.join(code)+&#39;.jpg&#39;,&#39;jpeg&#39;)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>img</span><span class=p>,</span><span class=n>code</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=vm>__name__</span> <span class=o>==</span> <span class=s1>&#39;__main__&#39;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>create_code</span><span class=p>()</span>
+</span></span></code></pre></div><p>2.views.py</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>views</span><span class=o>.</span><span class=n>py</span>
+</span></span><span class=line><span class=cl><span class=c1>#视图，生成验证码图片和code，返回图片，code存进session</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>get_captcha</span><span class=p>(</span><span class=n>View</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>get</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>request</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s1>&#39;&#39;&#39;
+</span></span></span><span class=line><span class=cl><span class=s1>        生成验证码图片和验证码code,返回验证码图片,并以形式将验证码存放在session里
+</span></span></span><span class=line><span class=cl><span class=s1>        &#39;&#39;&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>f</span> <span class=o>=</span> <span class=n>BytesIO</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=n>img</span><span class=p>,</span> <span class=n>code</span> <span class=o>=</span> <span class=n>create_captcha</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=n>request</span><span class=o>.</span><span class=n>session</span><span class=p>[</span><span class=s2>&#34;captcha&#34;</span><span class=p>]</span> <span class=o>=</span> <span class=n>code</span>
+</span></span><span class=line><span class=cl>            <span class=n>img</span><span class=o>.</span><span class=n>save</span><span class=p>(</span><span class=n>f</span><span class=p>,</span><span class=s1>&#39;PNG&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>HttpResponse</span><span class=p>(</span><span class=n>f</span><span class=o>.</span><span class=n>getvalue</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>        <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>log</span><span class=p>()</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=nb>str</span><span class=p>(</span><span class=n>e</span><span class=p>))</span>
+</span></span></code></pre></div><p>3.login.html</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-jsx data-lang=jsx><span class=line><span class=cl><span class=p>{</span><span class=err>#</span> <span class=nx>html</span> <span class=err>#</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>div</span> <span class=na>class</span><span class=o>=</span><span class=s>&#34;col-xs-4&#34;</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>img</span> <span class=na>id</span><span class=o>=</span><span class=s>&#34;captcha_img&#34;</span> <span class=na>src</span><span class=o>=</span><span class=s>&#34;{% url &#39;get_captcha&#39; %}&#34;</span> <span class=na>onclick</span><span class=o>=</span><span class=s>&#34;refresh_captcha()&#34;</span> <span class=na>style</span><span class=o>=</span><span class=s>&#34;margin-top: 28px;&#34;</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>p</span> <span class=na>class</span><span class=o>=</span><span class=s>&#34;help-block&#34;</span> <span class=na>onclick</span><span class=o>=</span><span class=s>&#34;refresh_captcha()&#34;</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>看不清楚</span><span class=o>?</span><span class=nx>换一张</span><span class=o>!</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;/</span><span class=nt>p</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>div</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>{</span><span class=err>#</span> <span class=nx>js</span> <span class=err>#</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//刷新验证码
+</span></span></span><span class=line><span class=cl>    <span class=kd>function</span> <span class=nx>refresh_captcha</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>$</span><span class=p>(</span><span class=s2>&#34;#captcha_img&#34;</span><span class=p>).</span><span class=nx>attr</span><span class=p>(</span><span class=s2>&#34;src&#34;</span><span class=p>,</span><span class=nx>$</span><span class=p>(</span><span class=s2>&#34;#captcha_img&#34;</span><span class=p>)[</span><span class=mi>0</span><span class=p>].</span><span class=nx>src</span> <span class=o>+</span> <span class=s1>&#39;?&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>};</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span></code></pre></div><p>4.url.py</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>url</span><span class=p>(</span><span class=sa>r</span><span class=s1>&#39;^get_captcha/$&#39;</span><span class=p>,</span><span class=n>cas_views</span><span class=o>.</span><span class=n>get_captcha</span><span class=o>.</span><span class=n>as_view</span><span class=p>(),</span> <span class=n>name</span><span class=o>=</span><span class=s2>&#34;get_captcha&#34;</span><span class=p>),</span>
+</span></span></code></pre></div><p>5.views.py</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1>#校验验证码是否正确</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=n>request</span><span class=o>.</span><span class=n>session</span><span class=p>[</span><span class=s2>&#34;captcha&#34;</span><span class=p>]</span><span class=o>.</span><span class=n>lower</span><span class=p>()</span> <span class=o>!=</span> <span class=n>captcha</span><span class=o>.</span><span class=n>lower</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>JsonResponse</span><span class=p>({</span><span class=s2>&#34;status&#34;</span><span class=p>:</span><span class=kc>False</span><span class=p>,</span> <span class=s2>&#34;msg&#34;</span><span class=p>:</span><span class=s2>&#34;验证码错误!&#34;</span><span class=p>})</span>
+</span></span></code></pre></div><p>一些代码是参考网络上其他开源代码，不过其实也挺简单的，熟悉request.session就差不多了。做个记录。</p></section><footer class=article-footer><section class=article-tags><a href=/tags/django/>Django</a>
 <a href=/tags/django%E9%AA%8C%E8%AF%81%E7%A0%81/>Django验证码</a>
 <a href=/tags/python%E9%AA%8C%E8%AF%81%E7%A0%81/>Python验证码</a>
 <a href=/tags/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/>运维开发</a>
-<a href=/tags/%E9%AA%8C%E8%AF%81%E7%A0%81/>验证码</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/posts/2018/09/2018-09-18-django%E7%B1%BB%E8%A7%86%E5%9B%BE%E8%A3%85%E9%A5%B0%E5%99%A8/><div class=article-details><h2 class=article-title>django类视图装饰器</h2></div></a></article><article><a href=/posts/2018/09/2018-09-06-%E4%B8%BAdjango-admin%E7%9A%84userpermission%E6%B7%BB%E5%8A%A0read-onlycan-view%E6%9D%83%E9%99%90/><div class=article-details><h2 class=article-title>为django-admin的userpermission添加read only(can view)权限</h2></div></a></article><article><a href=/posts/2017/12/2017-12-27-django%E4%BD%BF%E7%94%A8middleware%E5%AE%9E%E7%8E%B0views%E7%9A%84%E8%AE%BF%E9%97%AE%E9%99%90%E5%88%B6/><div class=article-details><h2 class=article-title>django使用middleware实现views的访问限制</h2></div></a></article><article><a href=/posts/2018/08/2018-08-02-%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%AB%8B%E7%AB%BF%E8%A7%81%E5%BD%B1%E7%9A%84%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/><div class=article-details><h2 class=article-title>记一次立竿见影的性能优化</h2></div></a></article><article><a href=/posts/2018/07/2018-07-23-%E4%B8%80%E4%B8%AA%E8%87%AA%E8%A7%A3%E6%9E%90nginx-upstream%E5%92%8Clocation%E5%B9%B6%E6%A3%80%E6%B5%8B%E8%BF%9E%E9%80%9A%E6%80%A7%E7%9A%84web%E7%B3%BB%E7%BB%9F/><div class=article-details><h2 class=article-title>一个自解析nginx upstream和location并检测连通性的web系统</h2></div></a></article></div></div></aside><div id=tcomment></div><script src=https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js></script><script>twikoo.init({envId:"calmblog.vercel.app",el:"#tcomment",lang:"zh-CN"})</script><footer class=site-footer><section class=copyright>&copy;
-2026 cAlm的个人Blog</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=4.0.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><script type=module>
+<a href=/tags/%E9%AA%8C%E8%AF%81%E7%A0%81/>验证码</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/posts/2018/09/2018-09-18-django%E7%B1%BB%E8%A7%86%E5%9B%BE%E8%A3%85%E9%A5%B0%E5%99%A8/><div class=article-details><h2 class=article-title>django类视图装饰器</h2></div></a></article><article><a href=/posts/2018/09/2018-09-06-%E4%B8%BAdjango-admin%E7%9A%84userpermission%E6%B7%BB%E5%8A%A0read-onlycan-view%E6%9D%83%E9%99%90/><div class=article-details><h2 class=article-title>为django-admin的userpermission添加read only(can view)权限</h2></div></a></article><article><a href=/posts/2017/12/2017-12-27-django%E4%BD%BF%E7%94%A8middleware%E5%AE%9E%E7%8E%B0views%E7%9A%84%E8%AE%BF%E9%97%AE%E9%99%90%E5%88%B6/><div class=article-details><h2 class=article-title>django使用middleware实现views的访问限制</h2></div></a></article><article><a href=/posts/2018/08/2018-08-02-%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%AB%8B%E7%AB%BF%E8%A7%81%E5%BD%B1%E7%9A%84%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/><div class=article-details><h2 class=article-title>记一次立竿见影的性能优化</h2></div></a></article><article><a href=/posts/2018/07/2018-07-23-%E4%B8%80%E4%B8%AA%E8%87%AA%E8%A7%A3%E6%9E%90nginx-upstream%E5%92%8Clocation%E5%B9%B6%E6%A3%80%E6%B5%8B%E8%BF%9E%E9%80%9A%E6%80%A7%E7%9A%84web%E7%B3%BB%E7%BB%9F/><div class=article-details><h2 class=article-title>一个自解析nginx upstream和location并检测连通性的web系统</h2></div></a></article></div></div></aside><div id=tcomment></div><script src=https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js></script><script>twikoo.init({envId:"",el:"#tcomment",lang:"zh-CN"})</script><footer class=site-footer><section class=copyright>&copy;
+2026 cAlm的个人Blog</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=4.0.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><script type=module>
     import gallery from '\/ts\/gallery.js';
 
     const articleContent = document.querySelector('.article-content');

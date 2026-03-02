@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Gunicorn on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/gunicorn/</link><description>Recent content in Gunicorn on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Fri, 15 Jun 2018 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/gunicorn/index.xml" rel="self" type="application/rss+xml"/><item><title>gunicorn中一个同步任务的坑</title><link>https://www.calmkart.com/posts/2018/06/2018-06-15-gunicorn%E4%B8%AD%E4%B8%80%E4%B8%AA%E5%90%8C%E6%AD%A5%E4%BB%BB%E5%8A%A1%E7%9A%84%E5%9D%91/</link><pubDate>Fri, 15 Jun 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/06/2018-06-15-gunicorn%E4%B8%AD%E4%B8%80%E4%B8%AA%E5%90%8C%E6%AD%A5%E4%BB%BB%E5%8A%A1%E7%9A%84%E5%9D%91/</guid><description>&lt;p&gt;最近有些django定时任务要跑，又懒的做异步celery worker tasks了，就是普通的同步任务，用的django crontab，其中django用的是gunicorn-&amp;gt;nginx的部署方式。但几天下来，发现任务总是执行到一半就停了，排错发现一个偶尔会出现的坑&lt;/p&gt;
-&lt;p&gt; &lt;/p&gt;
 &lt;p&gt;&amp;hellip;&lt;/p&gt;
 &lt;p&gt;检测到用curl请求接口，每到31秒就停止，后续同步任务不再继续&lt;/p&gt;
 &lt;p&gt;检查gonicorn参数，发现默认的timeout值为30s，既客户端请求30s后超时&lt;/p&gt;
 &lt;p&gt;gunicorn启动参数加上     -t 120&lt;/p&gt;
 &lt;p&gt;问题解决&lt;/p&gt;
 &lt;p&gt;&amp;hellip;&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="历史评论-2-条"&gt;历史评论 (2 条)
-&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;wuyan&lt;/strong&gt; (2019-07-29 16:34)&lt;/p&gt;
-&lt;p&gt;gunicorn启动参数加上 -t 120 是表示120s超时吗？如果是的话，会不会执行到120s就停了，还是没有解决根本问题吧？&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-08-09 15:26)&lt;/p&gt;
-&lt;p&gt;本来就是个简单的定时任务,要想彻底解决问题用celery做异步队列处理啊&lt;/p&gt;
-
- &lt;/blockquote&gt;</description></item></channel></rss>
+&lt;div class="archived-comments"&gt;
+&lt;h2&gt;历史评论 (2 条)&lt;/h2&gt;
+&lt;p class="comment-notice"&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/p&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;wuyan&lt;/strong&gt; (2019-07-29 16:34)&lt;/div&gt;
+&lt;div class="comment-body"&gt;gunicorn启动参数加上 -t 120 是表示120s超时吗？如果是的话，会不会执行到120s就停了，还是没有解决根本问题吧？&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item comment-reply"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;calmkart&lt;/strong&gt; (2019-08-09 15:26)&lt;/div&gt;
+&lt;div class="comment-body"&gt;本来就是个简单的定时任务,要想彻底解决问题用celery做异步队列处理啊&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item></channel></rss>

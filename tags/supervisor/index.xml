@@ -1,112 +1,103 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Supervisor on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/supervisor/</link><description>Recent content in Supervisor on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sun, 11 Feb 2018 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/supervisor/index.xml" rel="self" type="application/rss+xml"/><item><title>关于supervisor/gosuv等控制django/flask进程的小贴士</title><link>https://www.calmkart.com/posts/2018/02/2018-02-11-%E5%85%B3%E4%BA%8Esupervisor-gosuv%E7%AD%89%E6%8E%A7%E5%88%B6django-flask%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%B0%8F%E8%B4%B4%E5%A3%AB/</link><pubDate>Sun, 11 Feb 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/02/2018-02-11-%E5%85%B3%E4%BA%8Esupervisor-gosuv%E7%AD%89%E6%8E%A7%E5%88%B6django-flask%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%B0%8F%E8%B4%B4%E5%A3%AB/</guid><description>&lt;p&gt;在使用supervisor/gosuv等进程控制程序控制django/flask进程时，常常会出现一个&amp;quot;BUG&amp;quot;&amp;mdash;&amp;mdash;输入supervisor restart {app}/gosuv stop/start {app}后，经常会出现django/flask重启失败，因为端口已占用的错误。&lt;/p&gt;
 &lt;p&gt;这里我们常常想到，先把端口关掉不就可以了？经常在代码中加入如下命令：(如果程序是django或者flask，占用的端口是82端口)&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;import subprocess
-import os
-
-pid = os.popen(&amp;#34;lsof -i:82|grep python|awk &amp;#39;{print $2}&amp;#39;&amp;#34;).read()
-if len(pid):
- subprocess.check_output(&amp;#34;kill -9 &amp;#34;+str(int(pid)), shell=True)
-#注意，这里一定要用subprocess库来kill进程。用os.system运行kill -9或os.kill()都会导致新进程产生
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这样虽然可行，但是比较麻烦。其实占用端口的原因是flask/django服务器自动reload造成的，只需要在supervisor/gosuv的启动指令里，加上&amp;ndash;noreload参数就不会产生这个&amp;quot;BUG&amp;quot;了，举例如下：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;#原来启动指令
-python manage.py runserver 0.0.0.0:82
-#更新启动指令
-python manage.py runserver 0.0.0.0:82 --noreload
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;搞定&lt;/p&gt;</description></item><item><title>supervisor集中化管理web工具cesi</title><link>https://www.calmkart.com/posts/2018/01/2018-01-11-supervisor%E9%9B%86%E4%B8%AD%E5%8C%96%E7%AE%A1%E7%90%86web%E5%B7%A5%E5%85%B7cesi/</link><pubDate>Thu, 11 Jan 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/01/2018-01-11-supervisor%E9%9B%86%E4%B8%AD%E5%8C%96%E7%AE%A1%E7%90%86web%E5%B7%A5%E5%85%B7cesi/</guid><description>&lt;p&gt;linux进程管理器supervisor是会经常被用到的，但服务器多了之后，每个服务器的进程也不方便管理。同时，supervisor自带的web界面比较简陋，所以尝试了一下官网推荐的一些第三方开源软件，推荐一下这个cesi。 最终效果如下： &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/01/1.jpg" target="_blank" rel="noopener"
- &gt;&lt;img src="images/1.jpg" alt="" /&gt;
-&lt;/a&gt; [&lt;img src="images/2.jpg" alt="" /&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;subprocess&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;os&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;pid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;popen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;lsof -i:82|grep python|awk &amp;#39;{print $2}&amp;#39;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pid&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;subprocess&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;check_output&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;kill -9 &amp;#34;&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pid&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt; &lt;span class="n"&gt;shell&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#注意，这里一定要用subprocess库来kill进程。用os.system运行kill -9或os.kill()都会导致新进程产生&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这样虽然可行，但是比较麻烦。其实占用端口的原因是flask/django服务器自动reload造成的，只需要在supervisor/gosuv的启动指令里，加上&amp;ndash;noreload参数就不会产生这个&amp;quot;BUG&amp;quot;了，举例如下：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#原来启动指令&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;python manage.py runserver 0.0.0.0:82
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#更新启动指令&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;python manage.py runserver 0.0.0.0:82 --noreload
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;搞定&lt;/p&gt;</description></item><item><title>supervisor集中化管理web工具cesi</title><link>https://www.calmkart.com/posts/2018/01/2018-01-11-supervisor%E9%9B%86%E4%B8%AD%E5%8C%96%E7%AE%A1%E7%90%86web%E5%B7%A5%E5%85%B7cesi/</link><pubDate>Thu, 11 Jan 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/01/2018-01-11-supervisor%E9%9B%86%E4%B8%AD%E5%8C%96%E7%AE%A1%E7%90%86web%E5%B7%A5%E5%85%B7cesi/</guid><description>&lt;p&gt;linux进程管理器supervisor是会经常被用到的，但服务器多了之后，每个服务器的进程也不方便管理。同时，supervisor自带的web界面比较简陋，所以尝试了一下官网推荐的一些第三方开源软件，推荐一下这个cesi。 最终效果如下： &lt;img src="images/1.jpg" alt="" /&gt;
+ &lt;img src="images/2.jpg" alt="" /&gt;
 &lt;/p&gt;
-&lt;p&gt;](&lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/01/2.jpg" target="_blank" rel="noopener"
- &gt;http://www.calmkart.com/wp-content/uploads/2018/01/2.jpg&lt;/a&gt;)&lt;/p&gt;
 &lt;p&gt;1.首先是关于supervisor 通过apt或pip安装都可以&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;apt-get install supervisor
-#pip install supervisor
-echo_supervisord_conf &amp;gt; /etc/supervisor/supervisord.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;关于supervisor配置文件&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;[unix_http_server]
-#这里配置是否用unix socket通信来让supervisor与supervisorctl做通信
-
-[inet_http_server]
-#这里是用的http的方式做通信
-
-[supervisorctl]
-#这里选择supervisorctl到底用以上两种中的哪种方式来与supervisor通信，选择一种即可，记得填写密码
-
-[program:pro_name]
-stdout_logfile = {path}
-redirect_stderr = true ;让stderr也写入stdout中
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;常用操作&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;supervisorctl reload #重启加载supervisor配置文件
-supervisorctl update #只增加新增的配置文件
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.关于cesi&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;apt-get install supervisor
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#pip install supervisor&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;echo_supervisord_conf &amp;gt; /etc/supervisor/supervisord.conf
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;关于supervisor配置文件&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-ini" data-lang="ini"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;[unix_http_server]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#这里配置是否用unix socket通信来让supervisor与supervisorctl做通信&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;[inet_http_server]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#这里是用的http的方式做通信&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;[supervisorctl]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#这里选择supervisorctl到底用以上两种中的哪种方式来与supervisor通信，选择一种即可，记得填写密码&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;[program:pro_name]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;stdout_logfile&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;{path}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;redirect_stderr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;true ;让stderr也写入stdout中&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;常用操作&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;supervisorctl reload &lt;span class="c1"&gt;#重启加载supervisor配置文件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;supervisorctl update &lt;span class="c1"&gt;#只增加新增的配置文件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;2.关于cesi&lt;/p&gt;
 &lt;p&gt;项目地址：&lt;a class="link" href="https://github.com/Gamegos/cesi" target="_blank" rel="noopener"
  &gt;https://github.com/Gamegos/cesi&lt;/a&gt; 安装cesi&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;apt-get install sqlite3 python python-flask
-git clone https://github.com/Gamegos/cesi
-cd cesi
-sqlite3 ./userinfo.db &amp;lt; userinfo.sql
-cp cesi.conf /etc/cesi.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;配置cesi.conf,我的配置如下，一看就懂了&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;[node:118]
-username = ***
-password = ***
-host = 127.0.0.1
-port = 9001
-
-[node:calmkart]
-username = ***
-password = ***
-host = 45.76.71.69
-port = 9001
-
-[node:121]
-username = ***
-password = ***
-host = *.*.*.121
-port = 9001
-
-[environment:my_env]
-members = 118,calmkart,121
-
-[cesi]
-database = /root/cesi/userinfo.db
-activity_log = /var/log/cesi.log
-host = 0.0.0.0
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;用supervisor运行cesi,配置文件如下&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;[program:cesi]
-directory = /root/cesi/cesi/
-command = python web.py
-autostart = true
-startsecs = 5
-autorestart = true
-startretries = 3
-user = root
-redirect_stderr = true
-stdout_logfile = /var/log/cesi1.log
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;开启任务&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;supervisorctl start cesi
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;默认账号密码：admin,admin 端口需要改的自己去web.py里面改 you get it&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;apt-get install sqlite3 python python-flask
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone https://github.com/Gamegos/cesi
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; cesi
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sqlite3 ./userinfo.db &amp;lt; userinfo.sql
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;cp cesi.conf /etc/cesi.conf
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;配置cesi.conf,我的配置如下，一看就懂了&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-ini" data-lang="ini"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;[node:118]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;username&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;***&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;password&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;***&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;host&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;127.0.0.1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;port&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;9001&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;[node:calmkart]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;username&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;***&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;password&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;***&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;host&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;45.76.71.69&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;port&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;9001&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;[node:121]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;username&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;***&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;password&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;***&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;host&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;*.*.*.121&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;port&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;9001&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;[environment:my_env]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;members&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;118,calmkart,121&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;[cesi]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;database&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;/root/cesi/userinfo.db&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;activity_log&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;/var/log/cesi.log&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;host&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;0.0.0.0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;用supervisor运行cesi,配置文件如下&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-ini" data-lang="ini"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;[program:cesi]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;directory&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;/root/cesi/cesi/&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;command&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;python web.py&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;autostart&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;startsecs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;5&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;autorestart&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;startretries&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;user&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;root&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;redirect_stderr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;stdout_logfile&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;/var/log/cesi1.log&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;开启任务&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;supervisorctl start cesi
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;默认账号密码：admin,admin 端口需要改的自己去web.py里面改 you get it&lt;/p&gt;
 &lt;p&gt;本测试服地址： &lt;a class="link" href="http://cesi.calmkart.com" target="_blank" rel="noopener"
  &gt;http://cesi.calmkart.com&lt;/a&gt; 此外，其他常用的supervisor相关第三方工具还有 suponoff gosuv&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="历史评论-3-条"&gt;历史评论 (3 条)
-&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;qhh0205&lt;/strong&gt; (2018-07-18 23:00)&lt;/p&gt;
-&lt;p&gt;你好，cesi 支持管理多个服务器的进程吗？我看你截图貌似支持管理多个服务器的。我用默认的supervisor web UI，不支持管理多个服务器的supervisor。&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;↳ &lt;strong&gt;qhh0205&lt;/strong&gt; (2018-07-18 23:26)&lt;/p&gt;
-&lt;p&gt;sorry，刚没仔细看，是支持的&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;potoo&lt;/strong&gt; (2019-05-19 16:49)&lt;/p&gt;
-&lt;p&gt;你好，我看你提供的&lt;a class="link" href="http://cesi.calmkart.com" target="_blank" rel="noopener"
- &gt;测试地址&lt;/a&gt;的 web 效果不一样，是你自己修改了吗? 你可以说下修改的方法吗？ 我也在用 cesi，但是 cesi 移动端页面显示有问题，想自己修改下页面，但是不知道在哪里修改。&lt;/p&gt;
-
- &lt;/blockquote&gt;</description></item></channel></rss>
+&lt;div class="archived-comments"&gt;
+&lt;h2&gt;历史评论 (3 条)&lt;/h2&gt;
+&lt;p class="comment-notice"&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/p&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;qhh0205&lt;/strong&gt; (2018-07-18 23:00)&lt;/div&gt;
+&lt;div class="comment-body"&gt;你好，cesi 支持管理多个服务器的进程吗？我看你截图貌似支持管理多个服务器的。我用默认的supervisor web UI，不支持管理多个服务器的supervisor。&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item comment-reply"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;qhh0205&lt;/strong&gt; (2018-07-18 23:26)&lt;/div&gt;
+&lt;div class="comment-body"&gt;sorry，刚没仔细看，是支持的&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;potoo&lt;/strong&gt; (2019-05-19 16:49)&lt;/div&gt;
+&lt;div class="comment-body"&gt;你好，我看你提供的[测试地址](http://cesi.calmkart.com)的 web 效果不一样，是你自己修改了吗? 你可以说下修改的方法吗？ 我也在用 cesi，但是 cesi 移动端页面显示有问题，想自己修改下页面，但是不知道在哪里修改。&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item></channel></rss>

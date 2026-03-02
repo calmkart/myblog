@@ -2,161 +2,161 @@
 &lt;p&gt;测试系统：debian8.7&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;一.安装master&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;1.添加apt key&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;wget -O - https://repo.saltstack.com/apt/debian/8/amd64/latest/SALTSTACK-GPG-KEY.pub | sudo apt-key add -
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.将saltstack源添加进apt源&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;vi /etc/apt/sources.list
-#添加saltstack源
-deb http://repo.saltstack.com/apt/debian/8/amd64/latest jessie main
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.更新apt&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;apt-get update
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.安装master端相关组件&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;apt-get install salt-api
-apt-get install salt-cloud
-apt-get install salt-master
-apt-get install salt-minion
-apt-get install salt-ssh
-apt-get install salt-syndic
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.配置master&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;vi /etc/salt/master
-####################常见配置如下####################
-#指定master，冒号后有一个空格
-user: root
-#自动接收minion
-auto_accept: True
-
-#-------以下为可选--------------
-#自动接收minion
-auto_accept: True
-#salt的运行线程，开的线程越多一般处理的速度越快，但一般不要超过CPU的个数
-worker_threads: 10
-# master的管理端口
-publish_port : 4505
-# master跟minion的通讯端口，用于文件服务，认证，接受返回结果等
-ret_port : 4506
-# 如果这个master运行的salt-syndic连接到了一个更高层级的master,那么这个参数需要配置成连接到的这个高层级master的监听端口
-syndic_master_port : 4506
-# 指定pid文件位置
-pidfile: /var/run/salt-master.pid
-# saltstack 可以控制的文件系统的开始位置
-root_dir: /
-# 日志文件地址
-log_file: /var/log/salt_master.log
-# 分组设置
-nodegroups:
- group_all: &amp;#39;*&amp;#39;
-# salt state执行时候的根目录
-file_roots:
- base:
- - /srv/salt/
-# 设置pillar 的根目录
-pillar_roots:
- base:
- - /srv/pillar
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;6.启动master&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;systemctl start salt-master
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;二.安装minion&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;wget -O - https://repo.saltstack.com/apt/debian/8/amd64/latest/SALTSTACK-GPG-KEY.pub &lt;span class="p"&gt;|&lt;/span&gt; sudo apt-key add -
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;2.将saltstack源添加进apt源&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;vi /etc/apt/sources.list
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#添加saltstack源&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;deb http://repo.saltstack.com/apt/debian/8/amd64/latest jessie main
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;3.更新apt&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;apt-get update
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;4.安装master端相关组件&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;apt-get install salt-api
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;apt-get install salt-cloud
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;apt-get install salt-master
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;apt-get install salt-minion
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;apt-get install salt-ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;apt-get install salt-syndic
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;5.配置master&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;vi /etc/salt/master
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;####################常见配置如下####################&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#指定master，冒号后有一个空格&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;user: root
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#自动接收minion&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;auto_accept: True
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#-------以下为可选--------------&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#自动接收minion&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;auto_accept: True
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#salt的运行线程，开的线程越多一般处理的速度越快，但一般不要超过CPU的个数&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;worker_threads: &lt;span class="m"&gt;10&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# master的管理端口&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;publish_port : &lt;span class="m"&gt;4505&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# master跟minion的通讯端口，用于文件服务，认证，接受返回结果等&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ret_port : &lt;span class="m"&gt;4506&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 如果这个master运行的salt-syndic连接到了一个更高层级的master,那么这个参数需要配置成连接到的这个高层级master的监听端口&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;syndic_master_port : &lt;span class="m"&gt;4506&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 指定pid文件位置&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pidfile: /var/run/salt-master.pid
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# saltstack 可以控制的文件系统的开始位置&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;root_dir: /
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 日志文件地址&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;log_file: /var/log/salt_master.log
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 分组设置&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;nodegroups:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; group_all: &lt;span class="s1"&gt;&amp;#39;*&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# salt state执行时候的根目录&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;file_roots:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; base:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; - /srv/salt/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 设置pillar 的根目录&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pillar_roots:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; base:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; - /srv/pillar
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;6.启动master&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;systemctl start salt-master
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;二.安装minion&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;1.安装salt-minion&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;apt-get install salt-minion
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.配置minion相关信息&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;vi /etc/salt/minion
-
-###################以下为常见设置###########################
-#指定master，冒号后有一个空格
-master: 10.32.80.121
-
-#-------以下为可选--------------
-# minion的识别ID，可以是IP，域名，或是可以通过DNS解析的字符串
-id: xx
-# salt运行的用户权限
-user: root
-# master的识别ID，可以是IP，域名，或是可以通过DNS解析的字符串
-master : ip
-# master通讯端口
-master_port: 4506
-# 备份模式，minion是本地备份，当进行文件管理时的文件备份模式
-backup_mode: minion
-# 执行salt-call时候的输出方式
-output: nested 
-# minion等待master接受认证的时间
-acceptance_wait_time: 10
-# 失败重连次数，0表示无限次，非零会不断尝试到设置值后停止尝试
-acceptance_wait_time_max: 0
-# 重新认证延迟时间，可以避免因为master的key改变导致minion需要重新认证的syn风暴
-random_reauth_delay: 60
-# 日志文件位置
-log_file: /var/logs/salt_minion.log
-# 文件路径基本位置
-file_roots:
- base:
- - /etc/salt/minion/file
-# pillar基本位置
-pillar_roots:
- base:
- - /data/salt/minion/pillar
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.启动minion&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;systemctl start salt-minion
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;三.通过master管理minion&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;apt-get install salt-minion
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;2.配置minion相关信息&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;vi /etc/salt/minion
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;###################以下为常见设置###########################&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#指定master，冒号后有一个空格&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;master: 10.32.80.121
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#-------以下为可选--------------&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# minion的识别ID，可以是IP，域名，或是可以通过DNS解析的字符串&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;id: xx
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# salt运行的用户权限&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;user: root
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# master的识别ID，可以是IP，域名，或是可以通过DNS解析的字符串&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;master : ip
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# master通讯端口&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;master_port: &lt;span class="m"&gt;4506&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 备份模式，minion是本地备份，当进行文件管理时的文件备份模式&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;backup_mode: minion
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 执行salt-call时候的输出方式&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;output: nested 
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# minion等待master接受认证的时间&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;acceptance_wait_time: &lt;span class="m"&gt;10&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 失败重连次数，0表示无限次，非零会不断尝试到设置值后停止尝试&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;acceptance_wait_time_max: &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 重新认证延迟时间，可以避免因为master的key改变导致minion需要重新认证的syn风暴&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;random_reauth_delay: &lt;span class="m"&gt;60&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 日志文件位置&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;log_file: /var/logs/salt_minion.log
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 文件路径基本位置&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;file_roots:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; base:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; - /etc/salt/minion/file
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# pillar基本位置&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pillar_roots:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; base:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; - /data/salt/minion/pillar
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;3.启动minion&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;systemctl start salt-minion
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;三.通过master管理minion&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;1.配置key&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;#查看当前所有的key
-salt-key
-
-#注册所有key
-salt-key -A
-
-#注册某个key
-salt-key -a minion_id
-
-#删除全部key
-salt-key -D
-
-#删除某个key
-salt-key -d minion_id
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.测试是否连通&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;#测试所有minion的连通性
-salt &amp;#39;*&amp;#39; test.ping
-
-#测试某个minion的连通性
-salt &amp;#39;minion_id&amp;#39; test.ping
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.常用命令&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;#salt cmd.run用于让minion批量执行命令
-salt &amp;#39;*&amp;#39; cmd.run &amp;#39;ifconfig&amp;#39;
-salt &amp;#39;minion_id&amp;#39; cmd.run &amp;#39;ifconfig&amp;#39;
-
-#salt-run manage查看minioni信息
-salt-run manage.status #查看所有minion状态
-salt-run manage.down ##查看down掉的minion
-salt-run manage.up ##查看up的minion
-
-#salt-key管理密钥
-salt-key [options]
-salt-key -L ##查看所有minion-key
-salt-key -a &amp;lt;key-name&amp;gt; ##接受某个minion-key
-salt-key -d &amp;lt;key-name&amp;gt; ##删除某个minion-key
-salt-key -A ##接受所有的minion-key
-salt-key -D ##删除所有的minion-key
-
-#salt-call在minion上执行某命令
-salt-call [options] &amp;lt;function&amp;gt; [arguments]
-salt-call test.ping ##自己执行test.ping命令
-salt-call cmd.run &amp;#39;ifconfig&amp;#39; ##自己执行cmd.run函数
-
-#salt-cp分发文件给minion(不支持目录分发)
-salt-cp &amp;#39;*&amp;#39; testfile.html /tmp #把testfile.html发送到所有minion的/tmp文件夹
-salt-cp &amp;#39;test*&amp;#39; index.html /tmp/a.html #把index.html发送到所有test*的minion并重命名为/tmp/a.html
-
-#目标minion分组
-修改/etc/salt/master
-nodegroups:
- testgroup1: &amp;#39;L@test82.salt.cn,test83.salt.cn&amp;#39;
- testgroup2: &amp;#39;192.168.2.84&amp;#39;
-#-N为分组命令符
-salt -N testgroup1 test.ping
-#分组分为多种类型：
- G -- 针对 Grains 做单个匹配，例如：G@os:Ubuntu
- E -- 针对 minion 针对正则表达式做匹配，例如：E@web\d+.(dev|qa|prod).loc
- P -- 针对 Grains 做正则表达式匹配，例如：P@os:(RedHat|Fedora|CentOS)
- L -- 针对 minion 做列表匹配，例如：L@minion1.example.com,minion3.domain.com or bl*.domain.com
- I -- 针对 Pillar 做单个匹配，例如：I@pdata:foobar
- S -- 针对子网或是 IP 做匹配，例如：S@192.168.1.0/24 or S@192.168.1.100
- R -- 针对客户端范围做匹配，例如： R@%foo.bar
-&lt;/code&gt;&lt;/pre&gt;</description></item></channel></rss>
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#查看当前所有的key&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-key
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#注册所有key&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-key -A
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#注册某个key&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-key -a minion_id
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#删除全部key&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-key -D
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#删除某个key&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-key -d minion_id
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;2.测试是否连通&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#测试所有minion的连通性&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt &lt;span class="s1"&gt;&amp;#39;*&amp;#39;&lt;/span&gt; test.ping
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#测试某个minion的连通性&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt &lt;span class="s1"&gt;&amp;#39;minion_id&amp;#39;&lt;/span&gt; test.ping
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;3.常用命令&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#salt cmd.run用于让minion批量执行命令&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt &lt;span class="s1"&gt;&amp;#39;*&amp;#39;&lt;/span&gt; cmd.run &lt;span class="s1"&gt;&amp;#39;ifconfig&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt &lt;span class="s1"&gt;&amp;#39;minion_id&amp;#39;&lt;/span&gt; cmd.run &lt;span class="s1"&gt;&amp;#39;ifconfig&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#salt-run manage查看minioni信息&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-run manage.status &lt;span class="c1"&gt;#查看所有minion状态&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-run manage.down &lt;span class="c1"&gt;##查看down掉的minion&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-run manage.up &lt;span class="c1"&gt;##查看up的minion&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#salt-key管理密钥&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-key &lt;span class="o"&gt;[&lt;/span&gt;options&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-key -L &lt;span class="c1"&gt;##查看所有minion-key&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-key -a &amp;lt;key-name&amp;gt; &lt;span class="c1"&gt;##接受某个minion-key&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-key -d &amp;lt;key-name&amp;gt; &lt;span class="c1"&gt;##删除某个minion-key&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-key -A &lt;span class="c1"&gt;##接受所有的minion-key&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-key -D &lt;span class="c1"&gt;##删除所有的minion-key&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#salt-call在minion上执行某命令&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-call &lt;span class="o"&gt;[&lt;/span&gt;options&lt;span class="o"&gt;]&lt;/span&gt; &amp;lt;&lt;span class="k"&gt;function&lt;/span&gt;&amp;gt; &lt;span class="o"&gt;[&lt;/span&gt;arguments&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-call test.ping &lt;span class="c1"&gt;##自己执行test.ping命令&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-call cmd.run &lt;span class="s1"&gt;&amp;#39;ifconfig&amp;#39;&lt;/span&gt; &lt;span class="c1"&gt;##自己执行cmd.run函数&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#salt-cp分发文件给minion(不支持目录分发)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-cp &lt;span class="s1"&gt;&amp;#39;*&amp;#39;&lt;/span&gt; testfile.html /tmp &lt;span class="c1"&gt;#把testfile.html发送到所有minion的/tmp文件夹&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-cp &lt;span class="s1"&gt;&amp;#39;test*&amp;#39;&lt;/span&gt; index.html /tmp/a.html &lt;span class="c1"&gt;#把index.html发送到所有test*的minion并重命名为/tmp/a.html&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#目标minion分组&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;修改/etc/salt/master
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;nodegroups:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; testgroup1: &lt;span class="s1"&gt;&amp;#39;L@test82.salt.cn,test83.salt.cn&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; testgroup2: &lt;span class="s1"&gt;&amp;#39;192.168.2.84&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#-N为分组命令符&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt -N testgroup1 test.ping
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#分组分为多种类型：&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; G -- 针对 Grains 做单个匹配，例如：G@os:Ubuntu
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; E -- 针对 minion 针对正则表达式做匹配，例如：E@web&lt;span class="se"&gt;\d&lt;/span&gt;+.&lt;span class="o"&gt;(&lt;/span&gt;dev&lt;span class="p"&gt;|&lt;/span&gt;qa&lt;span class="p"&gt;|&lt;/span&gt;prod&lt;span class="o"&gt;)&lt;/span&gt;.loc
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; P -- 针对 Grains 做正则表达式匹配，例如：P@os:&lt;span class="o"&gt;(&lt;/span&gt;RedHat&lt;span class="p"&gt;|&lt;/span&gt;Fedora&lt;span class="p"&gt;|&lt;/span&gt;CentOS&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; L -- 针对 minion 做列表匹配，例如：L@minion1.example.com,minion3.domain.com or bl*.domain.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; I -- 针对 Pillar 做单个匹配，例如：I@pdata:foobar
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; S -- 针对子网或是 IP 做匹配，例如：S@192.168.1.0/24 or S@192.168.1.100
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; R -- 针对客户端范围做匹配，例如： R@%foo.bar
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description></item></channel></rss>

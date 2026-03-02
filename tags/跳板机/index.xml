@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>跳板机 on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/%E8%B7%B3%E6%9D%BF%E6%9C%BA/</link><description>Recent content in 跳板机 on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 22 Aug 2018 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/%E8%B7%B3%E6%9D%BF%E6%9C%BA/index.xml" rel="self" type="application/rss+xml"/><item><title>sshd的AuthorizedKeysCommand选项</title><link>https://www.calmkart.com/posts/2018/08/2018-08-22-sshd%E7%9A%84authorizedkeyscommand%E9%80%89%E9%A1%B9/</link><pubDate>Wed, 22 Aug 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/08/2018-08-22-sshd%E7%9A%84authorizedkeyscommand%E9%80%89%E9%A1%B9/</guid><description>&lt;p&gt;通常机器上保存的key都是读取~/.ssh/authorized_keys文件来获取的,这样的话就不好做到动态调整和控制权限.&lt;/p&gt;
 &lt;p&gt;openssh6.2版本以上新增加了AuthorizedKeysCommand选项功能,可以获取动态keys列表&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;Port 22
-Protocol 2
-SyslogFacility AUTH
-LogLevel INFO
-
-#PermitRootLogin no
-
-RSAAuthentication yes
-PubkeyAuthentication yes
-AuthorizedKeysFile .ssh/authorized_keys
-
-# To disable tunneled clear text passwords, change to no here!
-PasswordAuthentication no
-
-# Change to no to disable s/key passwords
-ChallengeResponseAuthentication no
-
-UsePAM yes
-
-AllowTcpForwarding no
-X11UseLocalhost no
-UseDNS no
-Subsystem sftp /usr/libexec/openssh/sftp-server
-
-AuthorizedKeysCommand /etc/get_key.sh
-AuthorizedKeysCommandUser root
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;一个典型的sshd配置如上,其中AuthorizedKeysCommand选项的作用是在每次登录时都调用指定的脚本，并以脚本当前的输出作为keys列表.当脚本的输出为空时,再调用本地authorized_keys文件中的keys列表验证.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Port 22
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Protocol 2
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;SyslogFacility AUTH
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;LogLevel INFO
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;#PermitRootLogin no
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;RSAAuthentication yes
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;PubkeyAuthentication yes
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;AuthorizedKeysFile .ssh/authorized_keys
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# To disable tunneled clear text passwords, change to no here!
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;PasswordAuthentication no
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# Change to no to disable s/key passwords
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ChallengeResponseAuthentication no
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;UsePAM yes
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;AllowTcpForwarding no
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;X11UseLocalhost no
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;UseDNS no
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Subsystem sftp /usr/libexec/openssh/sftp-server
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;AuthorizedKeysCommand /etc/get_key.sh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;AuthorizedKeysCommandUser root
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;一个典型的sshd配置如上,其中AuthorizedKeysCommand选项的作用是在每次登录时都调用指定的脚本，并以脚本当前的输出作为keys列表.当脚本的输出为空时,再调用本地authorized_keys文件中的keys列表验证.&lt;/p&gt;
 &lt;p&gt;一个典型的使用方式是,将ssh公钥放在一个统一的鉴权服务器上,与cmdb中的服务器资源列表做匹配,通过http restapi返回服务器允许登录的公钥列表,在服务器上通过get_key.sh进行读取.当读取为空时，使用本地authorized_keys，一般为权限用户.&lt;/p&gt;
 &lt;p&gt;这样就可以很好的实现服务器授权，组授权以及跳板机相关功能.(本地key转发通过跳板机连接服务器的情况,就可以做到权限集中与鉴权了)&lt;/p&gt;</description></item></channel></rss>

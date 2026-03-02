@@ -1,4 +1,18 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Sre on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/sre/</link><description>Recent content in Sre on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 25 Dec 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/sre/index.xml" rel="self" type="application/rss+xml"/><item><title>琐事繁多是不是一定不好?</title><link>https://www.calmkart.com/posts/2019/12/2019-12-25-%E7%90%90%E4%BA%8B%E7%B9%81%E5%A4%9A%E6%98%AF%E4%B8%8D%E6%98%AF%E4%B8%80%E5%AE%9A%E4%B8%8D%E5%A5%BD/</link><pubDate>Wed, 25 Dec 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/12/2019-12-25-%E7%90%90%E4%BA%8B%E7%B9%81%E5%A4%9A%E6%98%AF%E4%B8%8D%E6%98%AF%E4%B8%80%E5%AE%9A%E4%B8%8D%E5%A5%BD/</guid><description>&lt;p&gt;摘抄自 《SRE: Google运维解密》&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Sre on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/sre/</link><description>Recent content in Sre on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sat, 05 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/sre/index.xml" rel="self" type="application/rss+xml"/><item><title>在阿里巴巴，我们如何先于用户发现和定位 Kubernetes 集群问题？</title><link>https://www.calmkart.com/posts/2022/03/2022-03-05-%E5%9C%A8%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%88%91%E4%BB%AC%E5%A6%82%E4%BD%95%E5%85%88%E4%BA%8E%E7%94%A8%E6%88%B7%E5%8F%91%E7%8E%B0%E5%92%8C%E5%AE%9A%E4%BD%8D-kubernetes-%E9%9B%86/</link><pubDate>Sat, 05 Mar 2022 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2022/03/2022-03-05-%E5%9C%A8%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%88%91%E4%BB%AC%E5%A6%82%E4%BD%95%E5%85%88%E4%BA%8E%E7%94%A8%E6%88%B7%E5%8F%91%E7%8E%B0%E5%92%8C%E5%AE%9A%E4%BD%8D-kubernetes-%E9%9B%86/</guid><description>&lt;p&gt;&lt;a class="link" href="https://mp.weixin.qq.com/s/MAgCortf5zXmWIAAIWjIow" target="_blank" rel="noopener"
+ &gt;kubecon原文链接&lt;/a&gt;&lt;/p&gt;
+&lt;!-- 图片已丢失: mp.weixin.qq_.com_s_MAgCortf5zXmWIAAIWjIow-1.png --&gt;
+&lt;div class="archived-comments"&gt;
+&lt;h2&gt;历史评论 (2 条)&lt;/h2&gt;
+&lt;p class="comment-notice"&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/p&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;clmert&lt;/strong&gt; (2024-05-17 13:47)&lt;/div&gt;
+&lt;div class="comment-body"&gt;大神，什么时候更新下一篇文章啊？等了2年了&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;zzlua&lt;/strong&gt; (2025-08-13 15:32)&lt;/div&gt;
+&lt;div class="comment-body"&gt;大佬，求更新文章啊&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item><item><title>琐事繁多是不是一定不好?</title><link>https://www.calmkart.com/posts/2019/12/2019-12-25-%E7%90%90%E4%BA%8B%E7%B9%81%E5%A4%9A%E6%98%AF%E4%B8%8D%E6%98%AF%E4%B8%80%E5%AE%9A%E4%B8%8D%E5%A5%BD/</link><pubDate>Wed, 25 Dec 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/12/2019-12-25-%E7%90%90%E4%BA%8B%E7%B9%81%E5%A4%9A%E6%98%AF%E4%B8%8D%E6%98%AF%E4%B8%80%E5%AE%9A%E4%B8%8D%E5%A5%BD/</guid><description>&lt;p&gt;摘抄自 《SRE: Google运维解密》&lt;/p&gt;
 &lt;p&gt;字字珠玑。&lt;/p&gt;
 &lt;hr&gt;
 &lt;p&gt;琐事不会总是让每个人都不开心，特别是不太多的时候。已知的和重复性的工作有一种让人平静的功效。完成这些事可以带来一种满足感和快速胜利感。琐事可能是低风险低压力的活动，有些员工甚至喜欢做这种类型的工作。&lt;/p&gt;
@@ -7,7 +21,6 @@
 &lt;p&gt;如果花在工程项目上的时间太少，你的职业发展会变慢，甚至停滞。Google确实会奖励做那些脏活累活的人，但是仅仅是该工作是不可避免，并有巨大的正面影响的时候才会这样做。没有人可以通过不停地做脏活累活满足自己的职业发展。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;士气低落&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;每个人对自己可以承担的琐事限度有所不同，但是一定有个限度。过多的琐事会导致过度劳累，疲倦和不满。&lt;/p&gt;
-&lt;p&gt; &lt;/p&gt;
 &lt;p&gt;另外，牺牲工程实践而做琐事会对SRE组织的整体发展造成损害，原因如下：&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;造成误解&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;我们努力确保每个SRE以及与SRE一起工作的人都理解SRE是一个工程组织。如果个人或团队过度参与琐事，会破坏这种角色，造成误解。&lt;/p&gt;
@@ -19,14 +32,12 @@
 &lt;p&gt;即使你个人对琐事没有怨言，你现在的或未来的队友可能会很不开心。如果团队中引入了太多的琐事，其实就是在鼓励团队里最好的工程师开始寻找其他地方提供的更有价值的工作。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;违反承诺&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;那些为了项目工程工作而入职的新员工，以及转入SRE的老员工会有被欺骗的感觉，这非常不利于公司的士气。&lt;/p&gt;
-&lt;p&gt; &lt;/p&gt;
 &lt;p&gt;如果我们都致力于每一周通过工程工作消除一点琐事，就可以持续性地整顿服务。我们就可以将更多的力量投入到扩大服务规模的工程工作上去，或者是进行下一代的服务的架构设计，又或者是建立一套跨SRE使用的工具链。让我们多创新，少干琐事吧！&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="历史评论-1-条"&gt;历史评论 (1 条)
-&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;wallsis&lt;/strong&gt; (2020-03-12 11:40)&lt;/p&gt;
-&lt;p&gt;大神，感觉您好久都没更新文章了，希望能看到您更多的技术分享，😆&lt;/p&gt;
-
- &lt;/blockquote&gt;</description></item></channel></rss>
+&lt;div class="archived-comments"&gt;
+&lt;h2&gt;历史评论 (1 条)&lt;/h2&gt;
+&lt;p class="comment-notice"&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/p&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;wallsis&lt;/strong&gt; (2020-03-12 11:40)&lt;/div&gt;
+&lt;div class="comment-body"&gt;大神，感觉您好久都没更新文章了，希望能看到您更多的技术分享，😆&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item></channel></rss>

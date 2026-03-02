@@ -1,559 +1,583 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Django on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/django/</link><description>Recent content in Django on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Fri, 28 Sep 2018 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/django/index.xml" rel="self" type="application/rss+xml"/><item><title>Django sso server(一个用户友好的的单点登录系统)</title><link>https://www.calmkart.com/posts/2018/09/2018-09-28-django-sso-server%E4%B8%80%E4%B8%AA%E7%94%A8%E6%88%B7%E5%8F%8B%E5%A5%BD%E7%9A%84%E7%9A%84%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E7%B3%BB%E7%BB%9F/</link><pubDate>Fri, 28 Sep 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/09/2018-09-28-django-sso-server%E4%B8%80%E4%B8%AA%E7%94%A8%E6%88%B7%E5%8F%8B%E5%A5%BD%E7%9A%84%E7%9A%84%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E7%B3%BB%E7%BB%9F/</guid><description>&lt;p&gt;最近写了一个单点登录系统,这里做一些总结.&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/09/5C45207A-AF09-475D-ACD6-E732CFE1596D.png" target="_blank" rel="noopener"
- &gt;&lt;img src="images/5C45207A-AF09-475D-ACD6-E732CFE1596D.png" alt="" /&gt;
-&lt;/a&gt; github地址:(欢迎来star一发^_^) &lt;a class="link" href="https://github.com/calmkart/Django-sso-server" target="_blank" rel="noopener"
+&lt;p&gt;&lt;img src="images/5C45207A-AF09-475D-ACD6-E732CFE1596D.png" alt="" /&gt;
+ github地址:(欢迎来star一发^_^) &lt;a class="link" href="https://github.com/calmkart/Django-sso-server" target="_blank" rel="noopener"
  &gt;https://github.com/calmkart/Django-sso-server&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id="1流程原理"&gt;1.流程原理
 &lt;/h3&gt;&lt;h4 id="1系统管理流程"&gt;&amp;lt;1&amp;gt;.系统管理流程
 &lt;/h4&gt;&lt;p&gt;管理员在初始化系统时，填写ldap相关设置以及管理员账号相关设置，之后管理员账号可以在管理员后台调整相关配置 其中: a.系统初始化时将自动生成rsa公私钥,系统中所有涉及的密码,都会经过aes加密存放在数据库中,包括rsa私钥也会经过aes加密存放 b.在取用密码时将调用aes解密,加密的salt写在了common/crypto.py中,也可以自己替换&lt;/p&gt;
 &lt;h4 id="2用户流程"&gt;&amp;lt;2&amp;gt;.用户流程
 &lt;/h4&gt;&lt;p&gt;用户登录sso系统，验证ldap账号成功后，将用户信息以&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;now = time.time()
-user_info = &amp;#34;{0}|||||{1}&amp;#34;.format(ldap_username, now)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;的形式,通过rsa公钥加密写入cookie中，key为sso_user&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;response.set_cookie(&amp;#39;sso_user&amp;#39;, rsa.crypto(
- public_key, user_info), domain=options.objects.all()[0].cookie_domain)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;其他需要接入sso系统的子系统可以通过sso系统的api，来判断用户是否可以登录&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;url: /api/auth
-method: POST
-post_json_data: {&amp;#34;sso_user&amp;#34;:cookie}
-return: {&amp;#34;status&amp;#34;:True/False, &amp;#34;msg&amp;#34;:username}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;本sso系统已提供了相关装饰器，可在管理后台-添加站点的帮助栏查看&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;import requests
-
-def auth_login(func):
-&amp;#39;&amp;#39;&amp;#39;
-装饰器,用于需要登录的views functions,将读取cookie并调用sso的api获取username
-
-也可手动编写相关装饰器
-sso系统的登录鉴权api为&amp;#34;http://sso域名/api/auth&amp;#34;(如&amp;#34;http://sso.calmkart.com/api/auth&amp;#34;)
-用POST方法以json形式将sso_cookie传给上述api,
-返回{&amp;#34;status&amp;#34;:True, &amp;#34;msg&amp;#34;:{username}}则登录成功
-否则{&amp;#34;status&amp;#34;:False, &amp;#34;msg&amp;#34;:{exception}}则登录失败
-
-&amp;#39;&amp;#39;&amp;#39;
- def _auth(request):
- cookie = request.COOKIES.get(&amp;#34;sso_user&amp;#34;, &amp;#34;&amp;#34;)
- if cookie==&amp;#34;&amp;#34;:
- return HttpResponseRedirect(&amp;#34;{http://sso站域名/}&amp;#34;)
- r = request.post(&amp;#34;{http://sso站域名/api/auth}&amp;#34;,data={&amp;#34;sso_cookie&amp;#34;:cookie})
- if r.json()[&amp;#34;status&amp;#34;]==False:
- return HttpResponseRedirect(&amp;#34;{http://sso站域名}&amp;#34;)
- else:
- username = r.json()[&amp;#34;msg&amp;#34;]
- if username == &amp;#34;&amp;#34; or username == &amp;#34;error&amp;#34;:
- return HttpResponseRedirect(&amp;#34;{http://sso站域名/}&amp;#34;)
- else:
- return func(request, username)
- return _auth
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;用户拥有cookie后登陆系统，系统将解cookie，并获取当前时间，若时间不超过最大时间，则返回username&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;now&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; time.time&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;user_info&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;{0}|||||{1}&amp;#34;&lt;/span&gt;.format&lt;span class="o"&gt;(&lt;/span&gt;ldap_username, now&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;的形式,通过rsa公钥加密写入cookie中，key为sso_user&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;set_cookie&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;sso_user&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;rsa&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;crypto&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;public_key&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;user_info&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;domain&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;options&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;all&lt;/span&gt;&lt;span class="p"&gt;()[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cookie_domain&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;其他需要接入sso系统的子系统可以通过sso系统的api，来判断用户是否可以登录&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;api&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;auth&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;method&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;POST&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;post_json_data&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;sso_user&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;cookie&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;status&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;msg&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;本sso系统已提供了相关装饰器，可在管理后台-添加站点的帮助栏查看&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;requests&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;auth_login&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;func&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;&amp;#39;&amp;#39;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;装饰器,用于需要登录的views functions,将读取cookie并调用sso的api获取username
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;也可手动编写相关装饰器
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;sso系统的登录鉴权api为&amp;#34;http://sso域名/api/auth&amp;#34;(如&amp;#34;http://sso.calmkart.com/api/auth&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;用POST方法以json形式将sso_cookie传给上述api,
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;返回{&amp;#34;status&amp;#34;:True, &amp;#34;msg&amp;#34;:&lt;/span&gt;&lt;span class="si"&gt;{username}&lt;/span&gt;&lt;span class="s1"&gt;}则登录成功
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;否则{&amp;#34;status&amp;#34;:False, &amp;#34;msg&amp;#34;:&lt;/span&gt;&lt;span class="si"&gt;{exception}&lt;/span&gt;&lt;span class="s1"&gt;}则登录失败
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;&amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;_auth&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;cookie&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;COOKIES&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;sso_user&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;cookie&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;HttpResponseRedirect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;{http://sso站域名/}&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;post&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;{http://sso站域名/api/auth}&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;sso_cookie&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;cookie&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;json&lt;/span&gt;&lt;span class="p"&gt;()[&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;status&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;HttpResponseRedirect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;{http://sso站域名}&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;username&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;json&lt;/span&gt;&lt;span class="p"&gt;()[&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;msg&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;username&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&amp;#34;&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="n"&gt;username&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;error&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;HttpResponseRedirect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;{http://sso站域名/}&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;func&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;_auth&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;用户拥有cookie后登陆系统，系统将解cookie，并获取当前时间，若时间不超过最大时间，则返回username&lt;/p&gt;
 &lt;h4 id="3企业扫码登陆流程"&gt;&amp;lt;3&amp;gt;.企业扫码登陆流程
 &lt;/h4&gt;&lt;p&gt;在管理后台配置企业微信扫码登陆相关参数，通过企业微信相关js api，生成二维码，用户扫码后，企业微信后台将用户请求重定向到/api/wxlogin  (method:get)上，并加上携带有用户username信息的code参数，成功则写cookie。&lt;/p&gt;
-&lt;p&gt; &lt;/p&gt;
 &lt;h3 id="2common相关模块原理"&gt;2.common相关模块原理
 &lt;/h3&gt;&lt;p&gt;参见本blog其他博文&lt;/p&gt;
-&lt;h4 id="1关于django的图片验证码"&gt;&amp;lt;1&amp;gt;&lt;a class="link" href="http://www.calmkart.com/?p=332" target="_blank" rel="noopener"
- &gt;关于django的图片验证码&lt;/a&gt;
-&lt;/h4&gt;&lt;h4 id="2关于python操作ldap"&gt;&amp;lt;2&amp;gt;&lt;a class="link" href="http://www.calmkart.com/?p=355" target="_blank" rel="noopener"
- &gt;关于python操作ldap&lt;/a&gt;
-&lt;/h4&gt;&lt;h4 id="3关于python操作rsaaes加解密"&gt;&amp;lt;3&amp;gt;&lt;a class="link" href="http://www.calmkart.com/?p=353" target="_blank" rel="noopener"
- &gt;关于python操作rsa,aes加解密&lt;/a&gt;
-&lt;/h4&gt;&lt;hr&gt;
-&lt;h2 id="历史评论-9-条"&gt;历史评论 (9 条)
-&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;wzzzx&lt;/strong&gt; (2019-03-04 15:01)&lt;/p&gt;
-&lt;p&gt;请问idap是啥哦，百度谷歌都看不懂&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-03-07 10:55)&lt;/p&gt;
-&lt;p&gt;ldap
-&lt;a class="link" href="https://zh.wikipedia.org/zh-hans/%E8%BD%BB%E5%9E%8B%E7%9B%AE%E5%BD%95%E8%AE%BF%E9%97%AE%E5%8D%8F%E8%AE%AE" target="_blank" rel="noopener"
- &gt;https://zh.wikipedia.org/zh-hans/%E8%BD%BB%E5%9E%8B%E7%9B%AE%E5%BD%95%E8%AE%BF%E9%97%AE%E5%8D%8F%E8%AE%AE&lt;/a&gt;&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;( 曰..曰 )&lt;/strong&gt; (2019-04-18 17:23)&lt;/p&gt;
-&lt;p&gt;牛逼轰轰的彭董，不知道psc还招不招实习生，求大佬赏口饭吃啊&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-04-19 11:23)&lt;/p&gt;
-&lt;p&gt;彭董快饿死了，总裁谢行行好吧&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;lixueming&lt;/strong&gt; (2019-06-01 15:23)&lt;/p&gt;
-&lt;p&gt;大神好，我是19届的应届生，今年校招拿了些offer，都是跟Python相关的，我对Python的熟悉程度只是会用，算不上很了解，比较纠结的是，一个offer是偏运维开发，一个是做广告系统业务研发，不知道这2个方向以后的发展怎么样，会不会有什么坑呢，烦请大神指点下，不胜感激！&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-06-03 10:35)&lt;/p&gt;
-&lt;p&gt;看公司,python的业务开发其实面不太广,但在算法方面应用比较多.
-纯业务开发写来写去写久了很烦,但是运开也有很多方向,总的来说如果是一般运维前景是肯定不如开发的
-要是能做更有技术含量的东西,比如paas云,或者去google之类的sre,肯定比一般开发要强很多.
-运开的使命其实就是革了传统op的命,开发既运维。
-语言也不是太重要,python/c/c++/js/go肯定都要会的.
-应届还是更多考虑公司吧.&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;路过&lt;/strong&gt; (2019-06-16 20:39)&lt;/p&gt;
-&lt;p&gt;这个不同域名可以支持吗， 比如 sso.abc.com 和 client.efg.com之间可以实现吗&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-06-17 13:21)&lt;/p&gt;
-&lt;p&gt;这个项目的实现方式是基于cookie携带信息的，所以不支持跨域登陆，要支持跨域需要用其他手段实现。&lt;/p&gt;
-
- &lt;/blockquote&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt; ↳ **路过** (2019-06-17 20:35)
-&amp;gt;
-&amp;gt; 好的，谢谢。
-&amp;gt;
-&amp;gt; 我还是尝试走跳转把token带过去再验证。
-&lt;/code&gt;&lt;/pre&gt;</description></item><item><title>django生成图片验证码</title><link>https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/</link><pubDate>Tue, 18 Sep 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/</guid><description>&lt;p&gt;最近在做一个好玩的通用django单点登录系统，登录系统少不了验证码，参考了一下别人的做法和开源项目，总结一下。&lt;/p&gt;
+&lt;h4 id="1关于django的图片验证码"&gt;&amp;lt;1&amp;gt;&lt;a class="link" href="https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/" &gt;关于django的图片验证码&lt;/a&gt;
+&lt;/h4&gt;&lt;h4 id="2关于python操作ldap"&gt;&amp;lt;2&amp;gt;&lt;a class="link" href="https://www.calmkart.com/posts/2018/09/2018-09-28-python%E6%93%8D%E4%BD%9Cldap/" &gt;关于python操作ldap&lt;/a&gt;
+&lt;/h4&gt;&lt;h4 id="3关于python操作rsaaes加解密"&gt;&amp;lt;3&amp;gt;&lt;a class="link" href="https://www.calmkart.com/posts/2018/09/2018-09-28-python%E6%93%8D%E4%BD%9Crsa%E5%92%8Caes%E5%8A%A0%E8%A7%A3%E5%AF%86/" &gt;关于python操作rsa,aes加解密&lt;/a&gt;
+&lt;/h4&gt;&lt;div class="archived-comments"&gt;
+&lt;h2&gt;历史评论 (9 条)&lt;/h2&gt;
+&lt;p class="comment-notice"&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/p&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;wzzzx&lt;/strong&gt; (2019-03-04 15:01)&lt;/div&gt;
+&lt;div class="comment-body"&gt;请问idap是啥哦，百度谷歌都看不懂&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item comment-reply"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;calmkart&lt;/strong&gt; (2019-03-07 10:55)&lt;/div&gt;
+&lt;div class="comment-body"&gt;ldap https://zh.wikipedia.org/zh-hans/%E8%BD%BB%E5%9E%8B%E7%9B%AE%E5%BD%95%E8%AE%BF%E9%97%AE%E5%8D%8F%E8%AE%AE&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;( 曰..曰 )&lt;/strong&gt; (2019-04-18 17:23)&lt;/div&gt;
+&lt;div class="comment-body"&gt;牛逼轰轰的彭董，不知道psc还招不招实习生，求大佬赏口饭吃啊&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item comment-reply"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;calmkart&lt;/strong&gt; (2019-04-19 11:23)&lt;/div&gt;
+&lt;div class="comment-body"&gt;彭董快饿死了，总裁谢行行好吧&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;lixueming&lt;/strong&gt; (2019-06-01 15:23)&lt;/div&gt;
+&lt;div class="comment-body"&gt;大神好，我是19届的应届生，今年校招拿了些offer，都是跟Python相关的，我对Python的熟悉程度只是会用，算不上很了解，比较纠结的是，一个offer是偏运维开发，一个是做广告系统业务研发，不知道这2个方向以后的发展怎么样，会不会有什么坑呢，烦请大神指点下，不胜感激！&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item comment-reply"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;calmkart&lt;/strong&gt; (2019-06-03 10:35)&lt;/div&gt;
+&lt;div class="comment-body"&gt;看公司,python的业务开发其实面不太广,但在算法方面应用比较多. 纯业务开发写来写去写久了很烦,但是运开也有很多方向,总的来说如果是一般运维前景是肯定不如开发的 要是能做更有技术含量的东西,比如paas云,或者去google之类的sre,肯定比一般开发要强很多. 运开的使命其实就是革了传统op的命,开发既运维。 语言也不是太重要,python/c/c++/js/go肯定都要会的. 应届还是更多考虑公司吧.&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;路过&lt;/strong&gt; (2019-06-16 20:39)&lt;/div&gt;
+&lt;div class="comment-body"&gt;这个不同域名可以支持吗， 比如 sso.abc.com 和 client.efg.com之间可以实现吗&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item comment-reply"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;calmkart&lt;/strong&gt; (2019-06-17 13:21)&lt;/div&gt;
+&lt;div class="comment-body"&gt;这个项目的实现方式是基于cookie携带信息的，所以不支持跨域登陆，要支持跨域需要用其他手段实现。&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item comment-reply"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;路过&lt;/strong&gt; (2019-06-17 20:35)&lt;/div&gt;
+&lt;div class="comment-body"&gt;好的，谢谢。 我还是尝试走跳转把token带过去再验证。&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item><item><title>django类视图装饰器</title><link>https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%B1%BB%E8%A7%86%E5%9B%BE%E8%A3%85%E9%A5%B0%E5%99%A8/</link><pubDate>Tue, 18 Sep 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%B1%BB%E8%A7%86%E5%9B%BE%E8%A3%85%E9%A5%B0%E5%99%A8/</guid><description>&lt;p&gt;一点关于django类视图装饰器的小笔记。&lt;/p&gt;
+&lt;p&gt;django类视图是很常用的，对于传统的函数视图来说，装饰器可以直接装饰函数，但类视图，装饰器无法直接装饰类方法。&lt;/p&gt;
+&lt;p&gt;比较了几种常见的解决方法,个人觉得比较优雅的解决方法如下：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.shortcuts&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;render&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.utils.decorators&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;method_decorator&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.views.decorators.csrf&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;csrf_exempt&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.views.generic&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;View&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@method_decorator&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;csrf_exempt&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;dispatch&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;login&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;View&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nd"&gt;@method_decorator&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;auth_login&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#....func...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;render&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;login.html&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;displayName&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;admin_flag&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;admin_flag&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;既如以上代码，将装饰器函数传给method_decorator方法，直接修饰视图类方法。&lt;/p&gt;
+&lt;p&gt;也可直接修饰视图类，对于需要修饰的方法，用name参数的形式传入method_decorator中即可，但感觉不够优雅。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.shortcuts&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;render&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.utils.decorators&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;method_decorator&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.views.decorators.csrf&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;csrf_exempt&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.views.generic&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;View&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@method_decorator&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;csrf_exempt&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;dispatch&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@method_decorator&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;auth_login&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;get&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;login&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;View&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#....func...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;render&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;login.html&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;displayName&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;admin_flag&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;admin_flag&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;需要稍微注意的是，csrf_exempt跨站排除装饰器，只能修饰在类视图的dispatch方法上，既原始写法如下：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;login&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;View&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nd"&gt;@method_decorator&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;csrf_exempt&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;dispatch&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nb"&gt;super&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;login&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dispatch&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#....func...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;render&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;login.html&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;displayName&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;admin_flag&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;admin_flag&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;但其实直接用类方法装饰器装饰视图类，传入参数name=dispatch就行了，不需要重写dispatch方法。&lt;/p&gt;
+&lt;p&gt;既如上文。&lt;/p&gt;
+&lt;div class="archived-comments"&gt;
+&lt;h2&gt;历史评论 (2 条)&lt;/h2&gt;
+&lt;p class="comment-notice"&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/p&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;( 曰..曰 )&lt;/strong&gt; (2018-09-19 16:06)&lt;/div&gt;
+&lt;div class="comment-body"&gt;大佬，大佬，这绝对是大佬&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item comment-reply"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;calmkart&lt;/strong&gt; (2018-09-20 19:02)&lt;/div&gt;
+&lt;div class="comment-body"&gt;总裁谢你说大佬就大佬好吧&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item><item><title>django生成图片验证码</title><link>https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/</link><pubDate>Tue, 18 Sep 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%94%9F%E6%88%90%E7%99%BB%E5%BD%95%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81/</guid><description>&lt;p&gt;最近在做一个好玩的通用django单点登录系统，登录系统少不了验证码，参考了一下别人的做法和开源项目，总结一下。&lt;/p&gt;
 &lt;p&gt;结果如下：&lt;/p&gt;
 &lt;p&gt;&lt;img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_837b19bb-98df-4c26-afae-6678c91ff47a.png" alt="" /&gt;
 &lt;/p&gt;
 &lt;p&gt;主要思路流程是，后端根据随机码绘图，然后做混淆(我这里几乎没做模糊之类的混淆)，最后将随机验证码写进后端session里，前端获取图像后，提交时与session里的验证码做比较。流程还是比较简单的，大致代码如下。&lt;/p&gt;
 &lt;p&gt;1.captcha_handle.py&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;captcha_handle.py
-#用于生成随机字符串以及生成验证码图片
-
-# -*- coding:utf-8 -*-
-import random,string
-from PIL import Image,ImageDraw,ImageFont,ImageFilter
-
-#生成随机字符串
-def _getRandomChar():
- #string模块包含各种字符串，以下为小写字母加数字
- ran = string.ascii_lowercase+string.digits
- char = &amp;#39;&amp;#39;
- for i in range(4):
- char += random.choice(ran)
- return char
-
-#返回一个随机的RGB颜色
-def _getRandomColor():
- return (random.randint(50,150),random.randint(50,150),random.randint(50,150))
-
-def create_captcha():
-
- #创建图片，模式，大小，背景色
- img = Image.new(&amp;#39;RGB&amp;#39;, (120,30), (255,255,255))
- #创建画布
- draw = ImageDraw.Draw(img)
- #设置字体
- font = ImageFont.truetype(&amp;#39;Arial.ttf&amp;#39;, 25)
-
- code = _getRandomChar()
- #将生成的字符画在画布上
- for t in range(4):
- draw.text((30*t+5,0),code[t],_getRandomColor(),font)
-
- #生成干扰点
- for _ in range(random.randint(0,50)):
- #位置，颜色
- draw.point((random.randint(0, 120), random.randint(0, 30)),fill=_getRandomColor())
-
- #使用模糊滤镜使图片模糊
- # img = img.filter(ImageFilter.BLUR)
- #保存
- #img.save(&amp;#39;&amp;#39;.join(code)+&amp;#39;.jpg&amp;#39;,&amp;#39;jpeg&amp;#39;)
- return img,code
-
-if __name__ == &amp;#39;__main__&amp;#39;:
- create_code()
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.views.py&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;views.py
-#视图，生成验证码图片和code，返回图片，code存进session
-class get_captcha(View):
-
- def get(self, request):
- &amp;#39;&amp;#39;&amp;#39;
- 生成验证码图片和验证码code,返回验证码图片,并以形式将验证码存放在session里
- &amp;#39;&amp;#39;&amp;#39;
- try:
- f = BytesIO()
- img, code = create_captcha()
- request.session[&amp;#34;captcha&amp;#34;] = code
- img.save(f,&amp;#39;PNG&amp;#39;)
- return HttpResponse(f.getvalue())
- except Exception as e:
- log().error(str(e))
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;3.login.html&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;{# html #}
-&amp;lt;div class=&amp;#34;col-xs-4&amp;#34;&amp;gt;
- &amp;lt;img id=&amp;#34;captcha_img&amp;#34; src=&amp;#34;{% url &amp;#39;get_captcha&amp;#39; %}&amp;#34; onclick=&amp;#34;refresh_captcha()&amp;#34; style=&amp;#34;margin-top: 28px;&amp;#34;&amp;gt;
- &amp;lt;p class=&amp;#34;help-block&amp;#34; onclick=&amp;#34;refresh_captcha()&amp;#34;&amp;gt;
- 看不清楚?换一张!
- &amp;lt;/p&amp;gt;
-&amp;lt;/div&amp;gt;
-
-{# js #}
-&amp;lt;script&amp;gt;
- //刷新验证码
- function refresh_captcha() {
- $(&amp;#34;#captcha_img&amp;#34;).attr(&amp;#34;src&amp;#34;,$(&amp;#34;#captcha_img&amp;#34;)[0].src + &amp;#39;?&amp;#39;);
- };
-&amp;lt;/script&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;4.url.py&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;url(r&amp;#39;^get_captcha/$&amp;#39;,cas_views.get_captcha.as_view(), name=&amp;#34;get_captcha&amp;#34;),
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;5.views.py&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;#校验验证码是否正确
-if request.session[&amp;#34;captcha&amp;#34;].lower() != captcha.lower():
- return JsonResponse({&amp;#34;status&amp;#34;:False, &amp;#34;msg&amp;#34;:&amp;#34;验证码错误!&amp;#34;})
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;一些代码是参考网络上其他开源代码，不过其实也挺简单的，熟悉request.session就差不多了。做个记录。&lt;/p&gt;</description></item><item><title>django类视图装饰器</title><link>https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%B1%BB%E8%A7%86%E5%9B%BE%E8%A3%85%E9%A5%B0%E5%99%A8/</link><pubDate>Tue, 18 Sep 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/09/2018-09-18-django%E7%B1%BB%E8%A7%86%E5%9B%BE%E8%A3%85%E9%A5%B0%E5%99%A8/</guid><description>&lt;p&gt;一点关于django类视图装饰器的小笔记。&lt;/p&gt;
-&lt;p&gt;django类视图是很常用的，对于传统的函数视图来说，装饰器可以直接装饰函数，但类视图，装饰器无法直接装饰类方法。&lt;/p&gt;
-&lt;p&gt;比较了几种常见的解决方法,个人觉得比较优雅的解决方法如下：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;from django.shortcuts import render
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import View
-
-@method_decorator(csrf_exempt, name=&amp;#34;dispatch&amp;#34;)
-class login(View):
-
- @method_decorator(auth_login)
- def get(self, request, username):
- #....func...
- return render(request, &amp;#39;login.html&amp;#39;, {&amp;#34;displayName&amp;#34;:username, &amp;#34;admin_flag&amp;#34;:admin_flag})
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;既如以上代码，将装饰器函数传给method_decorator方法，直接修饰视图类方法。&lt;/p&gt;
-&lt;p&gt;也可直接修饰视图类，对于需要修饰的方法，用name参数的形式传入method_decorator中即可，但感觉不够优雅。&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;from django.shortcuts import render
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import View
-
-@method_decorator(csrf_exempt, name=&amp;#34;dispatch&amp;#34;)
-@method_decorator(auth_login, name=&amp;#34;get&amp;#34;)
-class login(View):
-
- def get(self, request, username):
- #....func...
- return render(request, &amp;#39;login.html&amp;#39;, {&amp;#34;displayName&amp;#34;:username, &amp;#34;admin_flag&amp;#34;:admin_flag})
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;需要稍微注意的是，csrf_exempt跨站排除装饰器，只能修饰在类视图的dispatch方法上，既原始写法如下：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;class login(View):
- 
- @method_decorator(csrf_exempt)
- def dispatch(self, request, *args, **kwargs):
- return super(login,self).dispatch(request,*args,**kwargs)
- 
- def get(self, request, username):
- #....func...
- return render(request, &amp;#39;login.html&amp;#39;, {&amp;#34;displayName&amp;#34;:username, &amp;#34;admin_flag&amp;#34;:admin_flag})
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;但其实直接用类方法装饰器装饰视图类，传入参数name=dispatch就行了，不需要重写dispatch方法。&lt;/p&gt;
-&lt;p&gt;既如上文。&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="历史评论-2-条"&gt;历史评论 (2 条)
-&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;( 曰..曰 )&lt;/strong&gt; (2018-09-19 16:06)&lt;/p&gt;
-&lt;p&gt;大佬，大佬，这绝对是大佬&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2018-09-20 19:02)&lt;/p&gt;
-&lt;p&gt;总裁谢你说大佬就大佬好吧&lt;/p&gt;
-
- &lt;/blockquote&gt;</description></item><item><title>为django-admin的userpermission添加read only(can view)权限</title><link>https://www.calmkart.com/posts/2018/09/2018-09-06-%E4%B8%BAdjango-admin%E7%9A%84userpermission%E6%B7%BB%E5%8A%A0read-onlycan-view%E6%9D%83%E9%99%90/</link><pubDate>Thu, 06 Sep 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/09/2018-09-06-%E4%B8%BAdjango-admin%E7%9A%84userpermission%E6%B7%BB%E5%8A%A0read-onlycan-view%E6%9D%83%E9%99%90/</guid><description>&lt;p&gt;默认的django-admin中用户的models权限只有三个,分别是(Can change, Can add, Can delete),显然的,对于绝大部分crud工程师(^_^)而言,一眼看过去就少了些什么,没错,少了很关键的Can view权限.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;captcha_handle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;py&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#用于生成随机字符串以及生成验证码图片&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# -*- coding:utf-8 -*-&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;random&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nn"&gt;string&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;PIL&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Image&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;ImageDraw&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;ImageFont&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;ImageFilter&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#生成随机字符串&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;_getRandomChar&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#string模块包含各种字符串，以下为小写字母加数字&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;ran&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;string&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ascii_lowercase&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="n"&gt;string&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;digits&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;char&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;char&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;choice&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ran&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;char&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#返回一个随机的RGB颜色&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;_getRandomColor&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;randint&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;150&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;randint&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;150&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;randint&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;150&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;create_captcha&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#创建图片，模式，大小，背景色&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;img&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Image&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;new&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;RGB&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;120&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;30&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;255&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;255&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;255&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#创建画布&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;draw&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ImageDraw&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Draw&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;img&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#设置字体&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;font&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ImageFont&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;truetype&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Arial.ttf&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;code&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;_getRandomChar&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#将生成的字符画在画布上&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;draw&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="mi"&gt;30&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;span class="n"&gt;code&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;&lt;span class="n"&gt;_getRandomColor&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;&lt;span class="n"&gt;font&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#生成干扰点&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;_&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;randint&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="p"&gt;)):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#位置，颜色&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;draw&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;point&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;randint&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;120&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;randint&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;30&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;&lt;span class="n"&gt;fill&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;_getRandomColor&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#使用模糊滤镜使图片模糊&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;# img = img.filter(ImageFilter.BLUR)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#保存&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;#img.save(&amp;#39;&amp;#39;.join(code)+&amp;#39;.jpg&amp;#39;,&amp;#39;jpeg&amp;#39;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;img&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;code&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="vm"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__main__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;create_code&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;2.views.py&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;views&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;py&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#视图，生成验证码图片和code，返回图片，code存进session&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;get_captcha&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;View&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;&amp;#39;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt; 生成验证码图片和验证码code,返回验证码图片,并以形式将验证码存放在session里
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt; &amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;BytesIO&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;img&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;code&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;create_captcha&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;session&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;captcha&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;code&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;img&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;save&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;PNG&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;HttpResponse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getvalue&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;Exception&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;log&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;3.login.html&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-jsx" data-lang="jsx"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt; &lt;span class="nx"&gt;html&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;div&lt;/span&gt; &lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;col-xs-4&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;img&lt;/span&gt; &lt;span class="na"&gt;id&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;captcha_img&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;src&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;{% url &amp;#39;get_captcha&amp;#39; %}&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;onclick&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;refresh_captcha()&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;style&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;margin-top: 28px;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;p&lt;/span&gt; &lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;help-block&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;onclick&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;refresh_captcha()&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;看不清楚&lt;/span&gt;&lt;span class="o"&gt;?&lt;/span&gt;&lt;span class="nx"&gt;换一张&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;p&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;div&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt; &lt;span class="nx"&gt;js&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;script&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;//刷新验证码
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;refresh_captcha&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;#captcha_img&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;attr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;src&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;#captcha_img&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;].&lt;/span&gt;&lt;span class="nx"&gt;src&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;?&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;script&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;4.url.py&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^get_captcha/$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;cas_views&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_captcha&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;as_view&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;get_captcha&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;5.views.py&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#校验验证码是否正确&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;session&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;captcha&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;lower&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="n"&gt;captcha&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;lower&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;JsonResponse&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;status&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;msg&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;验证码错误!&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;一些代码是参考网络上其他开源代码，不过其实也挺简单的，熟悉request.session就差不多了。做个记录。&lt;/p&gt;</description></item><item><title>为django-admin的userpermission添加read only(can view)权限</title><link>https://www.calmkart.com/posts/2018/09/2018-09-06-%E4%B8%BAdjango-admin%E7%9A%84userpermission%E6%B7%BB%E5%8A%A0read-onlycan-view%E6%9D%83%E9%99%90/</link><pubDate>Thu, 06 Sep 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/09/2018-09-06-%E4%B8%BAdjango-admin%E7%9A%84userpermission%E6%B7%BB%E5%8A%A0read-onlycan-view%E6%9D%83%E9%99%90/</guid><description>&lt;p&gt;默认的django-admin中用户的models权限只有三个,分别是(Can change, Can add, Can delete),显然的,对于绝大部分crud工程师(^_^)而言,一眼看过去就少了些什么,没错,少了很关键的Can view权限.&lt;/p&gt;
 &lt;p&gt;当然django-admin的用户权限是可以自定义的,需要改permission的meta,这里不细述,发现一个简单好用的django app,可以直接添加Can view权限,美滋滋.&lt;/p&gt;
-&lt;p&gt;最终效果如下 &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/09/B6CE8AA0-F925-4290-B2C0-E3C98ECF0C79.png" target="_blank" rel="noopener"
- &gt;&lt;img src="images/B6CE8AA0-F925-4290-B2C0-E3C98ECF0C79.png" alt="" /&gt;
-&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;最终效果如下 &lt;img src="images/B6CE8AA0-F925-4290-B2C0-E3C98ECF0C79.png" alt="" /&gt;
+&lt;/p&gt;
 &lt;p&gt;插件是: django-admin-view-permission 地址 &lt;a class="link" href="https://github.com/ctxis/django-admin-view-permission" target="_blank" rel="noopener"
  &gt;https://github.com/ctxis/django-admin-view-permission&lt;/a&gt; 使用方式及其简单&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;#pip安装插件
-pip install django-admin-view-permission
-
-#将app注册,记得一定注册在django.contrib.admin之前
-INSTALLED_APPS = [
- &amp;#39;admin_view_permission&amp;#39;,
- &amp;#39;django.contrib.admin&amp;#39;,
- ...
-]
-
-#更新数据库
-python manage.py migrate
-
-即可
-
-#如需要只对一些数据库管用,可以
-ADMIN_VIEW_PERMISSION_MODELS = [
- &amp;#39;auth.User&amp;#39;,
- ...
-]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;的确是个好东西啊,免掉了手写这种本应就有的权限.分享一下.&lt;/p&gt;</description></item><item><title>记一次立竿见影的性能优化</title><link>https://www.calmkart.com/posts/2018/08/2018-08-02-%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%AB%8B%E7%AB%BF%E8%A7%81%E5%BD%B1%E7%9A%84%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/</link><pubDate>Thu, 02 Aug 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/08/2018-08-02-%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%AB%8B%E7%AB%BF%E8%A7%81%E5%BD%B1%E7%9A%84%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/</guid><description>&lt;p&gt;通过一点细微代码的修改,将某系统首页载入时间缩短了10倍有余.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#pip安装插件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pip install django-admin-view-permission
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#将app注册,记得一定注册在django.contrib.admin之前&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;INSTALLED_APPS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;admin_view_permission&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;django.contrib.admin&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ...
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#更新数据库&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;python manage.py migrate
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;即可
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#如需要只对一些数据库管用,可以&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;ADMIN_VIEW_PERMISSION_MODELS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;auth.User&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ...
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;的确是个好东西啊,免掉了手写这种本应就有的权限.分享一下.&lt;/p&gt;</description></item><item><title>记一次立竿见影的性能优化</title><link>https://www.calmkart.com/posts/2018/08/2018-08-02-%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%AB%8B%E7%AB%BF%E8%A7%81%E5%BD%B1%E7%9A%84%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/</link><pubDate>Thu, 02 Aug 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/08/2018-08-02-%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%AB%8B%E7%AB%BF%E8%A7%81%E5%BD%B1%E7%9A%84%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/</guid><description>&lt;p&gt;通过一点细微代码的修改,将某系统首页载入时间缩短了10倍有余.&lt;/p&gt;
 &lt;p&gt;系统首页大致这样&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/08/201882204014dama.png" target="_blank" rel="noopener"
- &gt;&lt;img src="images/201882204014dama.png" alt="" /&gt;
-&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="images/201882204014dama.png" alt="" /&gt;
+&lt;/p&gt;
 &lt;p&gt;逻辑是读取后台的所有服务列表,判断用户是否有权限,有权限则交给前端用ztree显示,并可进行部署操作,但因为服务太多,遍历服务后判断用户是否有权限后台耗时太长,用chrome查了下,后台数据处理费时2000ms,这样首页就载入的太慢了.&lt;/p&gt;
 &lt;p&gt;第一步,查代码,原始代码如下:&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;@login_required
-def services(request):
- user = request.user
- _online_apps = App.objects.filter(app_env=&amp;#39;online&amp;#39;)
- _test_apps = App.objects.filter(app_env=&amp;#39;test&amp;#39;)
- _dev_apps = App.objects.filter(app_env=&amp;#39;dev&amp;#39;)
-
- online_apps = [a for a in _online_apps if user.has_perm(&amp;#39;deploy_perm&amp;#39;, a) or is_admin_by_group(user.username)]
- test_apps = [a for a in _test_apps if user.has_perm(&amp;#39;deploy_perm&amp;#39;, a) or is_admin_by_group(user.username)]
- dev_apps = [a for a in _dev_apps if user.has_perm(&amp;#39;deploy_perm&amp;#39;, a) or is_admin_by_group(user.username)]
-
- online_apps_name = [{&amp;#39;name&amp;#39;:app.app_name, &amp;#39;id&amp;#39;:app.id} for app in online_apps]
- test_apps_name = [{&amp;#39;name&amp;#39;:app.app_name, &amp;#39;id&amp;#39;:app.id} for app in test_apps]
- dev_apps_name = [{&amp;#39;name&amp;#39;:app.app_name, &amp;#39;id&amp;#39;:app.id} for app in dev_apps]
- nodes = [
- {&amp;#39;name&amp;#39;:&amp;#39;online&amp;#39;,
- &amp;#39;open&amp;#39;:&amp;#39;true&amp;#39;,
- &amp;#39;children&amp;#39;:online_apps_name
- },
- {&amp;#39;name&amp;#39;:&amp;#39;test&amp;#39;,
- &amp;#39;open&amp;#39;:&amp;#39;false&amp;#39;,
- &amp;#39;children&amp;#39;:test_apps_name
- },
- {&amp;#39;name&amp;#39;:&amp;#39;dev&amp;#39;,
- &amp;#39;open&amp;#39;:&amp;#39;false&amp;#39;,
- &amp;#39;children&amp;#39;:dev_apps_name
- }
- ];
- return render(request, &amp;#39;services/services.html&amp;#39;, {&amp;#39;nodes&amp;#39;: json.dumps(nodes)})
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;也没什么复杂的,就是django models + django-guardian权限控制,然后返回数据给ztree生成树结构.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@login_required&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;services&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;user&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;_online_apps&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;App&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;app_env&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;online&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;_test_apps&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;App&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;app_env&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;test&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;_dev_apps&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;App&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;app_env&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;dev&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;online_apps&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;_online_apps&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;has_perm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;deploy_perm&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="n"&gt;is_admin_by_group&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;test_apps&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;_test_apps&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;has_perm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;deploy_perm&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="n"&gt;is_admin_by_group&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;dev_apps&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;_dev_apps&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;has_perm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;deploy_perm&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="n"&gt;is_admin_by_group&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;online_apps_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;app&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;online_apps&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;test_apps_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;app&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;test_apps&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;dev_apps_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;app&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;dev_apps&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;nodes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;online&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;open&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;true&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;children&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;online_apps_name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;test&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;open&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;false&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;children&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;test_apps_name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;dev&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;open&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;false&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;children&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;dev_apps_name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;];&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;render&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;services/services.html&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;nodes&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;json&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dumps&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nodes&lt;/span&gt;&lt;span class="p"&gt;)})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;也没什么复杂的,就是django models + django-guardian权限控制,然后返回数据给ztree生成树结构.&lt;/p&gt;
 &lt;p&gt;初步设想是因为列表生成式太多导致速度慢,写测试代码做测试&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;python manage.py shell
-
-&amp;gt;&amp;gt;&amp;gt; import time
-&amp;gt;&amp;gt;&amp;gt; from django.contrib.auth.models import User
-&amp;gt;&amp;gt;&amp;gt; from services.views import new_service
-&amp;gt;&amp;gt;&amp;gt; def test(user):
-... start = time.time()
-... new_service(user)
-... stop = time.time()
-... print stop-start
-...
-&amp;gt;&amp;gt;&amp;gt; pengng = User.objects.get(name=&amp;#39;pengng&amp;#39;)
-&amp;gt;&amp;gt;&amp;gt; test(pengng)
-1.93502497673
-&amp;gt;&amp;gt;&amp;gt; test(pengng)
-1.89282894135
-&amp;gt;&amp;gt;&amp;gt; test(pengng)
-2.14076519012
-&amp;gt;&amp;gt;&amp;gt; test(pengng)
-1.85515809059
-&amp;gt;&amp;gt;&amp;gt; test(pengng)
-1.91108703613
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;发现处理时间大致在1.8-1.9s之间,然后直接将上述原始代码第一步拆了出来&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;#仅测试这一步
-online_apps = [a for a in _online_apps if user.has_perm(&amp;#39;deploy_perm&amp;#39;, a) or is_admin_by_group(user.username)]
-
-#发现时间在1.2秒左右
-&amp;gt;&amp;gt;&amp;gt; test(pengng)
-1.25127100945
-&amp;gt;&amp;gt;&amp;gt; test(pengng)
-1.27178192139
-&amp;gt;&amp;gt;&amp;gt; test(pengng)
-1.22848701477
-&amp;gt;&amp;gt;&amp;gt; test(pengng)
-1.25300002098
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;继续分拆,发现是这个user.has_perm(&amp;lsquo;deploy_perm&amp;rsquo;,a)的guardian获取权限消耗了大量的时间 然后想起这个系统里权限都是以group来赋权的,获取用户对于服务的权限要先经过组再到服务,先遍历服务再单独查看用户是否有该组权限导致重复遍历太多,其实直接获取用户对应的所有拥有权限的服务对象即可(get_objects_for_user()方法),尝试修改代码&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;@login_required
-def services(request):
- user = request.user
-
- if is_admin_by_group(user.username):
- online_apps_name = [{&amp;#39;name&amp;#39;: a.app_name, &amp;#39;id&amp;#39;: a.id}
- for a in App.objects.filter(app_env=&amp;#39;online&amp;#39;)]
- test_apps_name = [{&amp;#39;name&amp;#39;: a.app_name, &amp;#39;id&amp;#39;: a.id}
- for a in App.objects.filter(app_env=&amp;#39;test&amp;#39;)]
- dev_apps_name = [{&amp;#39;name&amp;#39;: a.app_name, &amp;#39;id&amp;#39;: a.id}
- for a in App.objects.filter(app_env=&amp;#39;dev&amp;#39;)]
- else:
- online_apps_name = [{&amp;#39;name&amp;#39;: a.app_name, &amp;#39;id&amp;#39;: a.id} for a in get_objects_for_user(
- user, &amp;#39;deploy_perm&amp;#39;, klass=App) if a.app_env == &amp;#34;online&amp;#34;]
- test_apps_name = [{&amp;#39;name&amp;#39;: a.app_name, &amp;#39;id&amp;#39;: a.id} for a in get_objects_for_user(
- user, &amp;#39;deploy_perm&amp;#39;, klass=App) if a.app_env == &amp;#34;test&amp;#34;]
- dev_apps_name = [{&amp;#39;name&amp;#39;: a.app_name, &amp;#39;id&amp;#39;: a.id} for a in get_objects_for_user(
- user, &amp;#39;deploy_perm&amp;#39;, klass=App) if a.app_env == &amp;#34;dev&amp;#34;]
-
- nodes = [
- {&amp;#39;name&amp;#39;: &amp;#39;online&amp;#39;,
- &amp;#39;open&amp;#39;: &amp;#39;true&amp;#39;,
- &amp;#39;children&amp;#39;: online_apps_name
- },
- {&amp;#39;name&amp;#39;: &amp;#39;test&amp;#39;,
- &amp;#39;open&amp;#39;: &amp;#39;false&amp;#39;,
- &amp;#39;children&amp;#39;: test_apps_name
- },
- {&amp;#39;name&amp;#39;: &amp;#39;dev&amp;#39;,
- &amp;#39;open&amp;#39;: &amp;#39;false&amp;#39;,
- &amp;#39;children&amp;#39;: dev_apps_name
- }
- ]
- return render(request, &amp;#39;services/services.html&amp;#39;, {&amp;#39;nodes&amp;#39;: json.dumps(nodes)})
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;然后重载文件&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; reload(services.views)
-&amp;lt;module &amp;#39;services.views&amp;#39; from &amp;#39;/home/**/***/services/views.py&amp;#39;&amp;gt;
-&amp;gt;&amp;gt;&amp;gt; test(pengng)
-0.0817279815674
-&amp;gt;&amp;gt;&amp;gt; test(pengng)
-0.0788700580597
-&amp;gt;&amp;gt;&amp;gt; test(pengng)
-0.0756318569183
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;立竿见影,瞬间从2秒降低到了0.08秒左右 &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/08/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_008058b2-bd81-4a9c-8442-63afc75ac870.png" target="_blank" rel="noopener"
- &gt;&lt;img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_008058b2-bd81-4a9c-8442-63afc75ac870.png" alt="" /&gt;
-&lt;/a&gt;收工&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="历史评论-5-条"&gt;历史评论 (5 条)
-&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;安全黄&lt;/strong&gt; (2018-08-06 11:56)&lt;/p&gt;
-&lt;p&gt;给大佬递槟榔&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2018-08-13 15:03)&lt;/p&gt;
-&lt;p&gt;安全王牛瘪！安全王请带我飞！&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;杨硕&lt;/strong&gt; (2018-08-09 17:23)&lt;/p&gt;
-&lt;p&gt;大哥喝冰可乐，psc快收了我啊&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2018-08-13 15:03)&lt;/p&gt;
-&lt;p&gt;就等着xsc上市了&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;吃瓜群众&lt;/strong&gt; (2018-11-07 10:31)&lt;/p&gt;
-&lt;p&gt;您的文章写得真好，给大佬倒橙汁&lt;/p&gt;
-
- &lt;/blockquote&gt;</description></item><item><title>saltshaker--一个salt的webui</title><link>https://www.calmkart.com/posts/2018/07/2018-07-06-saltshaker-%E4%B8%80%E4%B8%AAsalt%E7%9A%84webui/</link><pubDate>Fri, 06 Jul 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/07/2018-07-06-saltshaker-%E4%B8%80%E4%B8%AAsalt%E7%9A%84webui/</guid><description>&lt;p&gt;salt的webui,官方的是halite,但已经被放弃了，不维护很久了 尝试过其他几个star比较的开源实现,比如saltpad,但要么就是bug满天飞,要么就是技能栈不符难以二次开发 最后发现了一个开源实现叫saltshaker的不错,最终效果如下 &lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/07/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_82481f1c-b153-4fb5-928f-2b98163e9635.png" target="_blank" rel="noopener"
- &gt;&lt;img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_82481f1c-b153-4fb5-928f-2b98163e9635.png" alt="" /&gt;
-&lt;/a&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="n"&gt;manage&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;py&lt;/span&gt; &lt;span class="n"&gt;shell&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;time&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.contrib.auth.models&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;User&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;services.views&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;new_service&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;...&lt;/span&gt; &lt;span class="n"&gt;start&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;time&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;time&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;...&lt;/span&gt; &lt;span class="n"&gt;new_service&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;...&lt;/span&gt; &lt;span class="n"&gt;stop&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;time&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;time&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;...&lt;/span&gt; &lt;span class="nb"&gt;print&lt;/span&gt; &lt;span class="n"&gt;stop&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;start&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;pengng&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;User&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;pengng&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pengng&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mf"&gt;1.93502497673&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pengng&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mf"&gt;1.89282894135&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pengng&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mf"&gt;2.14076519012&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pengng&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mf"&gt;1.85515809059&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pengng&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mf"&gt;1.91108703613&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;发现处理时间大致在1.8-1.9s之间,然后直接将上述原始代码第一步拆了出来&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#仅测试这一步&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;online_apps&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;_online_apps&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;has_perm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;deploy_perm&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="n"&gt;is_admin_by_group&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#发现时间在1.2秒左右&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pengng&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mf"&gt;1.25127100945&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pengng&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mf"&gt;1.27178192139&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pengng&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mf"&gt;1.22848701477&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pengng&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mf"&gt;1.25300002098&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;继续分拆,发现是这个user.has_perm(&amp;lsquo;deploy_perm&amp;rsquo;,a)的guardian获取权限消耗了大量的时间 然后想起这个系统里权限都是以group来赋权的,获取用户对于服务的权限要先经过组再到服务,先遍历服务再单独查看用户是否有该组权限导致重复遍历太多,其实直接获取用户对应的所有拥有权限的服务对象即可(get_objects_for_user()方法),尝试修改代码&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@login_required&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;services&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;user&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;is_admin_by_group&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;online_apps_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;App&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;app_env&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;online&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;test_apps_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;App&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;app_env&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;test&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;dev_apps_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;App&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;app_env&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;dev&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;online_apps_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;get_objects_for_user&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;deploy_perm&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;klass&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;App&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app_env&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;online&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;test_apps_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;get_objects_for_user&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;deploy_perm&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;klass&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;App&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app_env&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;test&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;dev_apps_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;get_objects_for_user&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;deploy_perm&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;klass&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;App&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app_env&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;dev&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;nodes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;online&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;open&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;true&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;children&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;online_apps_name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;test&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;open&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;false&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;children&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;test_apps_name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;dev&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;open&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;false&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;children&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;dev_apps_name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;render&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;services/services.html&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;nodes&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;json&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dumps&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nodes&lt;/span&gt;&lt;span class="p"&gt;)})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;然后重载文件&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-jsx" data-lang="jsx"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nx"&gt;reload&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;services&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;views&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;module&lt;/span&gt; &lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="na"&gt;services.views&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt; &lt;span class="na"&gt;from&lt;/span&gt; &lt;span class="err"&gt;&amp;#39;/&lt;/span&gt;&lt;span class="na"&gt;home&lt;/span&gt;&lt;span class="err"&gt;/**/***/&lt;/span&gt;&lt;span class="na"&gt;services&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="na"&gt;views.py&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nx"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;pengng&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mf"&gt;0.0817279815674&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nx"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;pengng&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mf"&gt;0.0788700580597&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nx"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;pengng&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="mf"&gt;0.0756318569183&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;立竿见影,瞬间从2秒降低到了0.08秒左右 &lt;img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_008058b2-bd81-4a9c-8442-63afc75ac870.png" alt="" /&gt;
+收工&lt;/p&gt;
+&lt;div class="archived-comments"&gt;
+&lt;h2&gt;历史评论 (5 条)&lt;/h2&gt;
+&lt;p class="comment-notice"&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/p&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;安全黄&lt;/strong&gt; (2018-08-06 11:56)&lt;/div&gt;
+&lt;div class="comment-body"&gt;给大佬递槟榔&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item comment-reply"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;calmkart&lt;/strong&gt; (2018-08-13 15:03)&lt;/div&gt;
+&lt;div class="comment-body"&gt;安全王牛瘪！安全王请带我飞！&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;杨硕&lt;/strong&gt; (2018-08-09 17:23)&lt;/div&gt;
+&lt;div class="comment-body"&gt;大哥喝冰可乐，psc快收了我啊&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item comment-reply"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;calmkart&lt;/strong&gt; (2018-08-13 15:03)&lt;/div&gt;
+&lt;div class="comment-body"&gt;就等着xsc上市了&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;吃瓜群众&lt;/strong&gt; (2018-11-07 10:31)&lt;/div&gt;
+&lt;div class="comment-body"&gt;您的文章写得真好，给大佬倒橙汁&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item><item><title>saltshaker--一个salt的webui</title><link>https://www.calmkart.com/posts/2018/07/2018-07-06-saltshaker-%E4%B8%80%E4%B8%AAsalt%E7%9A%84webui/</link><pubDate>Fri, 06 Jul 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/07/2018-07-06-saltshaker-%E4%B8%80%E4%B8%AAsalt%E7%9A%84webui/</guid><description>&lt;p&gt;salt的webui,官方的是halite,但已经被放弃了，不维护很久了 尝试过其他几个star比较的开源实现,比如saltpad,但要么就是bug满天飞,要么就是技能栈不符难以二次开发 最后发现了一个开源实现叫saltshaker的不错,最终效果如下 &lt;img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_82481f1c-b153-4fb5-928f-2b98163e9635.png" alt="" /&gt;
+&lt;/p&gt;
 &lt;p&gt;官方项目地址 &lt;a class="link" href="https://github.com/yueyongyue/saltshaker" target="_blank" rel="noopener"
  &gt;https://github.com/yueyongyue/saltshaker&lt;/a&gt; 部署文档见 install.txt&lt;/p&gt;
 &lt;p&gt;大致总结过程如下,非详情.&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;git clone https://github.com/yueyongyue/saltshaker.git
-pip install virtualenv
-virtualenv env
-source env/bin/activate
-yum install salt-api.noarch
-
-salt-api --version
-pip install cherrypy==3.8.0
-useradd -M -s /sbin/nologin admin
-passwd admin
-vim /etc/salt/master.d/saltapi.conf
-systemctl restart salt-master.service
-systemctl restart salt-api.service
-systemctl status salt-api.service
-systemctl status salt-master.service
-lsof -i:50075
-pip install Django==1.8.4
-pip install django-crontab
-
-yum install python-devel.x86_64
-yum install mysql-devel
-yum install MySQL-python
-yum install gcc
-
-pip install mysql-python
-
-查源码，改dashboard/views里index函数checkport的端口
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;几个容易踩坑的地方:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone https://github.com/yueyongyue/saltshaker.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pip install virtualenv
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;virtualenv env
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;source&lt;/span&gt; env/bin/activate
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;yum install salt-api.noarch
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;salt-api --version
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pip install &lt;span class="nv"&gt;cherrypy&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;3.8.0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;useradd -M -s /sbin/nologin admin
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;passwd admin
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;vim /etc/salt/master.d/saltapi.conf
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;systemctl restart salt-master.service
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;systemctl restart salt-api.service
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;systemctl status salt-api.service
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;systemctl status salt-master.service
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;lsof -i:50075
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pip install &lt;span class="nv"&gt;Django&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;1.8.4
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pip install django-crontab
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;yum install python-devel.x86_64
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;yum install mysql-devel
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;yum install MySQL-python
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;yum install gcc
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pip install mysql-python
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;查源码，改dashboard/views里index函数checkport的端口
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;几个容易踩坑的地方:&lt;/p&gt;
 &lt;p&gt;1.centos7.4用pip安装mysql-python的时候，需要先安装python-devel,mysql-devel,MySQL-python,gcc,否则会报错&lt;/p&gt;
 &lt;p&gt;2.supervisor要自己装，相关配置自己写一下，也容易&lt;/p&gt;
 &lt;p&gt;3.如果salt-api等几个部件没有运行在默认端口，那么启动saltshaker后在首页会显示down的状态，需要修改dashboard/views.py里的index函数checkport里的端口号.&lt;/p&gt;
 &lt;p&gt;4.如果salt-master版本比较高(大于2015.x)，官方yum源的salt-api就没有与之对应的版本了，需要自己下载salt-api的新包，我是自建的yum源，然后&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;createrepo &amp;lt;path&amp;gt;
-createrepo --update &amp;lt;path&amp;gt; 
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;更新仓库信息，安装最新的包&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;createrepo &amp;lt;path&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;createrepo --update &amp;lt;path&amp;gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;更新仓库信息，安装最新的包&lt;/p&gt;
 &lt;p&gt;5.django crontab在settings.py里被注释掉了3个，得把注释去掉，然后把所有django crontab跑起来.&lt;/p&gt;
 &lt;p&gt;最后，这个东西感觉也不是很完善好用，不过是django的，二次开发也很容易，有机会再自己来改改。&lt;/p&gt;</description></item><item><title>gunicorn中一个同步任务的坑</title><link>https://www.calmkart.com/posts/2018/06/2018-06-15-gunicorn%E4%B8%AD%E4%B8%80%E4%B8%AA%E5%90%8C%E6%AD%A5%E4%BB%BB%E5%8A%A1%E7%9A%84%E5%9D%91/</link><pubDate>Fri, 15 Jun 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/06/2018-06-15-gunicorn%E4%B8%AD%E4%B8%80%E4%B8%AA%E5%90%8C%E6%AD%A5%E4%BB%BB%E5%8A%A1%E7%9A%84%E5%9D%91/</guid><description>&lt;p&gt;最近有些django定时任务要跑，又懒的做异步celery worker tasks了，就是普通的同步任务，用的django crontab，其中django用的是gunicorn-&amp;gt;nginx的部署方式。但几天下来，发现任务总是执行到一半就停了，排错发现一个偶尔会出现的坑&lt;/p&gt;
-&lt;p&gt; &lt;/p&gt;
 &lt;p&gt;&amp;hellip;&lt;/p&gt;
 &lt;p&gt;检测到用curl请求接口，每到31秒就停止，后续同步任务不再继续&lt;/p&gt;
 &lt;p&gt;检查gonicorn参数，发现默认的timeout值为30s，既客户端请求30s后超时&lt;/p&gt;
 &lt;p&gt;gunicorn启动参数加上     -t 120&lt;/p&gt;
 &lt;p&gt;问题解决&lt;/p&gt;
 &lt;p&gt;&amp;hellip;&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="历史评论-2-条"&gt;历史评论 (2 条)
-&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;wuyan&lt;/strong&gt; (2019-07-29 16:34)&lt;/p&gt;
-&lt;p&gt;gunicorn启动参数加上 -t 120 是表示120s超时吗？如果是的话，会不会执行到120s就停了，还是没有解决根本问题吧？&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-08-09 15:26)&lt;/p&gt;
-&lt;p&gt;本来就是个简单的定时任务,要想彻底解决问题用celery做异步队列处理啊&lt;/p&gt;
-
- &lt;/blockquote&gt;</description></item><item><title>关于supervisor/gosuv等控制django/flask进程的小贴士</title><link>https://www.calmkart.com/posts/2018/02/2018-02-11-%E5%85%B3%E4%BA%8Esupervisor-gosuv%E7%AD%89%E6%8E%A7%E5%88%B6django-flask%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%B0%8F%E8%B4%B4%E5%A3%AB/</link><pubDate>Sun, 11 Feb 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/02/2018-02-11-%E5%85%B3%E4%BA%8Esupervisor-gosuv%E7%AD%89%E6%8E%A7%E5%88%B6django-flask%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%B0%8F%E8%B4%B4%E5%A3%AB/</guid><description>&lt;p&gt;在使用supervisor/gosuv等进程控制程序控制django/flask进程时，常常会出现一个&amp;quot;BUG&amp;quot;&amp;mdash;&amp;mdash;输入supervisor restart {app}/gosuv stop/start {app}后，经常会出现django/flask重启失败，因为端口已占用的错误。&lt;/p&gt;
+&lt;div class="archived-comments"&gt;
+&lt;h2&gt;历史评论 (2 条)&lt;/h2&gt;
+&lt;p class="comment-notice"&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/p&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;wuyan&lt;/strong&gt; (2019-07-29 16:34)&lt;/div&gt;
+&lt;div class="comment-body"&gt;gunicorn启动参数加上 -t 120 是表示120s超时吗？如果是的话，会不会执行到120s就停了，还是没有解决根本问题吧？&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item comment-reply"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;calmkart&lt;/strong&gt; (2019-08-09 15:26)&lt;/div&gt;
+&lt;div class="comment-body"&gt;本来就是个简单的定时任务,要想彻底解决问题用celery做异步队列处理啊&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item><item><title>[django笔记]crontab,异常捕获和打印log</title><link>https://www.calmkart.com/posts/2018/05/2018-05-28-django%E7%AC%94%E8%AE%B0crontab%E5%BC%82%E5%B8%B8%E6%8D%95%E8%8E%B7%E5%92%8C%E6%89%93%E5%8D%B0log/</link><pubDate>Mon, 28 May 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/05/2018-05-28-django%E7%AC%94%E8%AE%B0crontab%E5%BC%82%E5%B8%B8%E6%8D%95%E8%8E%B7%E5%92%8C%E6%89%93%E5%8D%B0log/</guid><description>&lt;p&gt;记录一些django常见功能的用法。 这次主要关注点是crontab定时任务,django/python的异常捕获,以及django/python的打印log功能&lt;/p&gt;
+&lt;h4 id="一crontab定时任务"&gt;一.crontab定时任务
+&lt;/h4&gt;&lt;p&gt;首先安装djanto-crontab模块&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pip install django-crontab
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;然后在django项目的settings.py里添加django-crontab模块&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;INSTALLED_APPS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;django_crontab&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;然后编写相关的cron定时任务程序，一般放在project/app/views里，命名为cron.py&lt;/p&gt;
+&lt;p&gt;接着在settings.py里添加定时任务&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;CRONJOBS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;0 12 1 * *&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;app.views.cron.cron1&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;0 12 * * 1-5&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;app.views.cron.cron2&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;定时设置参数为 (分 小时 日 月 星期),具体可参考google资料&lt;/p&gt;
+&lt;p&gt;然后常见的执行命令如下:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#查看定时任务&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;python manage.py crontab show
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#添加定时任务(修改定时任务)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;python manage.py crontab add
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#删除定时任务&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;python manage.py crontab remove
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#执行一次定时任务&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;python manage.py crontab run &lt;span class="o"&gt;{&lt;/span&gt;定时任务id&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;em&gt;&lt;strong&gt;特别注意:crontab的log地址一定要写绝对路径&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;h4 id="二djangopython的错误捕获"&gt;二.django/python的错误捕获
+&lt;/h4&gt;&lt;h6 id="1基础语法"&gt;1.基础语法
+&lt;/h6&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;pass&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;except&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;pass&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h6 id="2常见异常类型"&gt;2.常见异常类型
+&lt;/h6&gt;&lt;ul&gt;
+&lt;li&gt;AttributeError     试图访问一个对象没有的树形，比如foo.x,但foo没有属性x&lt;/li&gt;
+&lt;li&gt;IOError         输入输出异常；基本是无法打开文件错误&lt;/li&gt;
+&lt;li&gt;ImportError      无法引入模块或者包；基本上是路径问题或者名称错误&lt;/li&gt;
+&lt;li&gt;IndentationError   语法错误；代码没有正确的对齐&lt;/li&gt;
+&lt;li&gt;IndexError:       下标索引超出序列边界，比如当x只有三个元素，却试图访问x[5]&lt;/li&gt;
+&lt;li&gt;KeyError         试图访问字典里不存在的键&lt;/li&gt;
+&lt;li&gt;NameError        使用一个还未赋值的变量&lt;/li&gt;
+&lt;li&gt;SyntaxError       代码非法，&lt;/li&gt;
+&lt;li&gt;TypeError        传入对象类型与要求的不符合&lt;/li&gt;
+&lt;li&gt;ValueError       传给函数的参数类型不正确,比如给int()函数传入字符串形&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h6 id="3通用错误类型"&gt;3.通用错误类型
+&lt;/h6&gt;&lt;p&gt;Exception&lt;/p&gt;
+&lt;p&gt;语法:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;Exception&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;或者:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;Exception&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h6 id="4traceback获取异常详情"&gt;4.traceback获取异常详情
+&lt;/h6&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;traceback&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#返回错误字符串&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;traceback&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format_exc&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#打印错误字符串&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;traceback&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;print_exc&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#配合logging模块使用&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getLogger&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;traceback&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format_exc&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id="三djangopython的log打印"&gt;三.django/python的log打印
+&lt;/h4&gt;&lt;p&gt;&amp;hellip;&lt;/p&gt;
+&lt;div class="archived-comments"&gt;
+&lt;h2&gt;历史评论 (1 条)&lt;/h2&gt;
+&lt;p class="comment-notice"&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/p&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;吴伟康&lt;/strong&gt; (2018-06-08 17:24)&lt;/div&gt;
+&lt;div class="comment-body"&gt;楼主你好，请问下如果异常没有被捕获，例如忘记定义这种类型的异常，该怎么避免这种情况的报错啊，不胜感激&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item><item><title>关于supervisor/gosuv等控制django/flask进程的小贴士</title><link>https://www.calmkart.com/posts/2018/02/2018-02-11-%E5%85%B3%E4%BA%8Esupervisor-gosuv%E7%AD%89%E6%8E%A7%E5%88%B6django-flask%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%B0%8F%E8%B4%B4%E5%A3%AB/</link><pubDate>Sun, 11 Feb 2018 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2018/02/2018-02-11-%E5%85%B3%E4%BA%8Esupervisor-gosuv%E7%AD%89%E6%8E%A7%E5%88%B6django-flask%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%B0%8F%E8%B4%B4%E5%A3%AB/</guid><description>&lt;p&gt;在使用supervisor/gosuv等进程控制程序控制django/flask进程时，常常会出现一个&amp;quot;BUG&amp;quot;&amp;mdash;&amp;mdash;输入supervisor restart {app}/gosuv stop/start {app}后，经常会出现django/flask重启失败，因为端口已占用的错误。&lt;/p&gt;
 &lt;p&gt;这里我们常常想到，先把端口关掉不就可以了？经常在代码中加入如下命令：(如果程序是django或者flask，占用的端口是82端口)&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;import subprocess
-import os
-
-pid = os.popen(&amp;#34;lsof -i:82|grep python|awk &amp;#39;{print $2}&amp;#39;&amp;#34;).read()
-if len(pid):
- subprocess.check_output(&amp;#34;kill -9 &amp;#34;+str(int(pid)), shell=True)
-#注意，这里一定要用subprocess库来kill进程。用os.system运行kill -9或os.kill()都会导致新进程产生
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这样虽然可行，但是比较麻烦。其实占用端口的原因是flask/django服务器自动reload造成的，只需要在supervisor/gosuv的启动指令里，加上&amp;ndash;noreload参数就不会产生这个&amp;quot;BUG&amp;quot;了，举例如下：&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;#原来启动指令
-python manage.py runserver 0.0.0.0:82
-#更新启动指令
-python manage.py runserver 0.0.0.0:82 --noreload
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;搞定&lt;/p&gt;</description></item><item><title>django使用middleware实现views的访问限制</title><link>https://www.calmkart.com/posts/2017/12/2017-12-27-django%E4%BD%BF%E7%94%A8middleware%E5%AE%9E%E7%8E%B0views%E7%9A%84%E8%AE%BF%E9%97%AE%E9%99%90%E5%88%B6/</link><pubDate>Wed, 27 Dec 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/12/2017-12-27-django%E4%BD%BF%E7%94%A8middleware%E5%AE%9E%E7%8E%B0views%E7%9A%84%E8%AE%BF%E9%97%AE%E9%99%90%E5%88%B6/</guid><description>&lt;p&gt;需要实现这样的需求，对于以个django app，需要对其中的一些restful api做IP访问限制，这样实现起来最方便的是在middleware中写逻辑。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;subprocess&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;os&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;pid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;popen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;lsof -i:82|grep python|awk &amp;#39;{print $2}&amp;#39;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pid&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;subprocess&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;check_output&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;kill -9 &amp;#34;&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pid&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt; &lt;span class="n"&gt;shell&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#注意，这里一定要用subprocess库来kill进程。用os.system运行kill -9或os.kill()都会导致新进程产生&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这样虽然可行，但是比较麻烦。其实占用端口的原因是flask/django服务器自动reload造成的，只需要在supervisor/gosuv的启动指令里，加上&amp;ndash;noreload参数就不会产生这个&amp;quot;BUG&amp;quot;了，举例如下：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#原来启动指令&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;python manage.py runserver 0.0.0.0:82
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#更新启动指令&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;python manage.py runserver 0.0.0.0:82 --noreload
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;搞定&lt;/p&gt;</description></item><item><title>django使用middleware实现views的访问限制</title><link>https://www.calmkart.com/posts/2017/12/2017-12-27-django%E4%BD%BF%E7%94%A8middleware%E5%AE%9E%E7%8E%B0views%E7%9A%84%E8%AE%BF%E9%97%AE%E9%99%90%E5%88%B6/</link><pubDate>Wed, 27 Dec 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/12/2017-12-27-django%E4%BD%BF%E7%94%A8middleware%E5%AE%9E%E7%8E%B0views%E7%9A%84%E8%AE%BF%E9%97%AE%E9%99%90%E5%88%B6/</guid><description>&lt;p&gt;需要实现这样的需求，对于以个django app，需要对其中的一些restful api做IP访问限制，这样实现起来最方便的是在middleware中写逻辑。&lt;/p&gt;
 &lt;p&gt;关于django中间件的说明： &lt;a class="link" href="http://usyiyi.cn/translate/Django_111/topics/http/middleware.html" target="_blank" rel="noopener"
  &gt;http://usyiyi.cn/translate/Django_111/topics/http/middleware.html&lt;/a&gt; &lt;a class="link" href="http://python.usyiyi.cn/translate/django_182/topics/http/middleware.html" target="_blank" rel="noopener"
  &gt;http://python.usyiyi.cn/translate/django_182/topics/http/middleware.html&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;在django app得middleware.py中添加如下代码&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;from django.http import HttpResponse
-
-class checkIPMiddleware(object):
- def process_request(self, request):
- root_func = request.path.split(&amp;#34;/&amp;#34;)[1]
- api_flag = True if root_func==&amp;#34;api&amp;#34; else False
- if api_flag:
- ip = request.META.get(&amp;#34;HTTP_X_REAL_IP&amp;#34;, request.META.get(&amp;#34;REMOTE_ADDR&amp;#34;))
- if (ip==&amp;#34;10.10.10.10&amp;#34; or ip==&amp;#34;11.11.11.11&amp;#34;):
- return None
- else:
- return HttpReponse(&amp;#34;you are not allowed&amp;#34;)
- return None
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;关于request对象内容，详情如下(本代码限制的是所有/api/后的访问)： &lt;a class="link" href="http://python.usyiyi.cn/translate/django_182/ref/request-response.html" target="_blank" rel="noopener"
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.http&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;HttpResponse&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;checkIPMiddleware&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;process_request&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;root_func&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;split&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;/&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;api_flag&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;root_func&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;api&amp;#34;&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;api_flag&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;ip&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;META&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;HTTP_X_REAL_IP&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;META&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;REMOTE_ADDR&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ip&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;10.10.10.10&amp;#34;&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="n"&gt;ip&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;11.11.11.11&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;HttpReponse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;you are not allowed&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;关于request对象内容，详情如下(本代码限制的是所有/api/后的访问)： &lt;a class="link" href="http://python.usyiyi.cn/translate/django_182/ref/request-response.html" target="_blank" rel="noopener"
  &gt;http://python.usyiyi.cn/translate/django_182/ref/request-response.html&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;关于获取用户IP，在没有反向代理的情况下可以获取http头中的REMOTE_ADDR字段，用request.META对象来获取 当有Nginx等反向代理的时候，就会获取到本机IP，所以需要在nginx反向代理时，将用户原IP记录下来写入HTTP头中 既配置nginx配置如下(/site-enable/default):&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;location .... { 
- proxy_set_header X-Real-IP $remote_addr;
- proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
- proxy_set_header Host $http_host;
- proxy_set_header X-NginX-Proxy true;
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;最后在settings.py中将这个class添加进去&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;MIDDLEWARE_CLASSES = [
- &amp;#39;appname.middleware.checkIPMiddleware&amp;#39;
-]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;重启django之后，则/api后的restful api只允许10.10.10.10和11.11.11.11访问，其他时候就会返回&amp;quot;you are not allowed&amp;quot;&lt;/p&gt;</description></item></channel></rss>
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-nginx" data-lang="nginx"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;location&lt;/span&gt; &lt;span class="s"&gt;....&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kn"&gt;proxy_set_header&lt;/span&gt; &lt;span class="s"&gt;X-Real-IP&lt;/span&gt; &lt;span class="nv"&gt;$remote_addr&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kn"&gt;proxy_set_header&lt;/span&gt; &lt;span class="s"&gt;X-Forwarded-For&lt;/span&gt; &lt;span class="nv"&gt;$proxy_add_x_forwarded_for&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kn"&gt;proxy_set_header&lt;/span&gt; &lt;span class="s"&gt;Host&lt;/span&gt; &lt;span class="nv"&gt;$http_host&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kn"&gt;proxy_set_header&lt;/span&gt; &lt;span class="s"&gt;X-NginX-Proxy&lt;/span&gt; &lt;span class="s"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;最后在settings.py中将这个class添加进去&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;MIDDLEWARE_CLASSES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s1"&gt;&amp;#39;appname.middleware.checkIPMiddleware&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;重启django之后，则/api后的restful api只允许10.10.10.10和11.11.11.11访问，其他时候就会返回&amp;quot;you are not allowed&amp;quot;&lt;/p&gt;</description></item></channel></rss>

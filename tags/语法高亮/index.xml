@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>语法高亮 on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/%E8%AF%AD%E6%B3%95%E9%AB%98%E4%BA%AE/</link><description>Recent content in 语法高亮 on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 20 Nov 2017 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/%E8%AF%AD%E6%B3%95%E9%AB%98%E4%BA%AE/index.xml" rel="self" type="application/rss+xml"/><item><title>vim/nginx语法高亮插件</title><link>https://www.calmkart.com/posts/2017/11/2017-11-20-vim-nginx%E8%AF%AD%E6%B3%95%E9%AB%98%E4%BA%AE%E6%8F%92%E4%BB%B6/</link><pubDate>Mon, 20 Nov 2017 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2017/11/2017-11-20-vim-nginx%E8%AF%AD%E6%B3%95%E9%AB%98%E4%BA%AE%E6%8F%92%E4%BB%B6/</guid><description>&lt;p&gt;1.vim语法高亮插件molokai&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;cd ~/.vim/
-mkdir ./colors
-cd ./colos
-wget https://raw.githubusercontent.com/tomasr/molokai/master/colors/molokai.vim
-echo colorscheme molokai &amp;gt;&amp;gt; ~/.vimrc
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2.nginx语法高亮插件nginx.vim&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;mkdir -pv ~/.vim/syntax
-cd ~/.vim/syntax
-wget -O nginx.vim http://www.vim.org/scripts/download_script.php?src_id=19394
-echo &amp;#34;au BufRead,BufNewFile /etc/nginx/*,/usr/local/nginx/conf/* if &amp;amp;ft == &amp;#39;&amp;#39; | setfiletype nginx | endif &amp;#34; &amp;gt;&amp;gt; ~/.vim/filetype.vim
-&lt;/code&gt;&lt;/pre&gt;</description></item></channel></rss>
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; ~/.vim/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;mkdir ./colors
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; ./colos
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;wget https://raw.githubusercontent.com/tomasr/molokai/master/colors/molokai.vim
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; colorscheme molokai &amp;gt;&amp;gt; ~/.vimrc
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;2.nginx语法高亮插件nginx.vim&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;mkdir -pv ~/.vim/syntax
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; ~/.vim/syntax
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;wget -O nginx.vim http://www.vim.org/scripts/download_script.php?src_id&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;19394&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;au BufRead,BufNewFile /etc/nginx/*,/usr/local/nginx/conf/* if &amp;amp;ft == &amp;#39;&amp;#39; | setfiletype nginx | endif &amp;#34;&lt;/span&gt; &amp;gt;&amp;gt; ~/.vim/filetype.vim
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description></item></channel></rss>

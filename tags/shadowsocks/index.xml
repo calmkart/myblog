@@ -5,84 +5,73 @@
 &lt;p&gt;wireguard是一种比较新的vpn，基于udp，速度可以说秒杀其他vpn(实测体验)，体验几乎不逊色于ss。&lt;/p&gt;
 &lt;p&gt;并且wireguard配置简单，客户端易用，被集成进了linux内核，也许可以说比ss安全(这点我不确定，但是我的服务器确实ss被全面封杀，但是wireguard用起来轻松愉快)。&lt;/p&gt;
 &lt;p&gt;所以，很推荐现在用不了ss的朋友试试这个新东西，下面开始配置过程。&lt;/p&gt;
-&lt;p&gt; &lt;/p&gt;
 &lt;p&gt;首先配置服务端&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;#推荐使用一键安装脚本,github地址
-https://github.com/l-n-s/wireguard-install
-#过程
-wget https://raw.githubusercontent.com/l-n-s/wireguard-install/master/wireguard-install.sh -O wireguard-install.sh
-bash wireguard-install.sh
-
-#然后输入下确定啥的（dns记得选择google的8.8.8.8,4.4.4.4，比较靠谱），你以为一切就ok了，然而一般并不是，你会报错，说啥服务没起来。
-#你用systemctl status wg-quick@wg0.service查看一下到底除了啥问题，发现是ip link add dev wg0 type wireguard命令起不来
-#再次尝试手动ip link add dev wg0 type wireguard，发现报错，找不到wireguard类型的网卡设备名
-#查询了一下，原来是linux内核版本和linux-headers的问题，那么好办了，先更新下内核版本吧
-apt-get install linux-image-4.9.0.8-amd64
-#然后删除旧版本的linux内核
-apt-get remove linux-image-4.x.x.x-amd64
-#接着记得安装好对应版本的linux-headers
-apt-get install linux-headers-4.9.0.8-amd64
-#然后重启
-reboot
-#重启完成后手动启动wireguard网卡
-ip link add dev wg0 type wireguard
-#发现启动成功,这就很棒棒了
-#现在重启服务吧
-systemctl restart wg-quick@wg0.service
-#查看服务状态
-systemctl status wg-quick@wg0.service
-#很棒棒，又成功了，你得到它了
-
-#然后生成客户端配置文件
-wg showconf wg0
-#客户端配置文件将自动生成为/etc/wireguard/wg0.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;服务端这就已经配置完毕了，接着配置客户端(客户端用的Tunsafe，下载在文末)&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;#将客户端配置文件下载到自己的机器上(客户端),观察下配置文件的内容，其实也挺简单的，就是用rsa公私钥加密通信而已。
-#在客户端修改配置文件
-[Peer]
-#添加
-Endpoint = [服务端ip地址]:[服务端配置的ip端口号]
-#配置文件也搞定了。
-#客户端使用TunSafe，记得使用前需要先安装环境配置
-#点击import,导入下载下来的配置文件
-#然后点击connect即可
-enjoy it
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt; &lt;/p&gt;
-&lt;p&gt;总的来说，用了也一段时间了，wireguard的稳定性和可靠性还是很棒的，但是还是有些缺点。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#推荐使用一键安装脚本,github地址&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;https://github.com/l-n-s/wireguard-install
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#过程&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;wget https://raw.githubusercontent.com/l-n-s/wireguard-install/master/wireguard-install.sh -O wireguard-install.sh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;bash wireguard-install.sh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#然后输入下确定啥的（dns记得选择google的8.8.8.8,4.4.4.4，比较靠谱），你以为一切就ok了，然而一般并不是，你会报错，说啥服务没起来。&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#你用systemctl status wg-quick@wg0.service查看一下到底除了啥问题，发现是ip link add dev wg0 type wireguard命令起不来&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#再次尝试手动ip link add dev wg0 type wireguard，发现报错，找不到wireguard类型的网卡设备名&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#查询了一下，原来是linux内核版本和linux-headers的问题，那么好办了，先更新下内核版本吧&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;apt-get install linux-image-4.9.0.8-amd64
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#然后删除旧版本的linux内核&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;apt-get remove linux-image-4.x.x.x-amd64
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#接着记得安装好对应版本的linux-headers&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;apt-get install linux-headers-4.9.0.8-amd64
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#然后重启&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;reboot
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#重启完成后手动启动wireguard网卡&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ip link add dev wg0 &lt;span class="nb"&gt;type&lt;/span&gt; wireguard
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#发现启动成功,这就很棒棒了&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#现在重启服务吧&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;systemctl restart wg-quick@wg0.service
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#查看服务状态&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;systemctl status wg-quick@wg0.service
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#很棒棒，又成功了，你得到它了&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#然后生成客户端配置文件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;wg showconf wg0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#客户端配置文件将自动生成为/etc/wireguard/wg0.conf&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;服务端这就已经配置完毕了，接着配置客户端(客户端用的Tunsafe，下载在文末)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-ini" data-lang="ini"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#将客户端配置文件下载到自己的机器上(客户端),观察下配置文件的内容，其实也挺简单的，就是用rsa公私钥加密通信而已。&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#在客户端修改配置文件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;[Peer]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#添加&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;Endpoint&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;[服务端ip地址]:[服务端配置的ip端口号]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#配置文件也搞定了。&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#客户端使用TunSafe，记得使用前需要先安装环境配置&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#点击import,导入下载下来的配置文件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#然后点击connect即可&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;enjoy it&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;总的来说，用了也一段时间了，wireguard的稳定性和可靠性还是很棒的，但是还是有些缺点。&lt;/p&gt;
 &lt;p&gt;比如因为是vpn所以没法像ss一样针对流量做分流，都是用的全局流量。其次，wireguard是用的rsa公私钥做加密的，单配置只针对单用户，需要多人连接需要在服务端配置多用户，也不是那么方便，而且流量管理啥的好像也没啥现成的东西。而且速度确实还是逊色于ss的。(当然，ss现在的封锁力度太大啦。)&lt;/p&gt;
 &lt;p&gt;好的，就到这里了。&lt;/p&gt;
 &lt;p&gt;附上tunsafe客户端，方便上不了tunsafe官网的朋友(记得先安装其中的ts环境)&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/04/TunSafe.zip" target="_blank" rel="noopener"
- &gt;TunSafe&lt;/a&gt;&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="历史评论-5-条"&gt;历史评论 (5 条)
-&lt;/h2&gt;&lt;p&gt;&lt;em&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/em&gt;&lt;/p&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;liuxing&lt;/strong&gt; (2019-04-10 16:10)&lt;/p&gt;
-&lt;p&gt;大神，请问下苹果笔记本怎么用这个软件翻墙啊？&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-04-14 11:21)&lt;/p&gt;
-&lt;p&gt;服务端配好了同样用tunsafe客户端就行了啊,tunsafe客户端有MAC版本的&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;&lt;strong&gt;huan&lt;/strong&gt; (2019-04-29 17:01)&lt;/p&gt;
-&lt;p&gt;学习了，幸好我远离帝都&lt;/p&gt;
-
- &lt;/blockquote&gt;
-
- &lt;blockquote&gt;
- &lt;p&gt;↳ &lt;strong&gt;calmkart&lt;/strong&gt; (2019-04-30 10:50)&lt;/p&gt;
-&lt;p&gt;安全王？贵司应该就是用的stunnel+sniproxy+dns劫持翻墙的,讲道理还是不太安全&lt;/p&gt;
-
- &lt;/blockquote&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt; ↳ **huan** (2019-05-09 09:49)
-&amp;gt;
-&amp;gt; 没那么高端，直接是调整出口的路由到香港线路。
-&amp;gt; 我最近都是v2ray，感觉也很稳，被封了就试下wireguard
-&lt;/code&gt;&lt;/pre&gt;</description></item></channel></rss>
+&lt;p&gt;TunSafe（客户端文件已不再提供下载）&lt;/p&gt;
+&lt;div class="archived-comments"&gt;
+&lt;h2&gt;历史评论 (5 条)&lt;/h2&gt;
+&lt;p class="comment-notice"&gt;以下评论来自原 WordPress 站点，仅作存档展示。&lt;/p&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;liuxing&lt;/strong&gt; (2019-04-10 16:10)&lt;/div&gt;
+&lt;div class="comment-body"&gt;大神，请问下苹果笔记本怎么用这个软件翻墙啊？&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item comment-reply"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;calmkart&lt;/strong&gt; (2019-04-14 11:21)&lt;/div&gt;
+&lt;div class="comment-body"&gt;服务端配好了同样用tunsafe客户端就行了啊,tunsafe客户端有MAC版本的&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;huan&lt;/strong&gt; (2019-04-29 17:01)&lt;/div&gt;
+&lt;div class="comment-body"&gt;学习了，幸好我远离帝都&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item comment-reply"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;calmkart&lt;/strong&gt; (2019-04-30 10:50)&lt;/div&gt;
+&lt;div class="comment-body"&gt;安全王？贵司应该就是用的stunnel+sniproxy+dns劫持翻墙的,讲道理还是不太安全&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="comment-item comment-reply"&gt;
+&lt;div class="comment-meta"&gt;&lt;strong&gt;huan&lt;/strong&gt; (2019-05-09 09:49)&lt;/div&gt;
+&lt;div class="comment-body"&gt;没那么高端，直接是调整出口的路由到香港线路。 我最近都是v2ray，感觉也很稳，被封了就试下wireguard&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item></channel></rss>

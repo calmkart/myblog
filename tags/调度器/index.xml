@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>调度器 on cAlm的个人Blog</title><link>https://www.calmkart.com/tags/%E8%B0%83%E5%BA%A6%E5%99%A8/</link><description>Recent content in 调度器 on cAlm的个人Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 18 Sep 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://www.calmkart.com/tags/%E8%B0%83%E5%BA%A6%E5%99%A8/index.xml" rel="self" type="application/rss+xml"/><item><title>kubernetes scheduler流程图</title><link>https://www.calmkart.com/posts/2019/09/2019-09-18-kubernetes-scheduler%E6%B5%81%E7%A8%8B%E5%9B%BE/</link><pubDate>Wed, 18 Sep 2019 00:00:00 +0000</pubDate><guid>https://www.calmkart.com/posts/2019/09/2019-09-18-kubernetes-scheduler%E6%B5%81%E7%A8%8B%E5%9B%BE/</guid><description>&lt;p&gt;最近在跟着&lt;a class="link" href="https://github.com/farmer-hutao/k8s-source-code-analysis" target="_blank" rel="noopener"
  &gt;《k8s-1.13版本源码分析》&lt;/a&gt;读k8s源码，顺着流程把scheduler调度器模块过了一遍，文中有一幅k8s  scheduler调度器工作流程图画的不错，这里做个记录备忘。&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/09/kube-scheduler-workflow.png" target="_blank" rel="noopener"
- &gt;&lt;img src="images/kube-scheduler-workflow.png" alt="" /&gt;
-&lt;/a&gt;&lt;/p&gt;</description></item></channel></rss>
+&lt;p&gt;&lt;img src="images/kube-scheduler-workflow.png" alt="" /&gt;
+&lt;/p&gt;</description></item></channel></rss>
