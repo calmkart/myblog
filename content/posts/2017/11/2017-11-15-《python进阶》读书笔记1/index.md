@@ -1,6 +1,7 @@
 ---
 title: "《Python进阶》读书笔记(1)"
 date: 2017-11-15
+description: "Python中*args与**kwargs传参(不定长传参)、生成器、Map/Filter/Reduce、装饰器等进阶知识点的读书笔记。"
 categories: 
   - "计算机"
   - "读书笔记"
@@ -14,7 +15,7 @@ tags:
 
 使用举例：
 
-```
+```python
 function(fargs, *args, **kwargs)
 ```
 
@@ -26,7 +27,7 @@ function(fargs, *args, **kwargs)
 
 使用举例：
 
-```
+```python
 def generation_function():
     for i in range(10):
         yield i
@@ -45,7 +46,7 @@ lambda，可减少无需重复函数
 
 使用举例：
 
-```
+```python
 lambda x : x+1
 ```
 
@@ -53,13 +54,13 @@ lambda x : x+1
 
 将function应用于后面参数的所有LIST元素中，返回结果。(python2返回list,python3返回迭代器)
 
-```
+```python
 map(function, list)
 ```
 
 也支持多参数:
 
-```
+```python
 map(function, list1, list2, list3....)
 ```
 
@@ -67,7 +68,7 @@ map(function, list1, list2, list3....)
 
 使用举例：
 
-```
+```python
 items=[1,2,3,4,5]
 print map(lambda x : x**2, items)
 ```
@@ -82,7 +83,7 @@ map的本质既将一个函数映射到若干列表的所有元素上。
 
 使用举例：
 
-```
+```python
 number_list = range(-5,5)
 less_than_zero = filter(lambda x : x<0, number_list)
 ```
@@ -91,7 +92,7 @@ less_than_zero = filter(lambda x : x<0, number_list)
 
 #### 6.reduce()
 
-```
+```python
 from functools import reduce)
 product = reduce((lambda x,y:x*y),[1,2,3,4])
 ```
@@ -106,13 +107,13 @@ product = reduce((lambda x,y:x*y),[1,2,3,4])
 
 交集：
 
-```
+```python
 print (set1.intersection(set2))
 ```
 
 差集：
 
-```
+```python
 print (set1.difference(set2))
 ```
 
@@ -120,7 +121,7 @@ print (set1.difference(set2))
 
 使用举例：
 
-```
+```python
 is_fat = True
 state = "fat" if is_fat else "not fat"
 ```

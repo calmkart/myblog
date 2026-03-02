@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="传统的负载均衡策略一般是:\n客户端 -&gt; dns -&gt; 4层库在均衡(HA) -&gt; 7层负载均衡 -&gt; 具体的后端服务\n这种方式处理服务发现和动态配置比较难搞,比如后端服务动态扩缩容什么的。 一开始的做法肯定是OP人工维护7层负载均衡集群配置，以nginx为例，用git仓库之类的做人工服务发现和变更。这样很显然是不科学的。然后就会开始希望用种种自动化的手段去处理服务发现，比如微博的nginx-upsync-module,比如nginx-lua，比如openresty，比如etcd+confd等种种手段实现服务发现和自动化配置，但还是有很多瑕疵，比如etcd+confd每次修改upstream的服务后端就要reload nginx，nginx的策略会新开x个worker，容易造成性能问题甚至机器顶不住。而且vm服务机器的逻辑和upstream挂钩也有问题，总之，麻烦的很。\n而kubernetes处理这一套服务发现和负载均衡的方法就挺好用的，比如接下来会实践的这一套nginx-ingress+externalIP+dns的方式就很直观而且方便自动化流程，大致策略如下:\n客户端 -&gt; dns -&gt; k8s-nginx-ingress-service(in ExternalIP) -&gt; ingress-obj -&gt; service -&gt; pod\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="传统的负载均衡策略一般是: 客户端 -dns -4层库在均衡(HA) -7层负载均衡 -具体的后端服务 这种方式处理服务发现和动态配置比较难搞,比如后端服务动态扩缩容什么的。 一开始的做法肯定是OP人工维护7层负载均衡集群配置...">
 <title>kubernetes集群中服务的负载均衡和外部发现</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="kubernetes集群中服务的负载均衡和外部发现">
-<meta property='og:description' content="传统的负载均衡策略一般是:\n客户端 -&gt; dns -&gt; 4层库在均衡(HA) -&gt; 7层负载均衡 -&gt; 具体的后端服务\n这种方式处理服务发现和动态配置比较难搞,比如后端服务动态扩缩容什么的。 一开始的做法肯定是OP人工维护7层负载均衡集群配置，以nginx为例，用git仓库之类的做人工服务发现和变更。这样很显然是不科学的。然后就会开始希望用种种自动化的手段去处理服务发现，比如微博的nginx-upsync-module,比如nginx-lua，比如openresty，比如etcd+confd等种种手段实现服务发现和自动化配置，但还是有很多瑕疵，比如etcd+confd每次修改upstream的服务后端就要reload nginx，nginx的策略会新开x个worker，容易造成性能问题甚至机器顶不住。而且vm服务机器的逻辑和upstream挂钩也有问题，总之，麻烦的很。\n而kubernetes处理这一套服务发现和负载均衡的方法就挺好用的，比如接下来会实践的这一套nginx-ingress+externalIP+dns的方式就很直观而且方便自动化流程，大致策略如下:\n客户端 -&gt; dns -&gt; k8s-nginx-ingress-service(in ExternalIP) -&gt; ingress-obj -&gt; service -&gt; pod\n">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="kubernetes集群中服务的负载均衡和外部发现">
+<meta property='og:description' content="传统的负载均衡策略一般是: 客户端 -dns -4层库在均衡(HA) -7层负载均衡 -具体的后端服务 这种方式处理服务发现和动态配置比较难搞,比如后端服务动态扩缩容什么的。 一开始的做法肯定是OP人工维护7层负载均衡集群配置...">
 <meta property='og:url' content='http://localhost:1313/posts/2019/05/2019-05-25-kubernetes%E9%9B%86%E7%BE%A4%E4%B8%AD%E6%9C%8D%E5%8A%A1%E7%9A%84%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%92%8C%E5%A4%96%E9%83%A8%E5%8F%91%E7%8E%B0/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='dns' /><meta property='article:tag' content='externalip' /><meta property='article:tag' content='ingress' /><meta property='article:tag' content='k8s' /><meta property='article:tag' content='kubernetes' /><meta property='article:tag' content='nginx' /><meta property='article:tag' content='服务发现' /><meta property='article:tag' content='负载均衡' /><meta property='article:published_time' content='2019-05-25T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2019-05-25T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="kubernetes集群中服务的负载均衡和外部发现">
-<meta name="twitter:description" content="传统的负载均衡策略一般是:\n客户端 -&gt; dns -&gt; 4层库在均衡(HA) -&gt; 7层负载均衡 -&gt; 具体的后端服务\n这种方式处理服务发现和动态配置比较难搞,比如后端服务动态扩缩容什么的。 一开始的做法肯定是OP人工维护7层负载均衡集群配置，以nginx为例，用git仓库之类的做人工服务发现和变更。这样很显然是不科学的。然后就会开始希望用种种自动化的手段去处理服务发现，比如微博的nginx-upsync-module,比如nginx-lua，比如openresty，比如etcd+confd等种种手段实现服务发现和自动化配置，但还是有很多瑕疵，比如etcd+confd每次修改upstream的服务后端就要reload nginx，nginx的策略会新开x个worker，容易造成性能问题甚至机器顶不住。而且vm服务机器的逻辑和upstream挂钩也有问题，总之，麻烦的很。\n而kubernetes处理这一套服务发现和负载均衡的方法就挺好用的，比如接下来会实践的这一套nginx-ingress+externalIP+dns的方式就很直观而且方便自动化流程，大致策略如下:\n客户端 -&gt; dns -&gt; k8s-nginx-ingress-service(in ExternalIP) -&gt; ingress-obj -&gt; service -&gt; pod\n">
+<meta name="twitter:description" content="传统的负载均衡策略一般是: 客户端 -dns -4层库在均衡(HA) -7层负载均衡 -具体的后端服务 这种方式处理服务发现和动态配置比较难搞,比如后端服务动态扩缩容什么的。 一开始的做法肯定是OP人工维护7层负载均衡集群配置...">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -149,6 +157,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            传统的负载均衡策略一般是: 客户端 -dns -4层库在均衡(HA) -7层负载均衡 -具体的后端服务 这种方式处理服务发现和动态配置比较难搞,比如后端服务动态扩缩容什么的。 一开始的做法肯定是OP人工维护7层负载均衡集群配置...
+        </h3>
+        
     </div>
 
     
@@ -167,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2019-05-25T00:00:00Z'>Saturday, May 25, 2019</time>
+                <time class="article-time--published" datetime='2019-05-25T00:00:00Z'>2019年5月25日星期六</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 5 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -195,80 +221,116 @@
 <p>kubernetes集群中具体工作的pod是由service做负载均衡和服务发现的，而service的外部发现策略通常有NodePort，Kube-proxy以及Ingress。对于内部服务暴露给外部，NodePort基本上是不好用的，因为本来Port就有限，而且如果是web服务(80,443)，需要接dns的，开在30000+端口以上，还得在外部做一个四层负载均衡，这样就很烦。Kube-proxy用在调试环境还行，同样有以上问题，所以Ingress是更好的选择。</p>
 <p>nginx-ingress采用了nginx-lua模块实现upstream动态修正，无需reload nginx，可以解决上述提到的2x worker导致性能下降问题。且结合了service的pods自动发现(coredns)，轻松简单的完成很多过去很麻烦的任务。</p>
 <p>首先在上篇blog里我们已经有了一个k8s集群，然后我们创建ingress-nginx相关的api对象</p>
-<pre tabindex="0"><code>wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
-kubectl apply -f mandatory.yaml
-
-#会创建好相应的ingress-nginx controller和rbac相关api
-[root@xxxxxxxx ingress-nginx]# kubectl get pods -n ingress-nginx
-NAME                                        READY   STATUS    RESTARTS   AGE
-nginx-ingress-controller-5694ccb578-hwj2j   1/1     Running   0          3h11m
-</code></pre><p>然后我们创建一个ingress的service，用ExternalIP的方式暴露给集群外部</p>
-<pre tabindex="0"><code>vim externalIp-ingress-service.yaml
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: ingress-nginx
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-spec:
-  ports:
-    - name: http
-      port: 80
-      protocol: TCP
-    - name: https
-      port: 443
-      protocol: TCP
-  selector:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-  externalIPs:
-    #这里填写你的k8s masterip
-    - 10.1.33.159
-
-#将创建出如下服务
-[root@xxxxxxxxxxxx ingress-nginx]# kubectl get service -n ingress-nginx
-NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
-ingress-nginx   ClusterIP   10.96.139.222   10.1.33.159   80/TCP,443/TCP   3h12m
-</code></pre><p>接下来我们就可以创建具体的ingress对象了</p>
-<pre tabindex="0"><code>vim rook-ceph-ingress.yaml
-
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: rook-ceph-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: &#34;false&#34;
-  #要暴露的service对应的命名空间  
-  namespace: rook-ceph
-spec:
-  rules:
-  #这里按需配置,就是nginx的配置方法,具体查下ingress-nginx的项目文档
-  - host: k8s-ceph-dashboard.calmkart.com
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: rook-ceph-mgr-dashboard
-          servicePort: 8443
-
-kubectl apply -f rook-ceph-ingress.yaml
-#这个ingress将自动发现rook-ceph命名空间中的rook-ceph-mgr-dashboard服务，并将之作负载均衡对外暴露
-[root@xxxxxxxxxxx ingress]# kubectl get service -n rook-ceph
-NAME                      TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
-rook-ceph-mgr             ClusterIP   10.99.37.148             9283/TCP            3h48m
-rook-ceph-mgr-dashboard   ClusterIP   10.110.163.110           8443/TCP            3h48m
-rook-ceph-mon-a           ClusterIP   10.103.5.55              6789/TCP,3300/TCP   3h49m
-rook-ceph-mon-b           ClusterIP   10.104.22.199            6789/TCP,3300/TCP   3h49m
-rook-ceph-mon-c           ClusterIP   10.110.80.82             6789/TCP,3300/TCP   3h49m
-</code></pre><p>然后我们查看一下ingress状态</p>
-<pre tabindex="0"><code>[root@xxxxxxxxxx ingress]# kubectl get ingress -n rook-ceph
-NAME                HOSTS                                ADDRESS       PORTS   AGE
-rook-ceph-ingress   k8s-ceph-dashboard.calmkart.com   10.1.33.159   80      170m
-</code></pre><p>这样就没问题了 最后我们把dns记录k8s-ceph-dashboard.calmkart.com指向10.1.33.159</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
+</span></span><span class="line"><span class="cl">kubectl apply -f mandatory.yaml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#会创建好相应的ingress-nginx controller和rbac相关api</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>root@xxxxxxxx ingress-nginx<span class="o">]</span><span class="c1"># kubectl get pods -n ingress-nginx</span>
+</span></span><span class="line"><span class="cl">NAME                                        READY   STATUS    RESTARTS   AGE
+</span></span><span class="line"><span class="cl">nginx-ingress-controller-5694ccb578-hwj2j   1/1     Running   <span class="m">0</span>          3h11m
+</span></span></code></pre></div><p>然后我们创建一个ingress的service，用ExternalIP的方式暴露给集群外部</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="l">vim externalIp-ingress-service.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Service</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">ingress-nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">ingress-nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app.kubernetes.io/name</span><span class="p">:</span><span class="w"> </span><span class="l">ingress-nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app.kubernetes.io/part-of</span><span class="p">:</span><span class="w"> </span><span class="l">ingress-nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">http</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l">TCP</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">https</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">443</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l">TCP</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app.kubernetes.io/name</span><span class="p">:</span><span class="w"> </span><span class="l">ingress-nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app.kubernetes.io/part-of</span><span class="p">:</span><span class="w"> </span><span class="l">ingress-nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">externalIPs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#这里填写你的k8s masterip</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="m">10.1.33.159</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c">#将创建出如下服务</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">[</span><span class="l">root@xxxxxxxxxxxx ingress-nginx]# kubectl get service -n ingress-nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">ingress-nginx   ClusterIP   10.96.139.222   10.1.33.159   80/TCP,443/TCP   3h12m</span><span class="w">
+</span></span></span></code></pre></div><p>接下来我们就可以创建具体的ingress对象了</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="l">vim rook-ceph-ingress.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">extensions/v1beta1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Ingress</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph-ingress</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">nginx.ingress.kubernetes.io/ssl-redirect</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;false&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c">#要暴露的service对应的命名空间  </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">rules</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c">#这里按需配置,就是nginx的配置方法,具体查下ingress-nginx的项目文档</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-ceph-dashboard.calmkart.com</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">http</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">paths</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">backend</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">serviceName</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph-mgr-dashboard</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">servicePort</span><span class="p">:</span><span class="w"> </span><span class="m">8443</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">kubectl apply -f rook-ceph-ingress.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c">#这个ingress将自动发现rook-ceph命名空间中的rook-ceph-mgr-dashboard服务，并将之作负载均衡对外暴露</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">[</span><span class="l">root@xxxxxxxxxxx ingress]# kubectl get service -n rook-ceph</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">NAME                      TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">rook-ceph-mgr             ClusterIP   10.99.37.148             9283/TCP            3h48m</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">rook-ceph-mgr-dashboard   ClusterIP   10.110.163.110           8443/TCP            3h48m</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">rook-ceph-mon-a           ClusterIP   10.103.5.55              6789/TCP,3300/TCP   3h49m</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">rook-ceph-mon-b           ClusterIP   10.104.22.199            6789/TCP,3300/TCP   3h49m</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">rook-ceph-mon-c           ClusterIP   10.110.80.82             6789/TCP,3300/TCP   3h49m</span><span class="w">
+</span></span></span></code></pre></div><p>然后我们查看一下ingress状态</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">[</span>root@xxxxxxxxxx ingress<span class="o">]</span><span class="c1"># kubectl get ingress -n rook-ceph</span>
+</span></span><span class="line"><span class="cl">NAME                HOSTS                                ADDRESS       PORTS   AGE
+</span></span><span class="line"><span class="cl">rook-ceph-ingress   k8s-ceph-dashboard.calmkart.com   10.1.33.159   <span class="m">80</span>      170m
+</span></span></code></pre></div><p>这样就没问题了 最后我们把dns记录k8s-ceph-dashboard.calmkart.com指向10.1.33.159</p>
 <p>搞定。</p>
+<div class="archived-comments">
+<h2>历史评论 (8 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>duboops</strong> (2019-05-25 18:19)</div>
+<div class="comment-body">楼主采用的K8s负载均衡策略在性能上会优于传统的均衡策略么？</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-05-29 17:05)</div>
+<div class="comment-body">我这个例子里基本上不会，因为实际上都是用的nginx作负载均衡.但在内部coredns的性能上可能会有一些提升.不过网络环境中的性能瓶颈一般不会出在负载均衡层.</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>hukerlet</strong> (2019-06-10 20:50)</div>
+<div class="comment-body">看了楼主的文章，感觉您从事的工作是做基础架构么，好些文章写的真好，感觉您对k8s研究的很透彻。小弟刚从事运维工作没多久，最近工作中用到了容器，但对这方面是一知半解，不知道您能否抽空写些docker方面的文章呢，感激不尽。</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-06-11 11:05)</div>
+<div class="comment-body">读书吧，入门《每天5分钟玩转docker》，进阶《Docker容器与容器云(第二版)》</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>linda_zhang</strong> (2019-06-27 16:20)</div>
+<div class="comment-body">博主好，我是互动出版的约稿编辑，有幸阅读到您博客上的文章，感觉您的文章内容偏向入记录整理在工作中碰到的案例，内容质量上挺不错的，要是加以整理想必质量会更胜一筹，不知道您有没有考虑过将博客文章再次归纳整理下，并新增相关章节，集结出版呢，互动出版社主要是面向广大互联网读者推出相关技术书籍，目前年发行册数超过百万，在互联网读者中有较大的影响力。期待博主拨冗回复，详叙具体事宜。我的邮箱：329647550#qq.com  (注：发送邮件时请将#号转为@)</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>xiaohua</strong> (2019-07-09 19:55)</div>
+<div class="comment-body">楼主，我有个问题想向您请教下，我个人想往某一个技术方向去发展，比如成为k8s专家、或者mysql专家，但是感觉只钻研一个方向会不会以后的路会很窄，不知道您怎么看。</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-07-16 11:11)</div>
+<div class="comment-body">看是哪种钻研了.讲道理一个某单方面的专家,其他方面也不会说完全不会.面学片精吧.</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>xiaohua</strong> (2019-07-17 11:43)</div>
+<div class="comment-body">嗯嗯，您说的对，我也觉得往专家发展应该触类旁通，精通一点，也要了解其他的，要不然就是空中楼阁了，谢谢您的建议</div>
+</div>
+</div>
 </section>
 
 
@@ -295,6 +357,18 @@ rook-ceph-ingress   k8s-ceph-dashboard.calmkart.com   10.1.33.159   80      170m
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -306,7 +380,7 @@ rook-ceph-ingress   k8s-ceph-dashboard.calmkart.com   10.1.33.159   80      170m
     
 
 <aside class="related-content--wrapper">
-    <h2 class="section-title">Related content</h2>
+    <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
             
@@ -372,53 +446,16 @@ rook-ceph-ingress   k8s-ceph-dashboard.calmkart.com   10.1.33.159   80      170m
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -429,8 +466,8 @@ rook-ceph-ingress   k8s-ceph-dashboard.calmkart.com   10.1.33.159   80      170m
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

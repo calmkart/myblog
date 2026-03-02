@@ -1,6 +1,7 @@
 ---
 title: "saltstack的安装和基本使用"
 date: 2017-11-29
+description: "saltstack可用于批量管理集群,用的是c/s架构，master管理多个minion 测试系统：debian8.7 一.安装master 1.添加apt key"
 categories: 
   - "计算机"
 tags: 
@@ -18,13 +19,13 @@ saltstack可用于批量管理集群,用的是c/s架构，master管理多个mini
 
 1.添加apt key
 
-```
+```bash
 wget -O - https://repo.saltstack.com/apt/debian/8/amd64/latest/SALTSTACK-GPG-KEY.pub | sudo apt-key add -
 ```
 
 <!--more--> 2.将saltstack源添加进apt源
 
-```
+```bash
 vi /etc/apt/sources.list
 #添加saltstack源
 deb http://repo.saltstack.com/apt/debian/8/amd64/latest jessie main
@@ -32,13 +33,13 @@ deb http://repo.saltstack.com/apt/debian/8/amd64/latest jessie main
 
 3.更新apt
 
-```
+```bash
 apt-get update
 ```
 
 4.安装master端相关组件
 
-```
+```bash
 apt-get install salt-api
 apt-get install salt-cloud
 apt-get install salt-master
@@ -50,7 +51,7 @@ apt-get install salt-syndic
 
 5.配置master
 
-```
+```bash
 vi /etc/salt/master
 ####################常见配置如下####################
 #指定master，冒号后有一个空格
@@ -90,7 +91,7 @@ pillar_roots:
 
 6.启动master
 
-```
+```bash
 systemctl start salt-master
 ```
 
@@ -98,13 +99,13 @@ systemctl start salt-master
 
 1.安装salt-minion
 
-```
+```bash
 apt-get install salt-minion
 ```
 
 2.配置minion相关信息
 
-```
+```bash
 vi /etc/salt/minion
 
 ###################以下为常见设置###########################
@@ -144,7 +145,7 @@ pillar_roots:
 
 3.启动minion
 
-```
+```bash
 systemctl start salt-minion
 ```
 
@@ -152,7 +153,7 @@ systemctl start salt-minion
 
 1.配置key
 
-```
+```bash
 #查看当前所有的key
 salt-key
 
@@ -171,7 +172,7 @@ salt-key -d minion_id
 
 2.测试是否连通
 
-```
+```bash
 #测试所有minion的连通性
 salt '*' test.ping
 
@@ -181,7 +182,7 @@ salt 'minion_id' test.ping
 
 3.常用命令
 
-```
+```bash
 #salt cmd.run用于让minion批量执行命令
 salt '*' cmd.run 'ifconfig'
 salt 'minion_id' cmd.run 'ifconfig'

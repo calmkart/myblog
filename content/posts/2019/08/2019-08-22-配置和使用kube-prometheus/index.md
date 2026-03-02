@@ -1,6 +1,7 @@
 ---
 title: "配置和使用kube-prometheus"
 date: 2019-08-22
+description: "我们在k8s集群中使用云原生的promethues通常需要用到coreos的prometheus-operater，它可以方便的帮助我们在k8s中部署和配置使用prometheus。但prometheus并不是开箱即用的..."
 categories: 
   - "计算机"
 tags: 
@@ -19,14 +20,14 @@ tags:
 
 首先是部署，还是非常简单的，我们先将kube-prometheus的仓库clone下来
 
-```
+```bash
 git clone https://github.com/coreos/kube-prometheus.git
 
 ```
 
 然后根据官方文档操作即可
 
-```
+```bash
 $ kubectl create -f manifests/
 
 # It can take a few seconds for the above 'create manifests' command to fully create the following resources, so verify the resources are ready before proceeding.
@@ -39,7 +40,7 @@ $ kubectl apply -f manifests/ # This command sometimes may need to be done twice
 
 这里将自动为我们部署prometheus，alertmanager和grafana。我们接下来可以通过port-forward也可以通过ingress将服务暴露出来
 
-```
+```bash
 Prometheus
 
 $ kubectl --namespace monitoring port-forward svc/prometheus-k8s 9090
@@ -62,7 +63,7 @@ Then access via http://localhost:9093
 
 或者编写ingress
 
-```
+```yaml
 # ingress-monitor.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -99,17 +100,17 @@ spec:
 
 ```
 
-然后我们就可以访问到prometheus,alertmanager和grafana的服务页面了 [![](images/prometheus.jpg)](http://www.calmkart.com/wp-content/uploads/2019/08/prometheus.jpg)
+然后我们就可以访问到prometheus,alertmanager和grafana的服务页面了 ![](images/prometheus.jpg)
 
-[![](images/alert-manager.jpg)](http://www.calmkart.com/wp-content/uploads/2019/08/alert-manager.jpg)
+![](images/alert-manager.jpg)
 
-[![](images/grafana.jpg)](http://www.calmkart.com/wp-content/uploads/2019/08/grafana.jpg)
+![](images/grafana.jpg)
 
 这里prometheus已经集成了一些k8s相关的exporter和kubernetes-mixin的报警规则，我们可以从prometheus的status->rules和status->target中查看到。
 
 接下来，我们部署[push-gateway](https://github.com/helm/charts/tree/master/stable/prometheus-pushgateway)
 
-```
+```bash
 #可以参考我这里NodePort的values参数,也可以自行设置
 # values.yaml
 
@@ -234,7 +235,7 @@ podDisruptionBudget:
 
 1.实现接入内部的target 无论是外部或内部的target都需要一个metrics-server目标，对于内部target而言，一般是一个服务，比如服务calm-server 在prometheus-operater的使用方式中，有一个crd叫serviceMonitor，我们创建一个新的serviceMonitor就创建了一个prometheus的target 我们首先查看monitoring命名空间中已有的serviceMonitor(既prometheus target)
 
-```
+```bash
 [xxx@xxxxx]# kubectl get servicemonitors.monitoring.coreos.com -n monitoring
 NAME                      AGE
 alertmanager              23d
@@ -255,7 +256,7 @@ prometheus-pushgateway    19d
 
 我们创建一个新的serviceMonitor,将calm-server的/metrics作为target \# calm-server-serviceMonitor.yaml
 
-```
+```yaml
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -288,7 +289,7 @@ spec:
 
 2.实现接入外部target 实现了接入内部的target，那么，k8s集群外部的服务想要接入该怎么办呢？当然还是通过监控k8s集群内service的方式，不是service对应的是一个外部的endpoint对象。下面我们将以calm-server服务为例，说明如何通过k8s的endpoint外部对象接入外部target监控。 首先我们创建一个endpoint对象
 
-```
+```yaml
 # calm-server-endpoint.yaml
 apiVersion: v1
 kind: Endpoints
@@ -307,7 +308,7 @@ subsets:
 
 我们将ip和port替换成我们的外部服务，apply后就创建了一个endpoint api对象，我们可以通过kubectl get endpoints查看
 
-```
+```bash
 [xxx@xxxxxxx]# kubectl get endpoints
 NAME                                  ENDPOINTS                                                           AGE
 calm-server-metrics                   10.41.13.17:6789                                                    19d
@@ -318,7 +319,7 @@ push-gateway-prometheus-pushgateway   10.240.224.15:9091                        
 
 这里需要注意的是,endpoint对象是不区分namespaces的 接着，我们创建一个service，service的选择器选择calm-server-metrics这个外部endpoint
 
-```
+```yaml
 # calm-server-metrics-service.yaml
 
 apiVersion: v1
@@ -349,7 +350,7 @@ kube-prometheus官方文档推荐的方式是使用[jsonnet](https://jsonnet.org
 
 1.首先是prometheus的alert rules，我们可以通过修改prometheus-rules.yaml文件修改。 2.其次是alertmanager的config,我们可以修改alertmanager-secret.yaml文件,注意，这是一个secret对象，内容经过了base64加密，我们应该先将内容解密再做修改，修改后再加密替换即可。 3.最后是grafana的配置修改，参考了grafana官方的docker image之后，我们可以先修改grafana-deployment.yaml文件，为其增加一个volume,配置如下
 
-```
+```yaml
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
@@ -527,7 +528,7 @@ spec:
 
 其实就是将一个叫grafana-config的configMap作为volumeMount到/etc/grafana下。 然后我们创建这个configMap
 
-```
+```yaml
 # grafana-configmap.yaml
 
 apiVersion: v1
@@ -554,12 +555,12 @@ data:
 
 另外还有关于如何为grafana增加plugin等等话题，可以参考官方的相关资料。 就简单介绍到这里吧。
 
----
+<div class="archived-comments">
 
-## 历史评论 (1 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **曰..曰** (2019-08-26 19:35)
->
-> 牛逼的彭董，碾压我等底层劳苦大众，我是服的
+<h2>历史评论 (1 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>曰..曰</strong> (2019-08-26 19:35)</div>
+<div class="comment-body">牛逼的彭董，碾压我等底层劳苦大众，我是服的</div>
+</div>
+</div>

@@ -1,6 +1,7 @@
 ---
 title: "python操作ldap"
 date: 2018-09-28
+description: "封装了一个python的ldap常用操作类 首先pip装库 然后开始代码部分"
 categories: 
   - "计算机"
 tags: 
@@ -13,13 +14,13 @@ tags:
 
 首先pip装库
 
-```
+```bash
 pip install python-ldap
 ```
 
 然后开始代码部分 <!--more-->
 
-```
+```python
 # -*- coding:utf-8 -*-
 from __future__ import absolute_import
 
@@ -142,7 +143,7 @@ class MyLdap():
 
 使用时
 
-```
+```python
 ldap_client = MyLdap(ldap_url, base_dn, admin, password)
 ```
 

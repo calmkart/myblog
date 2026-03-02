@@ -1,14 +1,17 @@
 ---
 title: "一个自解析nginx upstream和location并检测连通性的web系统"
 date: 2018-07-23
-tags: 
+description: "最近做的一个小web系统，主要的思路是，怎样才能将nginx集群的海量配置文件,包括server和upstream及location等完全对象化 想做的东西就类似于httpdns，将nginx的海量配置文件对象化，或者考虑能不能数据库化..."
+categories:
+  - "计算机"
+tags:
   - "nginx"
   - "运维开发"
 ---
 
-最近做的一个小web系统，主要的思路是，怎样才能将nginx集群的海量配置文件,包括server和upstream及location等完全对象化 想做的东西就类似于httpdns，将nginx的海量配置文件对象化，或者考虑能不能数据库化 现在的功能只是解析所有nginx配置文件,自动读取upstream列表和location中proxy\_pass,然后做连接性追踪 当然,追踪列表也可自定义添加,在admin后台配置即可 最终效果图 ![custom](images/custom.png) ![back](images/back.png) <!--more--> git地址 [https://github.com/calmkart/check\_port](https://github.com/calmkart/check_port)
+最近做的一个小web系统，主要的思路是，怎样才能将nginx集群的海量配置文件,包括server和upstream及location等完全对象化 想做的东西就类似于httpdns，将nginx的海量配置文件对象化，或者考虑能不能数据库化 现在的功能只是解析所有nginx配置文件,自动读取upstream列表和location中proxy_pass,然后做连接性追踪 当然,追踪列表也可自定义添加,在admin后台配置即可 最终效果图 <!-- 图片已丢失: custom.png --> <!-- 图片已丢失: back.png --> <!--more--> git地址 [https://github.com/calmkart/check_port](https://github.com/calmkart/check_port)
 
-```
+```nginx
 #大致部署过程
 pip install -r pip.text
 #创建checkport数据库

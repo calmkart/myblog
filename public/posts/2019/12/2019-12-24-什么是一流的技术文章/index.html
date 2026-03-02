@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="这两天读Google的《SRE》时看到一段话\n今天，我们能感受到整个行业都在鼓吹厚颜无耻的&quot;代码拿来主义&quot;(just show me the code)。开源社区内部正在形成一种&quot;不要问我问题&quot;的风气&hellip;&hellip;&hellip;&hellip;.这本书中没有万能药，没有什么东西能解决一切问题，但是这恰恰是本书的宗旨：相比最后的软件结果，架构设计而言，真实的设计过程，作者本身的思考经历更有价值。实现细节永远只是短暂存在的，但是文档化的设计过程却是****无价之宝。\u00a0&ndash; 《Google SRE 运维解秘》\n深以为然，不禁让我想到了过去学习张磊老师《深入剖析Kubernetes》时曾看到张磊老师回复课后留言时说过的一句话\n直接讲源码是不负责任也是逃避困难的做法。（大意）\n什么是一流的技术文章？绝不是一上来就开始贴源码画流程图深入到每一个函数。\n相比具体的实现，掌握其思想，掌握其设计理念&mdash;为什么这样设计？架构为什么这样演进？更为重要。当然，要能将这些理念和演进历程传授给读者，更需要扎实的技术和文字功底。这远比上来就连篇累牍贴源码更困难也更有意义。\nTalk is not cheap.\n向每一个真诚分享的技术人致谢。\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="从Google SRE一书中的观点出发，探讨什么才是一流的技术文章。">
 <title>什么是一流的技术文章？</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="什么是一流的技术文章？">
-<meta property='og:description' content="这两天读Google的《SRE》时看到一段话\n今天，我们能感受到整个行业都在鼓吹厚颜无耻的&quot;代码拿来主义&quot;(just show me the code)。开源社区内部正在形成一种&quot;不要问我问题&quot;的风气&hellip;&hellip;&hellip;&hellip;.这本书中没有万能药，没有什么东西能解决一切问题，但是这恰恰是本书的宗旨：相比最后的软件结果，架构设计而言，真实的设计过程，作者本身的思考经历更有价值。实现细节永远只是短暂存在的，但是文档化的设计过程却是****无价之宝。\u00a0&ndash; 《Google SRE 运维解秘》\n深以为然，不禁让我想到了过去学习张磊老师《深入剖析Kubernetes》时曾看到张磊老师回复课后留言时说过的一句话\n直接讲源码是不负责任也是逃避困难的做法。（大意）\n什么是一流的技术文章？绝不是一上来就开始贴源码画流程图深入到每一个函数。\n相比具体的实现，掌握其思想，掌握其设计理念&mdash;为什么这样设计？架构为什么这样演进？更为重要。当然，要能将这些理念和演进历程传授给读者，更需要扎实的技术和文字功底。这远比上来就连篇累牍贴源码更困难也更有意义。\nTalk is not cheap.\n向每一个真诚分享的技术人致谢。\n">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="什么是一流的技术文章？">
+<meta property='og:description' content="从Google SRE一书中的观点出发，探讨什么才是一流的技术文章。">
 <meta property='og:url' content='http://localhost:1313/posts/2019/12/2019-12-24-%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%80%E6%B5%81%E7%9A%84%E6%8A%80%E6%9C%AF%E6%96%87%E7%AB%A0/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='感悟' /><meta property='article:tag' content='杂感' /><meta property='article:published_time' content='2019-12-24T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2019-12-24T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="什么是一流的技术文章？">
-<meta name="twitter:description" content="这两天读Google的《SRE》时看到一段话\n今天，我们能感受到整个行业都在鼓吹厚颜无耻的&quot;代码拿来主义&quot;(just show me the code)。开源社区内部正在形成一种&quot;不要问我问题&quot;的风气&hellip;&hellip;&hellip;&hellip;.这本书中没有万能药，没有什么东西能解决一切问题，但是这恰恰是本书的宗旨：相比最后的软件结果，架构设计而言，真实的设计过程，作者本身的思考经历更有价值。实现细节永远只是短暂存在的，但是文档化的设计过程却是****无价之宝。\u00a0&ndash; 《Google SRE 运维解秘》\n深以为然，不禁让我想到了过去学习张磊老师《深入剖析Kubernetes》时曾看到张磊老师回复课后留言时说过的一句话\n直接讲源码是不负责任也是逃避困难的做法。（大意）\n什么是一流的技术文章？绝不是一上来就开始贴源码画流程图深入到每一个函数。\n相比具体的实现，掌握其思想，掌握其设计理念&mdash;为什么这样设计？架构为什么这样演进？更为重要。当然，要能将这些理念和演进历程传授给读者，更需要扎实的技术和文字功底。这远比上来就连篇累牍贴源码更困难也更有意义。\nTalk is not cheap.\n向每一个真诚分享的技术人致谢。\n">
+<meta name="twitter:description" content="从Google SRE一书中的观点出发，探讨什么才是一流的技术文章。">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -149,6 +157,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            从Google SRE一书中的观点出发，探讨什么才是一流的技术文章。
+        </h3>
+        
     </div>
 
     
@@ -167,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2019-12-24T00:00:00Z'>Tuesday, December 24, 2019</time>
+                <time class="article-time--published" datetime='2019-12-24T00:00:00Z'>2019年12月24日星期二</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -195,7 +221,6 @@
 <p>相比具体的实现，掌握其思想，掌握其设计理念&mdash;为什么这样设计？架构为什么这样演进？更为重要。当然，要能将这些理念和演进历程传授给读者，更需要扎实的技术和文字功底。这远比上来就连篇累牍贴源码更困难也更有意义。</p>
 <p><strong>Talk is not cheap.</strong></p>
 <p>向每一个真诚分享的技术人致谢。</p>
-
 </section>
 
 
@@ -210,6 +235,18 @@
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -223,53 +260,16 @@
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -280,8 +280,8 @@
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

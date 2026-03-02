@@ -1,6 +1,7 @@
 ---
 title: "grafana dashboard django bug修复"
 date: 2019-08-14
+description: "grafana的官方有很多用户提供的dashboard样本,其中关于django的有 https://grafana.com/grafana/dashboards/9528 对应的django-metric是https://github..."
 categories: 
   - "计算机"
 tags: 
@@ -19,7 +20,7 @@ grafana的官方有很多用户提供的dashboard样本,其中关于django的有
 
 修改后的dashboard json如下
 
-```
+```json
 {
   "annotations": {
     "list": [

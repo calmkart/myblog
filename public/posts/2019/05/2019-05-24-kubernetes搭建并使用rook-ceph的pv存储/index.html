@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下.\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下.">
 <title>kubernetes搭建并使用rook/ceph的pv存储</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="kubernetes搭建并使用rook/ceph的pv存储">
-<meta property='og:description' content="k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下.\n">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="kubernetes搭建并使用rook/ceph的pv存储">
+<meta property='og:description' content="k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下.">
 <meta property='og:url' content='http://localhost:1313/posts/2019/05/2019-05-24-kubernetes%E6%90%AD%E5%BB%BA%E5%B9%B6%E4%BD%BF%E7%94%A8rook-ceph%E7%9A%84pv%E5%AD%98%E5%82%A8/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='ceph' /><meta property='article:tag' content='k8s' /><meta property='article:tag' content='kubernetes' /><meta property='article:tag' content='rook' /><meta property='article:tag' content='分布式存储' /><meta property='article:tag' content='运维开发' /><meta property='article:published_time' content='2019-05-24T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2019-05-24T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="kubernetes搭建并使用rook/ceph的pv存储">
-<meta name="twitter:description" content="k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下.\n">
+<meta name="twitter:description" content="k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下.">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -149,6 +157,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下.
+        </h3>
+        
     </div>
 
     
@@ -167,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2019-05-24T00:00:00Z'>Friday, May 24, 2019</time>
+                <time class="article-time--published" datetime='2019-05-24T00:00:00Z'>2019年5月24日星期五</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -188,131 +214,139 @@
     
     
     <p>k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下.</p>
-<p>首先有一个三个节点的k8s集群 <a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/05/111.png"  target="_blank" rel="noopener"
-    ><img src="images/111.png" alt="" />
-</a> 首先创建rook-ceph-common</p>
-<pre tabindex="0"><code>wget https://raw.githubusercontent.com/rook/rook/master/cluster/examples/kubernetes/ceph/common.yaml
-kubectl apply -f common.yaml
-</code></pre><p>然后创建rook-ceph-operator</p>
-<pre tabindex="0"><code>wget https://raw.githubusercontent.com/rook/rook/release-1.0/cluster/examples/kubernetes/ceph/operator.yaml
-kubectl apply -f operator.yaml
-</code></pre><p>以上两步基本上不会出啥问题,标准配置 接下来创建cluster的问题比较多,贴上我的配置</p>
-<pre tabindex="0"><code>vim cluster.yaml
-
-apiVersion: ceph.rook.io/v1
-kind: CephCluster
-metadata:
-  name: rook-ceph
-  namespace: rook-ceph
-spec:
-  cephVersion:
-    image: ceph/ceph:v14.2.1-20190430
-    allowUnsupported: true
-  #设置data路径到自己规划的路径
-  dataDirHostPath: /home/shared/rook
-  mon:
-    count: 3
-    allowMultiplePerNode: true
-  dashboard:
-    enabled: true
-    port: 8443
-    urlPrefix: /
-    #关闭https
-    ssl: false
-  network:
-    #如要在k8s集群外使用,这里可以打开
-    hostNetwork: false
-  rbdMirroring:
-    workers: 0
-  storage:
-    #全节点使用
-    useAllNodes: true
-    useAllDevices: false
-    deviceFilter:
-    config:
-      osdsPerDevice: &#34;1&#34;
-    directories:
-    - path: /home/shared/rook
-</code></pre><pre tabindex="0"><code>kubectl apply -f cluster.yaml
-</code></pre><p>查看部署情况 <a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/05/2.png"  target="_blank" rel="noopener"
-    ><img src="images/2.png" alt="" />
-</a> 这样就基本上没问题了,k8s中的每个Node会启两个pod(rook-ceph-agent和rook-discover),并且mgr和osd都没问题。 然后给ceph-dashboard提供NodePort的外部访问service</p>
-<pre tabindex="0"><code>vim dashboard-external-http.yaml
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: rook-ceph-mgr-dashboard-external-https
-  namespace: rook-ceph
-  labels:
-    app: rook-ceph-mgr
-    rook_cluster: rook-ceph
-spec:
-  ports:
-  - name: dashboard
-    port: 8443
-    protocol: TCP
-    targetPort: 8443
-  selector:
-    app: rook-ceph-mgr
-    rook_cluster: rook-ceph
-  sessionAffinity: None
-  type: NodePort
-</code></pre><pre tabindex="0"><code>kubectl apply -f dashboard-external-https.yaml
-</code></pre><p>然后查看下service的情况,是否正常 <a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/05/3.png"  target="_blank" rel="noopener"
-    ><img src="images/3.png" alt="" />
-</a> 这样就对了,可以访问一下http://<!-- raw HTML omitted -->:<!-- raw HTML omitted -->，看看是不是能进ceph-dashboard</p>
+<p>首先有一个三个节点的k8s集群 <img src="images/111.png" alt="" />
+ 首先创建rook-ceph-common</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">wget https://raw.githubusercontent.com/rook/rook/master/cluster/examples/kubernetes/ceph/common.yaml
+</span></span><span class="line"><span class="cl">kubectl apply -f common.yaml
+</span></span></code></pre></div><p>然后创建rook-ceph-operator</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">wget https://raw.githubusercontent.com/rook/rook/release-1.0/cluster/examples/kubernetes/ceph/operator.yaml
+</span></span><span class="line"><span class="cl">kubectl apply -f operator.yaml
+</span></span></code></pre></div><p>以上两步基本上不会出啥问题,标准配置 接下来创建cluster的问题比较多,贴上我的配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="l">vim cluster.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">ceph.rook.io/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">CephCluster</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">cephVersion</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">ceph/ceph:v14.2.1-20190430</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">allowUnsupported</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c">#设置data路径到自己规划的路径</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">dataDirHostPath</span><span class="p">:</span><span class="w"> </span><span class="l">/home/shared/rook</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">mon</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">allowMultiplePerNode</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">dashboard</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">8443</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">urlPrefix</span><span class="p">:</span><span class="w"> </span><span class="l">/</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#关闭https</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">ssl</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">network</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#如要在k8s集群外使用,这里可以打开</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">hostNetwork</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">rbdMirroring</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">workers</span><span class="p">:</span><span class="w"> </span><span class="m">0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">storage</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#全节点使用</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">useAllNodes</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">useAllDevices</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">deviceFilter</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">config</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">osdsPerDevice</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">directories</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/home/shared/rook</span><span class="w">
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl apply -f cluster.yaml
+</span></span></code></pre></div><p>查看部署情况 <img src="images/2.png" alt="" />
+ 这样就基本上没问题了,k8s中的每个Node会启两个pod(rook-ceph-agent和rook-discover),并且mgr和osd都没问题。 然后给ceph-dashboard提供NodePort的外部访问service</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="l">vim dashboard-external-http.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Service</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph-mgr-dashboard-external-https</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph-mgr</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">rook_cluster</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">dashboard</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">8443</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l">TCP</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="m">8443</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph-mgr</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">rook_cluster</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">sessionAffinity</span><span class="p">:</span><span class="w"> </span><span class="l">None</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">NodePort</span><span class="w">
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl apply -f dashboard-external-https.yaml
+</span></span></code></pre></div><p>然后查看下service的情况,是否正常 <img src="images/3.png" alt="" />
+ 这样就对了,可以访问一下http://<k8s-master-ip>:<ceph-dashboard-dashboard>，看看是不是能进ceph-dashboard</p>
 <p>一般情况下问题不大,查看admin的默认密码</p>
-<pre tabindex="0"><code>kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath=&#34;{[&#39;data&#39;][&#39;password&#39;]}&#34; | base64 --decode &amp;&amp; echo
-</code></pre><p>但是admin登陆进去了之后，肯定会疯狂500错误，查了下官方的issue，这里有bug。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o <span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&#34;{[&#39;data&#39;][&#39;password&#39;]}&#34;</span> <span class="p">|</span> base64 --decode <span class="o">&amp;&amp;</span> <span class="nb">echo</span>
+</span></span></code></pre></div><p>但是admin登陆进去了之后，肯定会疯狂500错误，查了下官方的issue，这里有bug。</p>
 <p><strong>解决办法是:</strong> <strong>在dashboard里创建一个新role角色(右上角用户管理,roles)，把权限全钩上，然后去掉iscsi的所有权限。</strong> <strong>接着创建一个新用户,绑定这个新的role角色,最后用新用户登陆</strong></p>
 <p>接着创建pool和storage用于自动生成pvc匹配的pv</p>
-<pre tabindex="0"><code>vim storageclass.yaml
-
-apiVersion: ceph.rook.io/v1
-kind: CephBlockPool
-metadata:
-  name: replicapool
-  namespace: rook-ceph
-spec:
-  replicated:
-    size: 2
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-   name: rook-ceph-block
-provisioner: ceph.rook.io/block
-parameters:
-  blockPool: replicapool
-  clusterNamespace: rook-ceph
-  fstype: xfs
-</code></pre><pre tabindex="0"><code>kubectl apply -f storagecalss.yaml
-</code></pre><p>创建pool和storage之后通过dashboard或者命令 kubectl get cephcluster -n rook-ceph 查看一下集群是否health，如果是health就没毛病了</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="l">vim storageclass.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">ceph.rook.io/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">CephBlockPool</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">replicapool</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">replicated</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nn">---</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">storage.k8s.io/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">StorageClass</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph-block</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">provisioner</span><span class="p">:</span><span class="w"> </span><span class="l">ceph.rook.io/block</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">parameters</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">blockPool</span><span class="p">:</span><span class="w"> </span><span class="l">replicapool</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">clusterNamespace</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">fstype</span><span class="p">:</span><span class="w"> </span><span class="l">xfs</span><span class="w">
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl apply -f storagecalss.yaml
+</span></span></code></pre></div><p>创建pool和storage之后通过dashboard或者命令 kubectl get cephcluster -n rook-ceph 查看一下集群是否health，如果是health就没毛病了</p>
 <p>最后测试一下申请一个pvc看看是否会自动生成pv与之绑定</p>
-<pre tabindex="0"><code>apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: jenkins-home
-  namespace: kube-ops
-  labels:
-    app: jenkins-home
-spec:
-  storageClassName: rook-ceph-block
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 20Gi
-</code></pre><p><a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/05/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_dd2a2f8b-10fb-4f3f-8d21-bbaa31a4ba7d.png"  target="_blank" rel="noopener"
-    ><img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_dd2a2f8b-10fb-4f3f-8d21-bbaa31a4ba7d.png" alt="" />
-</a> 可见，管用了.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">PersistentVolumeClaim</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">jenkins-home</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">kube-ops</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">jenkins-home</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">storageClassName</span><span class="p">:</span><span class="w"> </span><span class="l">rook-ceph-block</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">accessModes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">ReadWriteOnce</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">requests</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">storage</span><span class="p">:</span><span class="w"> </span><span class="l">20Gi</span><span class="w">
+</span></span></span></code></pre></div><p><img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_dd2a2f8b-10fb-4f3f-8d21-bbaa31a4ba7d.png" alt="" />
+ 可见，管用了.</p>
 <p><strong>外加一些小tips:</strong></p>
 <p>如果rook-ceph配置有误需要还原重新配置,一定要遵循官方的清理步骤 <a class="link" href="https://rook.github.io/docs/rook/v1.0/ceph-teardown.html"  target="_blank" rel="noopener"
     >https://rook.github.io/docs/rook/v1.0/ceph-teardown.html</a> 切记要删除掉所有k8s的node上配置的data文件夹,不然会导致新集群无法初始化.</p>
 <p>创建不出pod很多都是权限原因或者node无法调度,需要检查下rbac权限设置或者各个node的情况.</p>
 <p>最后附上rook项目的github地址: <a class="link" href="https://github.com/rook/rook"  target="_blank" rel="noopener"
     >https://github.com/rook/rook</a></p>
+<div class="archived-comments">
+<h2>历史评论 (2 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>huan</strong> (2019-05-28 16:30)</div>
+<div class="comment-body">大佬又开始搞K8S，我要跟着学习学习</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-05-29 17:06)</div>
+<div class="comment-body">学学学,建议买课,极客时间张磊博士的深入剖析k8s很好</div>
+</div>
+</div>
 </section>
 
 
@@ -335,6 +369,18 @@ spec:
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -346,7 +392,7 @@ spec:
     
 
 <aside class="related-content--wrapper">
-    <h2 class="section-title">Related content</h2>
+    <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
             
@@ -412,53 +458,16 @@ spec:
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -469,8 +478,8 @@ spec:
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

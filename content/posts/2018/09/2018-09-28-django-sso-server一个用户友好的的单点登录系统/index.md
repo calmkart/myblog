@@ -1,6 +1,7 @@
 ---
 title: "Django sso server(一个用户友好的的单点登录系统)"
 date: 2018-09-28
+description: "一个用户友好的Django单点登录(SSO)系统的设计与实现总结。"
 categories: 
   - "计算机"
 tags: 
@@ -12,7 +13,7 @@ tags:
 
 最近写了一个单点登录系统,这里做一些总结.
 
-[![](images/5C45207A-AF09-475D-ACD6-E732CFE1596D.png)](http://www.calmkart.com/wp-content/uploads/2018/09/5C45207A-AF09-475D-ACD6-E732CFE1596D.png) github地址:(欢迎来star一发^\_^) [https://github.com/calmkart/Django-sso-server](https://github.com/calmkart/Django-sso-server) <!--more-->
+![](images/5C45207A-AF09-475D-ACD6-E732CFE1596D.png) github地址:(欢迎来star一发^_^) [https://github.com/calmkart/Django-sso-server](https://github.com/calmkart/Django-sso-server) <!--more-->
 
 ### 1.流程原理
 
@@ -24,22 +25,22 @@ tags:
 
 用户登录sso系统，验证ldap账号成功后，将用户信息以
 
-```
+```bash
 now = time.time()
 user_info = "{0}|||||{1}".format(ldap_username, now)
 
 ```
 
-的形式,通过rsa公钥加密写入cookie中，key为sso\_user
+的形式,通过rsa公钥加密写入cookie中，key为sso_user
 
-```
+```python
 response.set_cookie('sso_user', rsa.crypto(
                 public_key, user_info), domain=options.objects.all()[0].cookie_domain)
 ```
 
 其他需要接入sso系统的子系统可以通过sso系统的api，来判断用户是否可以登录
 
-```
+```python
 url:      /api/auth
 method:   POST
 post_json_data:  {"sso_user":cookie}
@@ -49,7 +50,7 @@ return:     {"status":True/False, "msg":username}
 
 本sso系统已提供了相关装饰器，可在管理后台-添加站点的帮助栏查看
 
-```
+```python
 import requests
 
 def auth_login(func):
@@ -98,52 +99,44 @@ sso系统的登录鉴权api为"http://sso域名/api/auth"(如"http://sso.calmkar
 
 #### <3>[关于python操作rsa,aes加解密](http://www.calmkart.com/?p=353)
 
----
+<div class="archived-comments">
 
-## 历史评论 (9 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **wzzzx** (2019-03-04 15:01)
->
-> 请问idap是啥哦，百度谷歌都看不懂
-
-  > ↳ **calmkart** (2019-03-07 10:55)
-  >
-  > ldap
-  > https://zh.wikipedia.org/zh-hans/%E8%BD%BB%E5%9E%8B%E7%9B%AE%E5%BD%95%E8%AE%BF%E9%97%AE%E5%8D%8F%E8%AE%AE
-
-> **( 曰..曰 )** (2019-04-18 17:23)
->
-> 牛逼轰轰的彭董，不知道psc还招不招实习生，求大佬赏口饭吃啊
-
-  > ↳ **calmkart** (2019-04-19 11:23)
-  >
-  > 彭董快饿死了，总裁谢行行好吧
-
-> **lixueming** (2019-06-01 15:23)
->
-> 大神好，我是19届的应届生，今年校招拿了些offer，都是跟Python相关的，我对Python的熟悉程度只是会用，算不上很了解，比较纠结的是，一个offer是偏运维开发，一个是做广告系统业务研发，不知道这2个方向以后的发展怎么样，会不会有什么坑呢，烦请大神指点下，不胜感激！
-
-  > ↳ **calmkart** (2019-06-03 10:35)
-  >
-  > 看公司,python的业务开发其实面不太广,但在算法方面应用比较多.
-  > 纯业务开发写来写去写久了很烦,但是运开也有很多方向,总的来说如果是一般运维前景是肯定不如开发的
-  > 要是能做更有技术含量的东西,比如paas云,或者去google之类的sre,肯定比一般开发要强很多.
-  > 运开的使命其实就是革了传统op的命,开发既运维。
-  > 语言也不是太重要,python/c/c++/js/go肯定都要会的.
-  > 应届还是更多考虑公司吧.
-
-> **路过** (2019-06-16 20:39)
->
-> 这个不同域名可以支持吗， 比如 sso.abc.com 和 client.efg.com之间可以实现吗
-
-  > ↳ **calmkart** (2019-06-17 13:21)
-  >
-  > 这个项目的实现方式是基于cookie携带信息的，所以不支持跨域登陆，要支持跨域需要用其他手段实现。
-
-    > ↳ **路过** (2019-06-17 20:35)
-    >
-    > 好的，谢谢。
-    >
-    > 我还是尝试走跳转把token带过去再验证。
+<h2>历史评论 (9 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>wzzzx</strong> (2019-03-04 15:01)</div>
+<div class="comment-body">请问idap是啥哦，百度谷歌都看不懂</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-03-07 10:55)</div>
+<div class="comment-body">ldap https://zh.wikipedia.org/zh-hans/%E8%BD%BB%E5%9E%8B%E7%9B%AE%E5%BD%95%E8%AE%BF%E9%97%AE%E5%8D%8F%E8%AE%AE</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>( 曰..曰 )</strong> (2019-04-18 17:23)</div>
+<div class="comment-body">牛逼轰轰的彭董，不知道psc还招不招实习生，求大佬赏口饭吃啊</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-04-19 11:23)</div>
+<div class="comment-body">彭董快饿死了，总裁谢行行好吧</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>lixueming</strong> (2019-06-01 15:23)</div>
+<div class="comment-body">大神好，我是19届的应届生，今年校招拿了些offer，都是跟Python相关的，我对Python的熟悉程度只是会用，算不上很了解，比较纠结的是，一个offer是偏运维开发，一个是做广告系统业务研发，不知道这2个方向以后的发展怎么样，会不会有什么坑呢，烦请大神指点下，不胜感激！</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-06-03 10:35)</div>
+<div class="comment-body">看公司,python的业务开发其实面不太广,但在算法方面应用比较多. 纯业务开发写来写去写久了很烦,但是运开也有很多方向,总的来说如果是一般运维前景是肯定不如开发的 要是能做更有技术含量的东西,比如paas云,或者去google之类的sre,肯定比一般开发要强很多. 运开的使命其实就是革了传统op的命,开发既运维。 语言也不是太重要,python/c/c++/js/go肯定都要会的. 应届还是更多考虑公司吧.</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>路过</strong> (2019-06-16 20:39)</div>
+<div class="comment-body">这个不同域名可以支持吗， 比如 sso.abc.com 和 client.efg.com之间可以实现吗</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-06-17 13:21)</div>
+<div class="comment-body">这个项目的实现方式是基于cookie携带信息的，所以不支持跨域登陆，要支持跨域需要用其他手段实现。</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>路过</strong> (2019-06-17 20:35)</div>
+<div class="comment-body">好的，谢谢。 我还是尝试走跳转把token带过去再验证。</div>
+</div>
+</div>

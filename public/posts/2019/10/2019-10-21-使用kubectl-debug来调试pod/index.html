@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="在k8s环境中,我们经常会碰到各种疑难杂症.比如下面这个例子: 某pod无法启动,查看日志显示原来是init时容器无法拉取某个外部网络上的包.我们exec登陆容器后试图调试下产生这个问题的原因,我们输入ping xxx.xxx.xxx,但sh直接提示&quot;找不到ping命令&quot;,甚至直接无法exec到一个没有sh的容器中. 这样的情况我们该怎么办呢？这里有一个解决类似问题的调试工具kubectl-debug\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="在k8s环境中,我们经常会碰到各种疑难杂症.比如下面这个例子: 某pod无法启动,查看日志显示原来是init时容器无法拉取某个外部网络上的包.我们exec登陆容器后试图调试下产生这个问题的原因,我们输入ping xxx.xxx.xxx...">
 <title>使用kubectl-debug来调试pod</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="使用kubectl-debug来调试pod">
-<meta property='og:description' content="在k8s环境中,我们经常会碰到各种疑难杂症.比如下面这个例子: 某pod无法启动,查看日志显示原来是init时容器无法拉取某个外部网络上的包.我们exec登陆容器后试图调试下产生这个问题的原因,我们输入ping xxx.xxx.xxx,但sh直接提示&quot;找不到ping命令&quot;,甚至直接无法exec到一个没有sh的容器中. 这样的情况我们该怎么办呢？这里有一个解决类似问题的调试工具kubectl-debug\n">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="使用kubectl-debug来调试pod">
+<meta property='og:description' content="在k8s环境中,我们经常会碰到各种疑难杂症.比如下面这个例子: 某pod无法启动,查看日志显示原来是init时容器无法拉取某个外部网络上的包.我们exec登陆容器后试图调试下产生这个问题的原因,我们输入ping xxx.xxx.xxx...">
 <meta property='og:url' content='http://localhost:1313/posts/2019/10/2019-10-21-%E4%BD%BF%E7%94%A8kubectl-debug%E6%9D%A5%E8%B0%83%E8%AF%95pod/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='golang' /><meta property='article:tag' content='k8s' /><meta property='article:tag' content='kubectl-debug' /><meta property='article:tag' content='kubernetes' /><meta property='article:tag' content='sidecar' /><meta property='article:tag' content='云原生' /><meta property='article:tag' content='容器' /><meta property='article:tag' content='调试' /><meta property='article:published_time' content='2019-10-21T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2019-10-21T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="使用kubectl-debug来调试pod">
-<meta name="twitter:description" content="在k8s环境中,我们经常会碰到各种疑难杂症.比如下面这个例子: 某pod无法启动,查看日志显示原来是init时容器无法拉取某个外部网络上的包.我们exec登陆容器后试图调试下产生这个问题的原因,我们输入ping xxx.xxx.xxx,但sh直接提示&quot;找不到ping命令&quot;,甚至直接无法exec到一个没有sh的容器中. 这样的情况我们该怎么办呢？这里有一个解决类似问题的调试工具kubectl-debug\n">
+<meta name="twitter:description" content="在k8s环境中,我们经常会碰到各种疑难杂症.比如下面这个例子: 某pod无法启动,查看日志显示原来是init时容器无法拉取某个外部网络上的包.我们exec登陆容器后试图调试下产生这个问题的原因,我们输入ping xxx.xxx.xxx...">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -149,6 +157,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            在k8s环境中,我们经常会碰到各种疑难杂症.比如下面这个例子: 某pod无法启动,查看日志显示原来是init时容器无法拉取某个外部网络上的包.我们exec登陆容器后试图调试下产生这个问题的原因,我们输入ping xxx.xxx.xxx...
+        </h3>
+        
     </div>
 
     
@@ -167,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2019-10-21T00:00:00Z'>Monday, October 21, 2019</time>
+                <time class="article-time--published" datetime='2019-10-21T00:00:00Z'>2019年10月21日星期一</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -192,24 +218,36 @@
 <p>kubectl-debug的原理也很简单,因为docker容器是基于namespace做的隔离,所以可以创建一个新的预装好了各种调试工具的容器,直接加入待调试容器的namespace中,这样就可以与待调试pod共享各类栈,实现方便调试.(有点类似于k8s中的sidecar设计模式,但是使用的是一个用后既销的独立容器)</p>
 <p>这里介绍一下简单的使用方式 我们可以直接下载编译好的二进制文件包 <a class="link" href="https://github.com/aylei/kubectl-debug/releases"  target="_blank" rel="noopener"
     >https://github.com/aylei/kubectl-debug/releases</a> 也可以clone源代码自己做编译(可以获得更多最新修复和更新)</p>
-<pre tabindex="0"><code># 这里要开启docker,因为是通过docker编译的
-git clone https://github.com/aylei/kubectl-debug.git
-cd kubectl-debug
-make
-</code></pre><p>最简单的使用方式</p>
-<pre tabindex="0"><code>kubectl-debug POD_NAME
-</code></pre><p>kubectl-debug将拉取nicolaka/netshoot镜像作为默认的debug镜像. 过一小会拉取镜像的功夫,我们创建好了一个插入待调试pod namespace中的调试容器,并且已经获取了stdin和stdout,我们就可以进行调试了. 调试完成后exit退出,kubectl-debug将完成相关的清理工作.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 这里要开启docker,因为是通过docker编译的</span>
+</span></span><span class="line"><span class="cl">git clone https://github.com/aylei/kubectl-debug.git
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> kubectl-debug
+</span></span><span class="line"><span class="cl">make
+</span></span></code></pre></div><p>最简单的使用方式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="cl">kubectl-debug POD_NAME<span class="err">
+</span></span></span></code></pre></div><p>kubectl-debug将拉取nicolaka/netshoot镜像作为默认的debug镜像. 过一小会拉取镜像的功夫,我们创建好了一个插入待调试pod namespace中的调试容器,并且已经获取了stdin和stdout,我们就可以进行调试了. 调试完成后exit退出,kubectl-debug将完成相关的清理工作.</p>
 <p>当然,如果觉得默认的nicolaka/netshoot调试镜像不好用,也可以使用自己的私有镜像进行调试</p>
-<pre tabindex="0"><code># 使用私有仓库镜像,并设置私有仓库使用的kubernetes secret
-# secret data原文请设置为 {Username: , Password: }
-# 默认secret_name为kubectl-debug-registry-secret,默认namspace为default
-kubectl-debug POD_NAME --image calmkart/netshoot:latest --registry-secret-name  --registry-secret-namespace 
-</code></pre><p>甚至如果原pod已经无法启动了,我们可以使用fork模式fork出一个新的待调试pod用于调试(自动替换掉entry-point)</p>
-<pre tabindex="0"><code>kubectl debug POD_NAME --fork
-</code></pre><p>更多功能可以参考<a class="link" href="https://github.com/aylei/kubectl-debug/blob/master/docs/zh-cn.md"  target="_blank" rel="noopener"
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 使用私有仓库镜像,并设置私有仓库使用的kubernetes secret</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># secret data原文请设置为 {Username: , Password: }</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 默认secret_name为kubectl-debug-registry-secret,默认namspace为default</span>
+</span></span><span class="line"><span class="cl">kubectl-debug POD_NAME --image calmkart/netshoot:latest --registry-secret-name  --registry-secret-namespace 
+</span></span></code></pre></div><p>甚至如果原pod已经无法启动了,我们可以使用fork模式fork出一个新的待调试pod用于调试(自动替换掉entry-point)</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl debug POD_NAME --fork
+</span></span></code></pre></div><p>更多功能可以参考<a class="link" href="https://github.com/aylei/kubectl-debug/blob/master/docs/zh-cn.md"  target="_blank" rel="noopener"
     >kubectl-debug官方文档</a></p>
 <p>总之这个工具还是非常实用的,我也参与添加了一些增强功能和bug修复.k8s官方据说也将在未来版本增加<a class="link" href="https://github.com/kubernetes/enhancements/issues/277"  target="_blank" rel="noopener"
     >临时容器</a>功能以支持调试,虽然不知道啥时候能用上,但还是期待的.</p>
+<div class="archived-comments">
+<h2>历史评论 (2 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>myway</strong> (2019-10-23 16:59)</div>
+<div class="comment-body">请问下如何调试生产环境的k8s呢，用kubectl-debug会不会有什么风险？</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-10-24 20:12)</div>
+<div class="comment-body">你只要不乱搞，看不出有啥风险。 乱搞,ex: 1.乱给forkpod打label 2.在debug container里一顿神操作 之类.</div>
+</div>
+</div>
 </section>
 
 
@@ -236,6 +274,18 @@ kubectl-debug POD_NAME --image calmkart/netshoot:latest --registry-secret-name  
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -247,7 +297,7 @@ kubectl-debug POD_NAME --image calmkart/netshoot:latest --registry-secret-name  
     
 
 <aside class="related-content--wrapper">
-    <h2 class="section-title">Related content</h2>
+    <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
             
@@ -313,53 +363,16 @@ kubectl-debug POD_NAME --image calmkart/netshoot:latest --registry-secret-name  
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -370,8 +383,8 @@ kubectl-debug POD_NAME --image calmkart/netshoot:latest --registry-secret-name  
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

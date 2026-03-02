@@ -1,0 +1,48 @@
+// 归档评论区域样式
+.archived-comments {
+    margin-top: 2.5em;
+    padding-top: 1.5em;
+    border-top: 2px dashed var(--card-separator-color, #e0e0e0);
+    opacity: 0.8;
+
+    h2 {
+        font-size: 1.15rem;
+        color: var(--card-text-color-secondary, #999);
+        margin-bottom: 0.5em;
+    }
+
+    .comment-notice {
+        font-style: italic;
+        font-size: 0.85rem;
+        color: var(--card-text-color-secondary, #999);
+        margin-bottom: 1.2em;
+    }
+
+    .comment-item {
+        margin: 0.8em 0;
+        padding: 0.6em 1em;
+        border-left: 3px solid var(--accent-color);
+        background: var(--card-background);
+        border-radius: 0 6px 6px 0;
+        font-size: 0.9rem;
+
+        .comment-meta {
+            font-size: 0.8rem;
+            color: var(--card-text-color-secondary, #999);
+            margin-bottom: 0.3em;
+
+            strong {
+                color: var(--card-text-color-main);
+            }
+        }
+
+        .comment-body {
+            color: var(--card-text-color-main);
+            line-height: 1.6;
+        }
+    }
+
+    .comment-reply {
+        margin-left: 1.5em;
+    }
+}

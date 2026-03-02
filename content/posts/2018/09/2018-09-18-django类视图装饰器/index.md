@@ -1,6 +1,7 @@
 ---
 title: "django类视图装饰器"
 date: 2018-09-18
+description: "一点关于django类视图装饰器的小笔记。 django类视图是很常用的，对于传统的函数视图来说，装饰器可以直接装饰函数，但类视图，装饰器无法直接装饰类方法。 比较了几种常见的解决方法,个人觉得比较优雅的解决方法如下："
 categories: 
   - "计算机"
 tags: 
@@ -16,7 +17,7 @@ django类视图是很常用的，对于传统的函数视图来说，装饰器�
 
 比较了几种常见的解决方法,个人觉得比较优雅的解决方法如下：
 
-```
+```python
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -33,11 +34,11 @@ class login(View):
 
 <!--more-->
 
-既如以上代码，将装饰器函数传给method\_decorator方法，直接修饰视图类方法。
+既如以上代码，将装饰器函数传给method_decorator方法，直接修饰视图类方法。
 
-也可直接修饰视图类，对于需要修饰的方法，用name参数的形式传入method\_decorator中即可，但感觉不够优雅。
+也可直接修饰视图类，对于需要修饰的方法，用name参数的形式传入method_decorator中即可，但感觉不够优雅。
 
-```
+```python
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -52,9 +53,9 @@ class login(View):
         return render(request, 'login.html', {"displayName":username, "admin_flag":admin_flag})
 ```
 
-需要稍微注意的是，csrf\_exempt跨站排除装饰器，只能修饰在类视图的dispatch方法上，既原始写法如下：
+需要稍微注意的是，csrf_exempt跨站排除装饰器，只能修饰在类视图的dispatch方法上，既原始写法如下：
 
-```
+```python
 class login(View):
     
     @method_decorator(csrf_exempt)
@@ -70,16 +71,16 @@ class login(View):
 
 既如上文。
 
----
+<div class="archived-comments">
 
-## 历史评论 (2 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **( 曰..曰 )** (2018-09-19 16:06)
->
-> 大佬，大佬，这绝对是大佬
-
-  > ↳ **calmkart** (2018-09-20 19:02)
-  >
-  > 总裁谢你说大佬就大佬好吧
+<h2>历史评论 (2 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>( 曰..曰 )</strong> (2018-09-19 16:06)</div>
+<div class="comment-body">大佬，大佬，这绝对是大佬</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2018-09-20 19:02)</div>
+<div class="comment-body">总裁谢你说大佬就大佬好吧</div>
+</div>
+</div>

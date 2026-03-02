@@ -1,6 +1,7 @@
 ---
 title: "vim/nginx语法高亮插件"
 date: 2017-11-20
+description: "1.vim语法高亮插件molokai"
 categories: 
   - "计算机"
 tags: 
@@ -11,7 +12,7 @@ tags:
 
 1.vim语法高亮插件molokai
 
-```
+```bash
 cd ~/.vim/
 mkdir ./colors
 cd ./colos
@@ -23,7 +24,7 @@ echo colorscheme molokai  >> ~/.vimrc
 
 2.nginx语法高亮插件nginx.vim
 
-```
+```bash
 mkdir -pv  ~/.vim/syntax
 cd ~/.vim/syntax
 wget -O nginx.vim  http://www.vim.org/scripts/download_script.php?src_id=19394

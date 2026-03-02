@@ -1,6 +1,7 @@
 ---
 title: "《Python进阶》读书笔记(3)"
 date: 2017-11-16
+description: "16.异常处理 捕获所有异常："
 categories: 
   - "计算机"
   - "读书笔记"
@@ -12,14 +13,14 @@ tags:
 
 捕获所有异常：
 
-```
+```python
 except Exception as e:
     print e
 ```
 
 <!--more--> try/except/finally语句:
 
-```
+```yaml
 try:
     #首先执行
     pass
@@ -33,7 +34,7 @@ finally:
 
 try/else语句：
 
-```
+```yaml
 try:
     #首先执行
     pass
@@ -49,14 +50,14 @@ finally:
 
 python2:
 
-```
+```python
 python -m SimpleHTTPServer 8888
 #在当前文件夹建立简易http服务器，端口为8888
 ```
 
 python3:
 
-```
+```python
 python -m http.server 8888
 #在当前文件夹建立简易http服务器，端口为8888
 ```
@@ -67,7 +68,7 @@ python -m http.server 8888
 
 可以用于打印dict等数据结构，比较漂亮
 
-```
+```python
 from pprint import pprint
     pprint({a:1,b:2})
 ```
@@ -78,7 +79,7 @@ else仅在for循环正常结束时才会执行，当for循环被break时，不�
 
 举例说明：
 
-```
+```bash
 for item in container:
     if search_something(item):
         # Found it!
@@ -93,7 +94,7 @@ else:
 
 with块可在有异常时，自动释放句柄
 
-```
+```python
 with open('a.txt','r+') as f:
 #打开成功才会获得句柄，有异常则自动释放
     file = f.read()
@@ -101,7 +102,7 @@ with open('a.txt','r+') as f:
 
 用io.open可制定编码方式：
 
-```
+```python
 import io 
 with io.open('a.txt', 'w', encoding='utf-8') as f:
     f.write(.......)
@@ -113,7 +114,7 @@ with io.open('a.txt', 'w', encoding='utf-8') as f:
 
 与生成器有点像，但生成器是返回可迭代对象的生产者，而携程是接受参数的消费者。
 
-```
+```python
 def grep(pattern):
     print("Searching for", pattern)
     while True:
@@ -124,7 +125,7 @@ def grep(pattern):
 
 我们通过send方法传送给协程数据，然后用close()方法来关闭
 
-```
+```python
 search = grep('coroutine')
 next(search)
 #output: Searching for coroutine

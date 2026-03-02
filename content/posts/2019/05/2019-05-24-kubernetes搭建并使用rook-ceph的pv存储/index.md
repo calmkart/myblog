@@ -1,6 +1,7 @@
 ---
 title: "kubernetes搭建并使用rook/ceph的pv存储"
 date: 2019-05-24
+description: "k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下."
 categories: 
   - "计算机"
 tags: 
@@ -12,9 +13,9 @@ tags:
   - "运维开发"
 ---
 
-k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下. <!--more--> 首先有一个三个节点的k8s集群 [![](images/111.png)](http://www.calmkart.com/wp-content/uploads/2019/05/111.png) 首先创建rook-ceph-common 
+k8s中pod的存储在非单节点是不支持hostpath的，都得用各种分布式存储来实现.每个pvc对应的pv手工创建也很不现实,试了下rook-ceph分布式存储的搞法，感觉不错.其中也还是遇到了很多坑,这里稍微记录一下. <!--more--> 首先有一个三个节点的k8s集群 ![](images/111.png) 首先创建rook-ceph-common 
 
-```
+```bash
 wget https://raw.githubusercontent.com/rook/rook/master/cluster/examples/kubernetes/ceph/common.yaml
 kubectl apply -f common.yaml
 
@@ -22,7 +23,7 @@ kubectl apply -f common.yaml
 
 然后创建rook-ceph-operator
 
-```
+```bash
 wget https://raw.githubusercontent.com/rook/rook/release-1.0/cluster/examples/kubernetes/ceph/operator.yaml
 kubectl apply -f operator.yaml
 
@@ -30,7 +31,7 @@ kubectl apply -f operator.yaml
 
 以上两步基本上不会出啥问题,标准配置 接下来创建cluster的问题比较多,贴上我的配置
 
-```
+```yaml
 vim cluster.yaml
 
 apiVersion: ceph.rook.io/v1
@@ -70,13 +71,13 @@ spec:
 
 ```
 
-```
+```bash
 kubectl apply -f cluster.yaml
 ```
 
-查看部署情况 [![](images/2.png)](http://www.calmkart.com/wp-content/uploads/2019/05/2.png) 这样就基本上没问题了,k8s中的每个Node会启两个pod(rook-ceph-agent和rook-discover),并且mgr和osd都没问题。 然后给ceph-dashboard提供NodePort的外部访问service 
+查看部署情况 ![](images/2.png) 这样就基本上没问题了,k8s中的每个Node会启两个pod(rook-ceph-agent和rook-discover),并且mgr和osd都没问题。 然后给ceph-dashboard提供NodePort的外部访问service 
 
-```
+```yaml
 vim dashboard-external-http.yaml
 
 apiVersion: v1
@@ -100,16 +101,16 @@ spec:
   type: NodePort
 ```
 
-```
+```bash
 kubectl apply -f dashboard-external-https.yaml
 
 ```
 
-然后查看下service的情况,是否正常 [![](images/3.png)](http://www.calmkart.com/wp-content/uploads/2019/05/3.png) 这样就对了,可以访问一下http://<k8s-master-ip>:<ceph-dashboard-dashboard>，看看是不是能进ceph-dashboard
+然后查看下service的情况,是否正常 ![](images/3.png) 这样就对了,可以访问一下http://<k8s-master-ip>:<ceph-dashboard-dashboard>，看看是不是能进ceph-dashboard
 
 一般情况下问题不大,查看admin的默认密码
 
-```
+```bash
 kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath="{['data']['password']}" | base64 --decode && echo
 ```
 
@@ -119,7 +120,7 @@ kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath="{['dat
 
 接着创建pool和storage用于自动生成pvc匹配的pv
 
-```
+```yaml
 vim storageclass.yaml
 
 apiVersion: ceph.rook.io/v1
@@ -142,7 +143,7 @@ parameters:
   fstype: xfs
 ```
 
-```
+```bash
 kubectl apply -f storagecalss.yaml
 
 ```
@@ -151,7 +152,7 @@ kubectl apply -f storagecalss.yaml
 
 最后测试一下申请一个pvc看看是否会自动生成pv与之绑定
 
-```
+```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -168,7 +169,7 @@ spec:
       storage: 20Gi
 ```
 
-[![](images/企业微信截图_dd2a2f8b-10fb-4f3f-8d21-bbaa31a4ba7d.png)](http://www.calmkart.com/wp-content/uploads/2019/05/企业微信截图_dd2a2f8b-10fb-4f3f-8d21-bbaa31a4ba7d.png) 可见，管用了.
+![](images/企业微信截图_dd2a2f8b-10fb-4f3f-8d21-bbaa31a4ba7d.png) 可见，管用了.
 
 **外加一些小tips:**
 
@@ -178,16 +179,16 @@ spec:
 
 最后附上rook项目的github地址: [https://github.com/rook/rook](https://github.com/rook/rook)
 
----
+<div class="archived-comments">
 
-## 历史评论 (2 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **huan** (2019-05-28 16:30)
->
-> 大佬又开始搞K8S，我要跟着学习学习
-
-  > ↳ **calmkart** (2019-05-29 17:06)
-  >
-  > 学学学,建议买课,极客时间张磊博士的深入剖析k8s很好
+<h2>历史评论 (2 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>huan</strong> (2019-05-28 16:30)</div>
+<div class="comment-body">大佬又开始搞K8S，我要跟着学习学习</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-05-29 17:06)</div>
+<div class="comment-body">学学学,建议买课,极客时间张磊博士的深入剖析k8s很好</div>
+</div>
+</div>

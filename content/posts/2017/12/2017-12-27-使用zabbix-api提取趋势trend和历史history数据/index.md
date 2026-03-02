@@ -1,6 +1,7 @@
 ---
 title: "使用zabbix api提取趋势(trend)和历史(history)数据"
 date: 2017-12-27
+description: "zabbix restful api说明见官网文档 https://www.zabbix.com/documentation/4.0/zh/manual/api/reference/apiinfo 使用了github上封装好的python..."
 categories: 
   - "计算机"
 tags: 
@@ -12,17 +13,17 @@ zabbix restful api说明见官网文档 [https://www.zabbix.com/documentation/4.
 
 使用了github上封装好的python zabbix api,免去了自己造轮子的过程 [https://github.com/lukecyca/pyzabbix](https://github.com/lukecyca/pyzabbix) <!--more-->
 
-这个封装的python zabbix api实现起来也比较简单，主要是用缺省的类\_\_getattr\_\_()方法，调用zabbix的restful api
+这个封装的python zabbix api实现起来也比较简单，主要是用缺省的类__getattr__()方法，调用zabbix的restful api
 
 首先用pip安装pyzabbix
 
-```
+```bash
 pip install pyzabbix
 ```
 
 具体实现获取trend和history代码如下:
 
-```
+```python
 #---coding:utf-8---
 
 from pyzabbix import ZabbixAPI
@@ -95,4 +96,4 @@ class get_net(object):
 
 ```
 
-注： 其中get\_clock()函数用于做linux时间戳转换。
+注： 其中get_clock()函数用于做linux时间戳转换。

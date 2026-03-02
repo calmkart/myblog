@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="封装了一个python的ldap常用操作类\n首先pip装库\npip install python-ldap 然后开始代码部分\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="封装了一个python的ldap常用操作类 首先pip装库 然后开始代码部分">
 <title>python操作ldap</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="python操作ldap">
-<meta property='og:description' content="封装了一个python的ldap常用操作类\n首先pip装库\npip install python-ldap 然后开始代码部分\n">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="python操作ldap">
+<meta property='og:description' content="封装了一个python的ldap常用操作类 首先pip装库 然后开始代码部分">
 <meta property='og:url' content='http://localhost:1313/posts/2018/09/2018-09-28-python%E6%93%8D%E4%BD%9Cldap/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='ldap' /><meta property='article:tag' content='python' /><meta property='article:tag' content='运维开发' /><meta property='article:published_time' content='2018-09-28T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2018-09-28T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="python操作ldap">
-<meta name="twitter:description" content="封装了一个python的ldap常用操作类\n首先pip装库\npip install python-ldap 然后开始代码部分\n">
+<meta name="twitter:description" content="封装了一个python的ldap常用操作类 首先pip装库 然后开始代码部分">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -149,6 +157,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            封装了一个python的ldap常用操作类 首先pip装库 然后开始代码部分
+        </h3>
+        
     </div>
 
     
@@ -167,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2018-09-28T00:00:00Z'>Friday, September 28, 2018</time>
+                <time class="article-time--published" datetime='2018-09-28T00:00:00Z'>2018年9月28日星期五</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -189,128 +215,128 @@
     
     <p>封装了一个python的ldap常用操作类</p>
 <p>首先pip装库</p>
-<pre tabindex="0"><code>pip install python-ldap
-</code></pre><p>然后开始代码部分</p>
-<pre tabindex="0"><code># -*- coding:utf-8 -*-
-from __future__ import absolute_import
-
-import binascii
-import hashlib
-from base64 import b64encode
-
-import ldap
-import ldap.modlist as modlist
-
-from common.common import log
-
-class MyLdap():
-     
-    def __init__(self,ldap_host=None,base_dn=None,user=None,password=None):
-        self.base_dn = base_dn
-        self.ldap_host = ldap_host
-        self.user = user
-        self.password = password
-        try:
-            self.ldapconn = ldap.initialize(ldap_host)
-            self.ldapconn.simple_bind(user,password)
-        except ldap.LDAPError,e:
-            log().error(str(e))
-            print e
-
-    @property
-    def status(self):
-        &#39;&#39;&#39;
-        验证初始化ldap账号密码,以及ldap地址是否正确
-        &#39;&#39;&#39;
-        ldap_client = ldap.initialize(self.ldap_host)
-        try:
-            ldap_client.simple_bind_s(self.user, self.password)
-            ldap_client.unbind_s()
-            return {&#34;status&#34;:True}
-        except Exception as e:
-            log().error(str(e))
-            return {&#34;status&#34;:False, &#34;msg&#34;:&#34;ldap初始化管理员账号密码或ldap地址有误,详情:{0}&#34;.format(str(e))}
-
-    def _ldap_search_dn(self,uid=None):
-        obj = self.ldapconn
-        obj.protocal_version = ldap.VERSION3
-        searchScope = ldap.SCOPE_SUBTREE
-        retrieveAttributes = None 
-        searchFilter = &#34;cn=&#34; + uid
-        
-        try:
-            ldap_result_id = obj.search(self.base_dn, searchScope, searchFilter, retrieveAttributes)
-            result_type, result_data = obj.result(ldap_result_id, 0)
-            if result_type == ldap.RES_SEARCH_ENTRY:
-                return result_data[0][0]
-            else:
-                return None
-        except ldap.LDAPError, e:
-            log().error(str(e))
-
-    def ldap_get_user(self,uid=None):
-        &#39;&#39;&#39;
-        获取ldap用户详情,失败返None
-        &#39;&#39;&#39;
-        obj = self.ldapconn
-        obj.protocal_version = ldap.VERSION3
-        searchScope = ldap.SCOPE_SUBTREE
-        retrieveAttributes = None 
-        searchFilter = &#34;cn=&#34; + uid
-        try:
-            ldap_result_id = obj.search(self.base_dn, searchScope, searchFilter, retrieveAttributes)
-            result_type, result_data = obj.result(ldap_result_id, 0)
-            if result_type == ldap.RES_SEARCH_ENTRY:
-                username = result_data[0][1][&#39;cn&#39;][0]
-                mail = result_data[0][1][&#39;mail&#39;][0]
-                displayName = result_data[0][1][&#39;displayName&#39;][0]
-                sn = result_data[0][1][&#39;sn&#39;][0]
-                result = {&#39;username&#39;:username,&#39;mail&#39;:mail,&#39;displayName&#39;:displayName, &#39;sn&#39;:sn}
-                return result
-            else:
-                return None
-        except ldap.LDAPError, e:
-            log().error(str(e))
-    
-    def ldap_get(self,uid=None,passwd=None):
-        &#39;&#39;&#39;
-        验证ldap账号密码,成功返True,失败返False
-        &#39;&#39;&#39;
-        target_cn = self._ldap_search_dn(uid)
-        if not target_cn:
-            return False   
-        try:
-            client = ldap.initialize(self.ldap_host)
-            client.simple_bind_s(target_cn,passwd)
-            client.unbind_s()
-            return True
-        except ldap.LDAPError,e:
-            log().error(str(e))
-            return False
-
-    
-    def cnupdatepass(self, cn, passwd):
-        &#39;&#39;&#39;
-        更改ldap密码,成功返True,失败返error
-        &#39;&#39;&#39;
-        dn=&#39;cn={0},{1}&#39;.format(cn, self.base_dn)
-        try:
-            result=self.ldapconn.search_s(dn, ldap.SCOPE_SUBTREE, &#39;cn=%s&#39; % cn)
-            oldpass=result[0][1][&#39;userPassword&#39;]
-            oldwifipass=result[0][1][&#39;sambaNTPassword&#39;]
-            newpass=&#39;{MD5}&#39; + b64encode(hashlib.md5(passwd).digest())
-            wifipass=binascii.hexlify(hashlib.new(&#39;md4&#39;, passwd.encode(&#39;utf-16le&#39;)).digest())
-            old={&#39;userPassword&#39;:oldpass,&#39;sambaNTPassword&#39;: oldwifipass}
-            new={&#34;sambaNTPassword&#34;: [wifipass],&#34;userPassword&#34;:[newpass]}
-            mlist = modlist.modifyModlist(old, new)
-            self.ldapconn.modify_s(dn, mlist)
-            return {&#34;status&#34;:True}
-        except ldap.LDAPError as e:
-            log().error(str(e))
-            return {&#34;status&#34;:False, &#34;msg&#34;:&#34;ldap更改密码错误,详情: {0}&#34;.format(str(e))}
-</code></pre><p>使用时</p>
-<pre tabindex="0"><code>ldap_client = MyLdap(ldap_url, base_dn, admin, password)
-</code></pre><p>代码注释已经写的很清楚了感觉,不再写详情了,本文做个备忘</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">pip install python-ldap
+</span></span></code></pre></div><p>然后开始代码部分</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># -*- coding:utf-8 -*-</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">binascii</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">hashlib</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">base64</span> <span class="kn">import</span> <span class="n">b64encode</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">ldap</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">ldap.modlist</span> <span class="k">as</span> <span class="nn">modlist</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">common.common</span> <span class="kn">import</span> <span class="n">log</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MyLdap</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">     
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ldap_host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">base_dn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">user</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">base_dn</span> <span class="o">=</span> <span class="n">base_dn</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">ldap_host</span> <span class="o">=</span> <span class="n">ldap_host</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">ldapconn</span> <span class="o">=</span> <span class="n">ldap</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">ldap_host</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">ldapconn</span><span class="o">.</span><span class="n">simple_bind</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="n">password</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span> <span class="n">ldap</span><span class="o">.</span><span class="n">LDAPError</span><span class="p">,</span><span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span> <span class="n">e</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@property</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">        验证初始化ldap账号密码,以及ldap地址是否正确
+</span></span></span><span class="line"><span class="cl"><span class="s1">        &#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ldap_client</span> <span class="o">=</span> <span class="n">ldap</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ldap_host</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">ldap_client</span><span class="o">.</span><span class="n">simple_bind_s</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">ldap_client</span><span class="o">.</span><span class="n">unbind_s</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;status&#34;</span><span class="p">:</span><span class="kc">True</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;status&#34;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&#34;msg&#34;</span><span class="p">:</span><span class="s2">&#34;ldap初始化管理员账号密码或ldap地址有误,详情:</span><span class="si">{0}</span><span class="s2">&#34;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">_ldap_search_dn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">uid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ldapconn</span>
+</span></span><span class="line"><span class="cl">        <span class="n">obj</span><span class="o">.</span><span class="n">protocal_version</span> <span class="o">=</span> <span class="n">ldap</span><span class="o">.</span><span class="n">VERSION3</span>
+</span></span><span class="line"><span class="cl">        <span class="n">searchScope</span> <span class="o">=</span> <span class="n">ldap</span><span class="o">.</span><span class="n">SCOPE_SUBTREE</span>
+</span></span><span class="line"><span class="cl">        <span class="n">retrieveAttributes</span> <span class="o">=</span> <span class="kc">None</span> 
+</span></span><span class="line"><span class="cl">        <span class="n">searchFilter</span> <span class="o">=</span> <span class="s2">&#34;cn=&#34;</span> <span class="o">+</span> <span class="n">uid</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">ldap_result_id</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_dn</span><span class="p">,</span> <span class="n">searchScope</span><span class="p">,</span> <span class="n">searchFilter</span><span class="p">,</span> <span class="n">retrieveAttributes</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">result_type</span><span class="p">,</span> <span class="n">result_data</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="n">ldap_result_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">result_type</span> <span class="o">==</span> <span class="n">ldap</span><span class="o">.</span><span class="n">RES_SEARCH_ENTRY</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="n">result_data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span> <span class="n">ldap</span><span class="o">.</span><span class="n">LDAPError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">ldap_get_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">uid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">        获取ldap用户详情,失败返None
+</span></span></span><span class="line"><span class="cl"><span class="s1">        &#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ldapconn</span>
+</span></span><span class="line"><span class="cl">        <span class="n">obj</span><span class="o">.</span><span class="n">protocal_version</span> <span class="o">=</span> <span class="n">ldap</span><span class="o">.</span><span class="n">VERSION3</span>
+</span></span><span class="line"><span class="cl">        <span class="n">searchScope</span> <span class="o">=</span> <span class="n">ldap</span><span class="o">.</span><span class="n">SCOPE_SUBTREE</span>
+</span></span><span class="line"><span class="cl">        <span class="n">retrieveAttributes</span> <span class="o">=</span> <span class="kc">None</span> 
+</span></span><span class="line"><span class="cl">        <span class="n">searchFilter</span> <span class="o">=</span> <span class="s2">&#34;cn=&#34;</span> <span class="o">+</span> <span class="n">uid</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">ldap_result_id</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_dn</span><span class="p">,</span> <span class="n">searchScope</span><span class="p">,</span> <span class="n">searchFilter</span><span class="p">,</span> <span class="n">retrieveAttributes</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">result_type</span><span class="p">,</span> <span class="n">result_data</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="n">ldap_result_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">result_type</span> <span class="o">==</span> <span class="n">ldap</span><span class="o">.</span><span class="n">RES_SEARCH_ENTRY</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">username</span> <span class="o">=</span> <span class="n">result_data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;cn&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">                <span class="n">mail</span> <span class="o">=</span> <span class="n">result_data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mail&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">                <span class="n">displayName</span> <span class="o">=</span> <span class="n">result_data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;displayName&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">                <span class="n">sn</span> <span class="o">=</span> <span class="n">result_data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;sn&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">                <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;username&#39;</span><span class="p">:</span><span class="n">username</span><span class="p">,</span><span class="s1">&#39;mail&#39;</span><span class="p">:</span><span class="n">mail</span><span class="p">,</span><span class="s1">&#39;displayName&#39;</span><span class="p">:</span><span class="n">displayName</span><span class="p">,</span> <span class="s1">&#39;sn&#39;</span><span class="p">:</span><span class="n">sn</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="n">result</span>
+</span></span><span class="line"><span class="cl">            <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span> <span class="n">ldap</span><span class="o">.</span><span class="n">LDAPError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">ldap_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">uid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">passwd</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">        验证ldap账号密码,成功返True,失败返False
+</span></span></span><span class="line"><span class="cl"><span class="s1">        &#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">target_cn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ldap_search_dn</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="ow">not</span> <span class="n">target_cn</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="kc">False</span>   
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">client</span> <span class="o">=</span> <span class="n">ldap</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ldap_host</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">client</span><span class="o">.</span><span class="n">simple_bind_s</span><span class="p">(</span><span class="n">target_cn</span><span class="p">,</span><span class="n">passwd</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">client</span><span class="o">.</span><span class="n">unbind_s</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="kc">True</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span> <span class="n">ldap</span><span class="o">.</span><span class="n">LDAPError</span><span class="p">,</span><span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="kc">False</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">cnupdatepass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cn</span><span class="p">,</span> <span class="n">passwd</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">        更改ldap密码,成功返True,失败返error
+</span></span></span><span class="line"><span class="cl"><span class="s1">        &#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">dn</span><span class="o">=</span><span class="s1">&#39;cn=</span><span class="si">{0}</span><span class="s1">,</span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_dn</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ldapconn</span><span class="o">.</span><span class="n">search_s</span><span class="p">(</span><span class="n">dn</span><span class="p">,</span> <span class="n">ldap</span><span class="o">.</span><span class="n">SCOPE_SUBTREE</span><span class="p">,</span> <span class="s1">&#39;cn=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cn</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">oldpass</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;userPassword&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="n">oldwifipass</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;sambaNTPassword&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="n">newpass</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{MD5}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">b64encode</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">passwd</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">            <span class="n">wifipass</span><span class="o">=</span><span class="n">binascii</span><span class="o">.</span><span class="n">hexlify</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;md4&#39;</span><span class="p">,</span> <span class="n">passwd</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-16le&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">            <span class="n">old</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;userPassword&#39;</span><span class="p">:</span><span class="n">oldpass</span><span class="p">,</span><span class="s1">&#39;sambaNTPassword&#39;</span><span class="p">:</span> <span class="n">oldwifipass</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="n">new</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;sambaNTPassword&#34;</span><span class="p">:</span> <span class="p">[</span><span class="n">wifipass</span><span class="p">],</span><span class="s2">&#34;userPassword&#34;</span><span class="p">:[</span><span class="n">newpass</span><span class="p">]}</span>
+</span></span><span class="line"><span class="cl">            <span class="n">mlist</span> <span class="o">=</span> <span class="n">modlist</span><span class="o">.</span><span class="n">modifyModlist</span><span class="p">(</span><span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">ldapconn</span><span class="o">.</span><span class="n">modify_s</span><span class="p">(</span><span class="n">dn</span><span class="p">,</span> <span class="n">mlist</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;status&#34;</span><span class="p">:</span><span class="kc">True</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span> <span class="n">ldap</span><span class="o">.</span><span class="n">LDAPError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;status&#34;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&#34;msg&#34;</span><span class="p">:</span><span class="s2">&#34;ldap更改密码错误,详情: </span><span class="si">{0}</span><span class="s2">&#34;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))}</span>
+</span></span></code></pre></div><p>使用时</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">ldap_client</span> <span class="o">=</span> <span class="n">MyLdap</span><span class="p">(</span><span class="n">ldap_url</span><span class="p">,</span> <span class="n">base_dn</span><span class="p">,</span> <span class="n">admin</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+</span></span></code></pre></div><p>代码注释已经写的很清楚了感觉,不再写详情了,本文做个备忘</p>
 </section>
 
 
@@ -327,6 +353,18 @@ class MyLdap():
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -338,7 +376,7 @@ class MyLdap():
     
 
 <aside class="related-content--wrapper">
-    <h2 class="section-title">Related content</h2>
+    <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
             
@@ -404,53 +442,16 @@ class MyLdap():
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -461,8 +462,8 @@ class MyLdap():
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

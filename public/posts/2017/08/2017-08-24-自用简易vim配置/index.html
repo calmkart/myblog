@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="最常用到的编辑器VIM，记录一下自用简易配置方式，方便需要的时候使用。\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="最常用到的编辑器VIM，记录一下自用简易配置方式，方便需要的时候使用。">
 <title>自用简易VIM配置</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="自用简易VIM配置">
-<meta property='og:description' content="最常用到的编辑器VIM，记录一下自用简易配置方式，方便需要的时候使用。\n">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="自用简易VIM配置">
+<meta property='og:description' content="最常用到的编辑器VIM，记录一下自用简易配置方式，方便需要的时候使用。">
 <meta property='og:url' content='http://localhost:1313/posts/2017/08/2017-08-24-%E8%87%AA%E7%94%A8%E7%AE%80%E6%98%93vim%E9%85%8D%E7%BD%AE/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='linux' /><meta property='article:tag' content='vim' /><meta property='article:published_time' content='2017-08-24T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2017-08-24T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="自用简易VIM配置">
-<meta name="twitter:description" content="最常用到的编辑器VIM，记录一下自用简易配置方式，方便需要的时候使用。\n">
+<meta name="twitter:description" content="最常用到的编辑器VIM，记录一下自用简易配置方式，方便需要的时候使用。">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -149,6 +157,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            最常用到的编辑器VIM，记录一下自用简易配置方式，方便需要的时候使用。
+        </h3>
+        
     </div>
 
     
@@ -167,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2017-08-24T00:00:00Z'>Thursday, August 24, 2017</time>
+                <time class="article-time--published" datetime='2017-08-24T00:00:00Z'>2017年8月24日星期四</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -188,55 +214,55 @@
     
     
     <p>最常用到的编辑器VIM，记录一下自用简易配置方式，方便需要的时候使用。</p>
-<pre tabindex="0"><code>cd
-./.vimrc
-</code></pre><p>./.vimrc</p>
-<pre tabindex="0"><code>&#34;去掉vi的一致性&#34;
-set nocompatible
-&#34; 隐藏滚动条&#34;
-set guioptions-=r
-set guioptions-=L
-set guioptions-=b
-&#34;隐藏顶部标签栏&#34;
-set showtabline=0
-&#34;设置字体&#34;
-set guifont=Monaco:h13
-syntax on    &#34;开启语法高亮&#34;
-set background=dark        &#34;设置背景色&#34;
-set fileformat=unix    &#34;设置以unix的格式保存文件&#34;
-set tabstop=4    &#34;设置table长度&#34;
-set shiftwidth=4        &#34;同上&#34;
-set showmatch    &#34;显示匹配的括号&#34;
-set scrolloff=5        &#34;距离顶部和底部5行&#34;
-set laststatus=2    &#34;命令行为两行&#34;
-set fenc=utf-8      &#34;文件编码&#34;
-set backspace=2
-set mouse=n        &#34;启用鼠标&#34;
-set selection=exclusive
-set selectmode=mouse,key
-set matchtime=5
-set ignorecase        &#34;忽略大小写&#34;
-set incsearch
-set hlsearch        &#34;高亮搜索项&#34;
-set expandtab        &#34;不允许扩展table&#34;
-set autoread
-set list
-set listchars=tab:&gt;-
-set nu
-
-map  :w:!python %
-
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-Plugin &#39;VundleVim/Vundle.vim&#39;
-Plugin &#39;vim-airline/vim-airline&#39;
-call vundle#end()
-
-let g:airline_powerline_fonts = 1
-</code></pre><p>然后安装插件 这里主要安装Vundle管理插件以及界面美化插件vim-airline</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">cd</span>
+</span></span><span class="line"><span class="cl">./.vimrc
+</span></span></code></pre></div><p>./.vimrc</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="s2">&#34;去掉vi的一致性&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">nocompatible</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34; 隐藏滚动条&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">guioptions</span><span class="o">-=</span><span class="nx">r</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">guioptions</span><span class="o">-=</span><span class="nx">L</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">guioptions</span><span class="o">-=</span><span class="nx">b</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;隐藏顶部标签栏&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">showtabline</span><span class="o">=</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;设置字体&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">guifont</span><span class="o">=</span><span class="nx">Monaco</span><span class="o">:</span><span class="nx">h13</span>
+</span></span><span class="line"><span class="cl"><span class="nx">syntax</span> <span class="nx">on</span>    <span class="s2">&#34;开启语法高亮&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">background</span><span class="o">=</span><span class="nx">dark</span>        <span class="s2">&#34;设置背景色&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">fileformat</span><span class="o">=</span><span class="nx">unix</span>    <span class="s2">&#34;设置以unix的格式保存文件&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">tabstop</span><span class="o">=</span><span class="mi">4</span>    <span class="s2">&#34;设置table长度&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">shiftwidth</span><span class="o">=</span><span class="mi">4</span>        <span class="s2">&#34;同上&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">showmatch</span>    <span class="s2">&#34;显示匹配的括号&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">scrolloff</span><span class="o">=</span><span class="mi">5</span>        <span class="s2">&#34;距离顶部和底部5行&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">laststatus</span><span class="o">=</span><span class="mi">2</span>    <span class="s2">&#34;命令行为两行&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">fenc</span><span class="o">=</span><span class="nx">utf</span><span class="o">-</span><span class="mi">8</span>      <span class="s2">&#34;文件编码&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">backspace</span><span class="o">=</span><span class="mi">2</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">mouse</span><span class="o">=</span><span class="nx">n</span>        <span class="s2">&#34;启用鼠标&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">selection</span><span class="o">=</span><span class="nx">exclusive</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">selectmode</span><span class="o">=</span><span class="nx">mouse</span><span class="p">,</span><span class="nx">key</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">matchtime</span><span class="o">=</span><span class="mi">5</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">ignorecase</span>        <span class="s2">&#34;忽略大小写&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">incsearch</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">hlsearch</span>        <span class="s2">&#34;高亮搜索项&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">expandtab</span>        <span class="s2">&#34;不允许扩展table&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">autoread</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">list</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">listchars</span><span class="o">=</span><span class="nx">tab</span><span class="o">:&gt;-</span>
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">nu</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">map</span>  <span class="o">:</span><span class="nx">w</span><span class="o">:!</span><span class="nx">python</span> <span class="o">%</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">set</span> <span class="nx">rtp</span><span class="o">+=~</span><span class="err">/.vim/bundle/Vundle.vim</span>
+</span></span><span class="line"><span class="cl"><span class="nx">call</span> <span class="nx">vundle</span><span class="err">#</span><span class="nx">begin</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Plugin</span> <span class="s1">&#39;VundleVim/Vundle.vim&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Plugin</span> <span class="s1">&#39;vim-airline/vim-airline&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">call</span> <span class="nx">vundle</span><span class="err">#</span><span class="nx">end</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">g</span><span class="o">:</span><span class="nx">airline_powerline_fonts</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span></code></pre></div><p>然后安装插件 这里主要安装Vundle管理插件以及界面美化插件vim-airline</p>
 <p>1.安装Vundle</p>
-<pre tabindex="0"><code>git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-</code></pre><p>VIM下运行 :BundleInstall 进行安装插件 :BundleClean 卸载没有写在./.vimrc中的插件</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+</span></span></code></pre></div><p>VIM下运行 :BundleInstall 进行安装插件 :BundleClean 卸载没有写在./.vimrc中的插件</p>
 <p>2.安装vim-airline Plugin &lsquo;vim-airline/vim-airline&rsquo; 既可</p>
 <p> </p>
 <p> </p>
@@ -256,6 +282,18 @@ let g:airline_powerline_fonts = 1
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -269,53 +307,16 @@ let g:airline_powerline_fonts = 1
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -326,8 +327,8 @@ let g:airline_powerline_fonts = 1
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

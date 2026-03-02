@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="linux进程管理器supervisor是会经常被用到的，但服务器多了之后，每个服务器的进程也不方便管理。同时，supervisor自带的web界面比较简陋，所以尝试了一下官网推荐的一些第三方开源软件，推荐一下这个cesi。 最终效果如下： [ ">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="linux进程管理器supervisor是会经常被用到的，但服务器多了之后，每个服务器的进程也不方便管理。同时，supervisor自带的web界面比较简陋，所以尝试了一下官网推荐的一些第三方开源软件，推荐一下这个cesi...">
 <title>supervisor集中化管理web工具cesi</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="supervisor集中化管理web工具cesi">
-<meta property='og:description' content="linux进程管理器supervisor是会经常被用到的，但服务器多了之后，每个服务器的进程也不方便管理。同时，supervisor自带的web界面比较简陋，所以尝试了一下官网推荐的一些第三方开源软件，推荐一下这个cesi。 最终效果如下： [ ">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="supervisor集中化管理web工具cesi">
+<meta property='og:description' content="linux进程管理器supervisor是会经常被用到的，但服务器多了之后，每个服务器的进程也不方便管理。同时，supervisor自带的web界面比较简陋，所以尝试了一下官网推荐的一些第三方开源软件，推荐一下这个cesi...">
 <meta property='og:url' content='http://localhost:1313/posts/2018/01/2018-01-11-supervisor%E9%9B%86%E4%B8%AD%E5%8C%96%E7%AE%A1%E7%90%86web%E5%B7%A5%E5%85%B7cesi/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='supervisor' /><meta property='article:tag' content='运维' /><meta property='article:published_time' content='2018-01-11T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2018-01-11T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="supervisor集中化管理web工具cesi">
-<meta name="twitter:description" content="linux进程管理器supervisor是会经常被用到的，但服务器多了之后，每个服务器的进程也不方便管理。同时，supervisor自带的web界面比较简陋，所以尝试了一下官网推荐的一些第三方开源软件，推荐一下这个cesi。 最终效果如下： [ ">
+<meta name="twitter:description" content="linux进程管理器supervisor是会经常被用到的，但服务器多了之后，每个服务器的进程也不方便管理。同时，supervisor自带的web界面比较简陋，所以尝试了一下官网推荐的一些第三方开源软件，推荐一下这个cesi...">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -149,6 +157,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            linux进程管理器supervisor是会经常被用到的，但服务器多了之后，每个服务器的进程也不方便管理。同时，supervisor自带的web界面比较简陋，所以尝试了一下官网推荐的一些第三方开源软件，推荐一下这个cesi...
+        </h3>
+        
     </div>
 
     
@@ -167,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2018-01-11T00:00:00Z'>Thursday, January 11, 2018</time>
+                <time class="article-time--published" datetime='2018-01-11T00:00:00Z'>2018年1月11日星期四</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -187,82 +213,95 @@
     <section class="article-content">
     
     
-    <p>linux进程管理器supervisor是会经常被用到的，但服务器多了之后，每个服务器的进程也不方便管理。同时，supervisor自带的web界面比较简陋，所以尝试了一下官网推荐的一些第三方开源软件，推荐一下这个cesi。 最终效果如下： <a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/01/1.jpg"  target="_blank" rel="noopener"
-    ><img src="images/1.jpg" alt="" />
-</a> [<img src="images/2.jpg" alt="" />
+    <p>linux进程管理器supervisor是会经常被用到的，但服务器多了之后，每个服务器的进程也不方便管理。同时，supervisor自带的web界面比较简陋，所以尝试了一下官网推荐的一些第三方开源软件，推荐一下这个cesi。 最终效果如下： <img src="images/1.jpg" alt="" />
+ <img src="images/2.jpg" alt="" />
 </p>
-<p>](<a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/01/2.jpg"  target="_blank" rel="noopener"
-    >http://www.calmkart.com/wp-content/uploads/2018/01/2.jpg</a>)</p>
 <p>1.首先是关于supervisor 通过apt或pip安装都可以</p>
-<pre tabindex="0"><code>apt-get install supervisor
-#pip install supervisor
-echo_supervisord_conf &gt; /etc/supervisor/supervisord.conf
-</code></pre><p>关于supervisor配置文件</p>
-<pre tabindex="0"><code>[unix_http_server]
-#这里配置是否用unix socket通信来让supervisor与supervisorctl做通信
-
-[inet_http_server]
-#这里是用的http的方式做通信
-
-[supervisorctl]
-#这里选择supervisorctl到底用以上两种中的哪种方式来与supervisor通信，选择一种即可，记得填写密码
-
-[program:pro_name]
-stdout_logfile = {path}
-redirect_stderr = true  ;让stderr也写入stdout中
-</code></pre><p>常用操作</p>
-<pre tabindex="0"><code>supervisorctl reload #重启加载supervisor配置文件
-supervisorctl update #只增加新增的配置文件
-</code></pre><p>2.关于cesi</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">apt-get install supervisor
+</span></span><span class="line"><span class="cl"><span class="c1">#pip install supervisor</span>
+</span></span><span class="line"><span class="cl">echo_supervisord_conf &gt; /etc/supervisor/supervisord.conf
+</span></span></code></pre></div><p>关于supervisor配置文件</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[unix_http_server]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#这里配置是否用unix socket通信来让supervisor与supervisorctl做通信</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">[inet_http_server]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#这里是用的http的方式做通信</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">[supervisorctl]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#这里选择supervisorctl到底用以上两种中的哪种方式来与supervisor通信，选择一种即可，记得填写密码</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">[program:pro_name]</span>
+</span></span><span class="line"><span class="cl"><span class="na">stdout_logfile</span> <span class="o">=</span> <span class="s">{path}</span>
+</span></span><span class="line"><span class="cl"><span class="na">redirect_stderr</span> <span class="o">=</span> <span class="s">true  ;让stderr也写入stdout中</span>
+</span></span></code></pre></div><p>常用操作</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">supervisorctl reload <span class="c1">#重启加载supervisor配置文件</span>
+</span></span><span class="line"><span class="cl">supervisorctl update <span class="c1">#只增加新增的配置文件</span>
+</span></span></code></pre></div><p>2.关于cesi</p>
 <p>项目地址：<a class="link" href="https://github.com/Gamegos/cesi"  target="_blank" rel="noopener"
     >https://github.com/Gamegos/cesi</a> 安装cesi</p>
-<pre tabindex="0"><code>apt-get install sqlite3 python python-flask
-git clone https://github.com/Gamegos/cesi
-cd cesi
-sqlite3 ./userinfo.db &lt; userinfo.sql
-cp cesi.conf /etc/cesi.conf
-</code></pre><p>配置cesi.conf,我的配置如下，一看就懂了</p>
-<pre tabindex="0"><code>[node:118]
-username = ***
-password = ***
-host = 127.0.0.1
-port = 9001
-
-[node:calmkart]
-username = ***
-password = ***
-host = 45.76.71.69
-port = 9001
-
-[node:121]
-username = ***
-password = ***
-host = *.*.*.121
-port = 9001
-
-[environment:my_env]
-members = 118,calmkart,121
-
-[cesi]
-database = /root/cesi/userinfo.db
-activity_log = /var/log/cesi.log
-host = 0.0.0.0
-</code></pre><p>用supervisor运行cesi,配置文件如下</p>
-<pre tabindex="0"><code>[program:cesi]
-directory = /root/cesi/cesi/
-command = python web.py
-autostart = true
-startsecs = 5
-autorestart = true
-startretries = 3
-user = root
-redirect_stderr = true
-stdout_logfile = /var/log/cesi1.log
-</code></pre><p>开启任务</p>
-<pre tabindex="0"><code>supervisorctl start cesi
-</code></pre><p>默认账号密码：admin,admin 端口需要改的自己去web.py里面改 you get it</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">apt-get install sqlite3 python python-flask
+</span></span><span class="line"><span class="cl">git clone https://github.com/Gamegos/cesi
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> cesi
+</span></span><span class="line"><span class="cl">sqlite3 ./userinfo.db &lt; userinfo.sql
+</span></span><span class="line"><span class="cl">cp cesi.conf /etc/cesi.conf
+</span></span></code></pre></div><p>配置cesi.conf,我的配置如下，一看就懂了</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[node:118]</span>
+</span></span><span class="line"><span class="cl"><span class="na">username</span> <span class="o">=</span> <span class="s">***</span>
+</span></span><span class="line"><span class="cl"><span class="na">password</span> <span class="o">=</span> <span class="s">***</span>
+</span></span><span class="line"><span class="cl"><span class="na">host</span> <span class="o">=</span> <span class="s">127.0.0.1</span>
+</span></span><span class="line"><span class="cl"><span class="na">port</span> <span class="o">=</span> <span class="s">9001</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">[node:calmkart]</span>
+</span></span><span class="line"><span class="cl"><span class="na">username</span> <span class="o">=</span> <span class="s">***</span>
+</span></span><span class="line"><span class="cl"><span class="na">password</span> <span class="o">=</span> <span class="s">***</span>
+</span></span><span class="line"><span class="cl"><span class="na">host</span> <span class="o">=</span> <span class="s">45.76.71.69</span>
+</span></span><span class="line"><span class="cl"><span class="na">port</span> <span class="o">=</span> <span class="s">9001</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">[node:121]</span>
+</span></span><span class="line"><span class="cl"><span class="na">username</span> <span class="o">=</span> <span class="s">***</span>
+</span></span><span class="line"><span class="cl"><span class="na">password</span> <span class="o">=</span> <span class="s">***</span>
+</span></span><span class="line"><span class="cl"><span class="na">host</span> <span class="o">=</span> <span class="s">*.*.*.121</span>
+</span></span><span class="line"><span class="cl"><span class="na">port</span> <span class="o">=</span> <span class="s">9001</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">[environment:my_env]</span>
+</span></span><span class="line"><span class="cl"><span class="na">members</span> <span class="o">=</span> <span class="s">118,calmkart,121</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">[cesi]</span>
+</span></span><span class="line"><span class="cl"><span class="na">database</span> <span class="o">=</span> <span class="s">/root/cesi/userinfo.db</span>
+</span></span><span class="line"><span class="cl"><span class="na">activity_log</span> <span class="o">=</span> <span class="s">/var/log/cesi.log</span>
+</span></span><span class="line"><span class="cl"><span class="na">host</span> <span class="o">=</span> <span class="s">0.0.0.0</span>
+</span></span></code></pre></div><p>用supervisor运行cesi,配置文件如下</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[program:cesi]</span>
+</span></span><span class="line"><span class="cl"><span class="na">directory</span> <span class="o">=</span> <span class="s">/root/cesi/cesi/</span>
+</span></span><span class="line"><span class="cl"><span class="na">command</span> <span class="o">=</span> <span class="s">python web.py</span>
+</span></span><span class="line"><span class="cl"><span class="na">autostart</span> <span class="o">=</span> <span class="s">true</span>
+</span></span><span class="line"><span class="cl"><span class="na">startsecs</span> <span class="o">=</span> <span class="s">5</span>
+</span></span><span class="line"><span class="cl"><span class="na">autorestart</span> <span class="o">=</span> <span class="s">true</span>
+</span></span><span class="line"><span class="cl"><span class="na">startretries</span> <span class="o">=</span> <span class="s">3</span>
+</span></span><span class="line"><span class="cl"><span class="na">user</span> <span class="o">=</span> <span class="s">root</span>
+</span></span><span class="line"><span class="cl"><span class="na">redirect_stderr</span> <span class="o">=</span> <span class="s">true</span>
+</span></span><span class="line"><span class="cl"><span class="na">stdout_logfile</span> <span class="o">=</span> <span class="s">/var/log/cesi1.log</span>
+</span></span></code></pre></div><p>开启任务</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">supervisorctl start cesi
+</span></span></code></pre></div><p>默认账号密码：admin,admin 端口需要改的自己去web.py里面改 you get it</p>
 <p>本测试服地址： <a class="link" href="http://cesi.calmkart.com"  target="_blank" rel="noopener"
     >http://cesi.calmkart.com</a> 此外，其他常用的supervisor相关第三方工具还有 suponoff gosuv</p>
+<div class="archived-comments">
+<h2>历史评论 (3 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>qhh0205</strong> (2018-07-18 23:00)</div>
+<div class="comment-body">你好，cesi 支持管理多个服务器的进程吗？我看你截图貌似支持管理多个服务器的。我用默认的supervisor web UI，不支持管理多个服务器的supervisor。</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>qhh0205</strong> (2018-07-18 23:26)</div>
+<div class="comment-body">sorry，刚没仔细看，是支持的</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>potoo</strong> (2019-05-19 16:49)</div>
+<div class="comment-body">你好，我看你提供的[测试地址](http://cesi.calmkart.com)的 web 效果不一样，是你自己修改了吗? 你可以说下修改的方法吗？ 我也在用 cesi，但是 cesi 移动端页面显示有问题，想自己修改下页面，但是不知道在哪里修改。</div>
+</div>
+</div>
 </section>
 
 
@@ -277,6 +316,18 @@ stdout_logfile = /var/log/cesi1.log
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -288,7 +339,7 @@ stdout_logfile = /var/log/cesi1.log
     
 
 <aside class="related-content--wrapper">
-    <h2 class="section-title">Related content</h2>
+    <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
             
@@ -332,53 +383,16 @@ stdout_logfile = /var/log/cesi1.log
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -389,8 +403,8 @@ stdout_logfile = /var/log/cesi1.log
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

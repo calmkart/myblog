@@ -1,6 +1,7 @@
 ---
 title: "使用kubefwd对k8s中的service进行本地化调试"
 date: 2019-12-10
+description: "大家都知道,k8s中的服务(service)是对k8s中的deployment等对象的一个一致访问点.所以service会有一个vip(headless service没有).无论是普通service的vip或者headless..."
 categories: 
   - "计算机"
 tags: 
@@ -21,7 +22,7 @@ tags:
 
 我们先从使用开始。 首先有一个集群,有nginx和nginx1两个service,其中nginx是普通service,而nginx1是headless service.
 
-```
+```bash
 ➜  ~ kubectl get pods
 NAME                                 READY   STATUS      RESTARTS   AGE
 nginx-deployment-5cdfb5fc49-fgn78    1/1     Running     0          24d
@@ -40,7 +41,7 @@ nginx1       ClusterIP   None                    80/TCP    21d
 
 然后我们下载最新版的kubefwd([release](https://github.com/txn2/kubefwd/releases))在本地运行。
 
-```
+```bash
 ➜  kubefwd git:(master) sudo kubefwd svc
 Password:
 INFO[11:44:47]  _          _           __             _
@@ -68,7 +69,7 @@ INFO[11:44:47] Forwarding: nginx:80 to pod nginx-deployment-5cdfb5fc49-fgn78:80
 
 接着我们查看一下本机的hosts
 
-```
+```bash
 ➜  ~ cat /etc/hosts
 ##
 # Host Database
@@ -86,7 +87,7 @@ INFO[11:44:47] Forwarding: nginx:80 to pod nginx-deployment-5cdfb5fc49-fgn78:80
 
 厉害了，居然多出了这么多记录。 从这个hosts看起来，我们访问nginx1/nginx1.default.svc.cluster.local/nginx1.default应该都可以访问到k8s集群中的nginx1服务; 我们访问nginx/nginx.default.svc.cluster.local/nginx.default应该都可以访问到k8s集群中的nginx服务,我们来尝试一下。 使用httpie试试
 
-```
+```bash
 ➜  ~ http get nginx1
 HTTP/1.1 200 OK
 Accept-Ranges: bytes
@@ -115,7 +116,7 @@ Server: nginx/1.7.9
 
 我们尝试在k8s集群中新添加一个service叫nginx2,这个服务和nginx1一样是一个headless service
 
-```
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -163,7 +164,7 @@ spec:
 
  
 
-```
+```bash
 ➜  ~ kubectl apply -f nginx2.yaml
 deployment.apps/nginx-deployment2 created
 service/nginx2 created
@@ -172,7 +173,7 @@ service/nginx2 created
 
 这个时候我们发现运行的kubefwd INFO记录显示了如下内容
 
-```
+```bash
 INFO[12:01:12] Forwarding: nginx2:80 to pod nginx-deployment2-5995ddf44f-6r9fg:80
 INFO[12:01:12] Forwarding: nginx-deployment2-5995ddf44f-6r9fg.nginx2:80 to pod nginx-deployment2-5995ddf44f-6r9fg:80
 INFO[12:01:12] Forwarding: nginx-deployment2-5995ddf44f-d5q9d.nginx2:80 to pod nginx-deployment2-5995ddf44f-d5q9d:80
@@ -181,7 +182,7 @@ INFO[12:01:12] Forwarding: nginx-deployment2-5995ddf44f-d5q9d.nginx2:80 to pod n
 
 我们来看看Hosts
 
-```
+```bash
 127.1.27.5       nginx2 nginx2.default.svc.cluster.local nginx2.default
 127.1.27.6       nginx-deployment2-5995ddf44f-6r9fg.nginx2 nginx-deployment2-5995ddf44f-6r9fg.nginx2.default.svc.cluster.local nginx-deployment2-5995ddf44f-6r9fg.nginx2.default
 127.1.27.7       nginx-deployment2-5995ddf44f-d5q9d.nginx2 nginx-deployment2-5995ddf44f-d5q9d.nginx2.default.svc.cluster.local nginx-deployment2-5995ddf44f-d5q9d.nginx2.default
@@ -190,7 +191,7 @@ INFO[12:01:12] Forwarding: nginx-deployment2-5995ddf44f-d5q9d.nginx2:80 to pod n
 
 果然，新添加了这些记录。看来我们通过本地域名解析nginx2就可以访问到nginx2服务啦.我们来试试.
 
-```
+```bash
 ➜  ~ http get nginx2
 HTTP/1.1 200 OK
 Accept-Ranges: bytes
@@ -206,7 +207,7 @@ Server: nginx/1.17.6
 
 果然，和我们预想的一样。 最后我们通过ctrl+c停止kubefwd.
 
-```
+```bash
 ^CWARN[12:04:08] Stopped forwarding nginx-deployment1-75c5577b94-vcpn5.nginx1 in default.
 WARN[12:04:08] Stopped forwarding nginx-deployment2-5995ddf44f-d5q9d.nginx2 in default.
 WARN[12:04:08] Stopped forwarding nginx2 in default.
@@ -220,7 +221,7 @@ INFO[12:04:08] Done...
 
 terminal中显示我们停止了nginx,nginx1,nginx2的转发,我们再来看看hosts呢？
 
-```
+```bash
 ##
 # Host Database
 #
@@ -241,12 +242,12 @@ kubefwd项目过去的运行机制是在运行时通过api-server拉取k8s中的
 
 其实原理上并不复杂，但确实是能在k8s环境中解决某一个方向上的问题的。 欢迎大家来试着使用使用。
 
----
+<div class="archived-comments">
 
-## 历史评论 (1 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **1** (2019-12-16 17:03)
->
-> 1
+<h2>历史评论 (1 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>1</strong> (2019-12-16 17:03)</div>
+<div class="comment-body">1</div>
+</div>
+</div>

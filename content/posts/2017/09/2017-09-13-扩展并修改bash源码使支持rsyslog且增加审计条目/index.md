@@ -1,6 +1,7 @@
 ---
 title: "扩展并修改bash源码使支持rsyslog且增加审计条目"
 date: 2017-09-13
+description: "最终效果： log记录: /var/log/messages"
 categories: 
   - "计算机"
 tags: 
@@ -11,21 +12,21 @@ tags:
 
 最终效果： log记录: /var/log/messages
 
-[![](images/1.png)](http://www.calmkart.com/wp-content/uploads/2017/09/1.png) <!--more--> history记录: history
+![](images/1.png) <!--more--> history记录: history
 
-[![](images/2-1.jpg)](http://www.calmkart.com/wp-content/uploads/2017/09/2-1.jpg)
+![](images/2-1.jpg)
 
 首先去gnu下载最新版的bash源码，本次采用的是bash-4.4版本
 
 编辑config-top.h文件，主要关注以下两点: 一.103行，取消
 
-```
+```bash
 #define SSH_SOURCE_BASHRC
 ```
 
 的注释 二.116行，取消
 
-```
+```bash
 #define SYSLOG_HISTORY
 ```
 
@@ -35,7 +36,7 @@ tags:
 
 然后编辑bashhist.c源码文件，主要关注750行->800行。 未经修改的原文件：
 
-```
+```c
 void
 bash_syslog_history (line)
      const char *line;
@@ -63,7 +64,7 @@ bash_syslog_history (line)
 
 这里主要就是用来修改syslog服务的相关记录项，可以增删功能。 修改后的代码：
 
-```
+```c
 bash_syslog_history (line)
      const char *line;
 {
@@ -114,7 +115,7 @@ bash_syslog_history (line)
 
 最后，可以编辑/etc/profile，修改环境变量，添加如下三行常用配置：
 
-```
+```bash
 export HISTTIMEFORMAT="[%Y-%m-%d %H:%M:%S] [`who am i 2>/dev/null| awk '{print $NF}'|sed -e 's/[    ()]//g'`] "
 export HISTSIZE="999999"
 readonly PROMPT_COMMAND="history -a"
@@ -123,20 +124,20 @@ readonly PROMPT_COMMAND="history -a"
 
 第一行定义history格式 第二行第一history最大存储 第三行让所有用户操作都能即时写入history中，而不是退出session时再写入(如果同时又几个用户登录，可能导致history事件错乱)
 
----
+<div class="archived-comments">
 
-## 历史评论 (3 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **请叫我总裁谢** (2017-09-18 18:18)
->
-> 我日，彭总不亏是全国pythone第一人，技术博客吊炸天，在下是服的
-
-> **孙昊** (2017-10-31 14:12)
->
-> 彭总，快更新文章啊！！！！！！！
-
-> **Huanguo** (2017-11-10 17:23)
->
-> dalao,dalao
+<h2>历史评论 (3 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>请叫我总裁谢</strong> (2017-09-18 18:18)</div>
+<div class="comment-body">我日，彭总不亏是全国pythone第一人，技术博客吊炸天，在下是服的</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>孙昊</strong> (2017-10-31 14:12)</div>
+<div class="comment-body">彭总，快更新文章啊！！！！！！！</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>Huanguo</strong> (2017-11-10 17:23)</div>
+<div class="comment-body">dalao,dalao</div>
+</div>
+</div>

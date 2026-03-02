@@ -1,6 +1,7 @@
 ---
 title: "zabbix报警收敛"
 date: 2017-08-23
+description: "因zabbix可能同一段时间报警过多，接受消息时如果不做收敛可能出错也不容易审查，所以需要一个报警收敛机制。"
 categories: 
   - "计算机"
 tags: 
@@ -15,7 +16,7 @@ tags:
 
 server端程序如下：
 
-```
+```python
 # -*- coding:utf-8 -*-
 from threading import Timer
 import urllib2
@@ -118,7 +119,7 @@ while True:
 
 clent端程序如下：
 
-```
+```python
 # --- coding:utf-8 ---
 import random
 from multiprocessing.connection import Client
@@ -145,14 +146,14 @@ for i in range(0,1000):
 
 主要用到的工具是正则表达式做匹配
 
-代码已上传至github,地址 [https://github.com/calmkart/Zabbix\_convergence](https://github.com/calmkart/Zabbix_convergence)
+代码已上传至github,地址 [https://github.com/calmkart/Zabbix_convergence](https://github.com/calmkart/Zabbix_convergence)
 
----
+<div class="archived-comments">
 
-## 历史评论 (1 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **我有一个可爱的小椰子** (2017-08-29 20:39)
->
-> 厉害了，过来学习一下
+<h2>历史评论 (1 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>我有一个可爱的小椰子</strong> (2017-08-29 20:39)</div>
+<div class="comment-body">厉害了，过来学习一下</div>
+</div>
+</div>

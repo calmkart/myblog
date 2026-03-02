@@ -1,6 +1,7 @@
 ---
 title: "增量计算海量数据均值,方差,标准差"
 date: 2018-10-12
+description: "最近需要从海量数据中获取均值,方差,标准差 显然直接读如内存中按公式做肯定是gg的,于是考虑是否可以增量计算 最终写了一个增量计算海量数据均值方差标准差的python通用类"
 categories: 
   - "计算机"
 tags: 
@@ -18,11 +19,11 @@ tags:
 
 参考了以下公式推导:
 
-[![](images/canvas.png)](http://www.calmkart.com/wp-content/uploads/2018/10/canvas.png)
+![](images/canvas.png)
 
 代码如下:
 
-```
+```python
 # -*- coding: utf-8 -*-
 from __future__ import division
 import numpy

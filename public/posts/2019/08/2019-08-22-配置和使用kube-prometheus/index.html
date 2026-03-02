@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="我们在k8s集群中使用云原生的promethues通常需要用到coreos的prometheus-operater，它可以方便的帮助我们在k8s中部署和配置使用prometheus。但prometheus并不是开箱即用的，如果要做到开箱即用的监控全家桶，官方提供了两个选择，分别是prometheus-operater helm chart和kube-prometheus。这两者都可以为我们提供开箱即用的方式部署promethues+alertmanager+promethues-push-gateway(kube-promethueus不包含,需要单独部署)+grafana全家桶，同时包含kubernetes-mixin的一整套报警规则和node-exporter，kube-state-metrics等一系列metrics exporter。区别在于helm chart由社区维护，而kube-promethues由coreos维护。这里我们将以kube-prometheus为例，简要说明配置和使用方式。\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="我们在k8s集群中使用云原生的promethues通常需要用到coreos的prometheus-operater，它可以方便的帮助我们在k8s中部署和配置使用prometheus。但prometheus并不是开箱即用的...">
 <title>配置和使用kube-prometheus</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="配置和使用kube-prometheus">
-<meta property='og:description' content="我们在k8s集群中使用云原生的promethues通常需要用到coreos的prometheus-operater，它可以方便的帮助我们在k8s中部署和配置使用prometheus。但prometheus并不是开箱即用的，如果要做到开箱即用的监控全家桶，官方提供了两个选择，分别是prometheus-operater helm chart和kube-prometheus。这两者都可以为我们提供开箱即用的方式部署promethues+alertmanager+promethues-push-gateway(kube-promethueus不包含,需要单独部署)+grafana全家桶，同时包含kubernetes-mixin的一整套报警规则和node-exporter，kube-state-metrics等一系列metrics exporter。区别在于helm chart由社区维护，而kube-promethues由coreos维护。这里我们将以kube-prometheus为例，简要说明配置和使用方式。\n">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="配置和使用kube-prometheus">
+<meta property='og:description' content="我们在k8s集群中使用云原生的promethues通常需要用到coreos的prometheus-operater，它可以方便的帮助我们在k8s中部署和配置使用prometheus。但prometheus并不是开箱即用的...">
 <meta property='og:url' content='http://localhost:1313/posts/2019/08/2019-08-22-%E9%85%8D%E7%BD%AE%E5%92%8C%E4%BD%BF%E7%94%A8kube-prometheus/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='alertmanager' /><meta property='article:tag' content='grafana' /><meta property='article:tag' content='k8s' /><meta property='article:tag' content='kubernetes' /><meta property='article:tag' content='prometheus' /><meta property='article:tag' content='云原生' /><meta property='article:tag' content='容器' /><meta property='article:tag' content='监控' /><meta property='article:tag' content='运维' /><meta property='article:published_time' content='2019-08-22T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2019-08-22T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="配置和使用kube-prometheus">
-<meta name="twitter:description" content="我们在k8s集群中使用云原生的promethues通常需要用到coreos的prometheus-operater，它可以方便的帮助我们在k8s中部署和配置使用prometheus。但prometheus并不是开箱即用的，如果要做到开箱即用的监控全家桶，官方提供了两个选择，分别是prometheus-operater helm chart和kube-prometheus。这两者都可以为我们提供开箱即用的方式部署promethues+alertmanager+promethues-push-gateway(kube-promethueus不包含,需要单独部署)+grafana全家桶，同时包含kubernetes-mixin的一整套报警规则和node-exporter，kube-state-metrics等一系列metrics exporter。区别在于helm chart由社区维护，而kube-promethues由coreos维护。这里我们将以kube-prometheus为例，简要说明配置和使用方式。\n">
+<meta name="twitter:description" content="我们在k8s集群中使用云原生的promethues通常需要用到coreos的prometheus-operater，它可以方便的帮助我们在k8s中部署和配置使用prometheus。但prometheus并不是开箱即用的...">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -149,6 +157,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            我们在k8s集群中使用云原生的promethues通常需要用到coreos的prometheus-operater，它可以方便的帮助我们在k8s中部署和配置使用prometheus。但prometheus并不是开箱即用的...
+        </h3>
+        
     </div>
 
     
@@ -167,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2019-08-22T00:00:00Z'>Thursday, August 22, 2019</time>
+                <time class="article-time--published" datetime='2019-08-22T00:00:00Z'>2019年8月22日星期四</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 8 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -193,477 +219,482 @@
     >kube-prometheus</a>。这两者都可以为我们提供开箱即用的方式部署promethues+alertmanager+promethues-push-gateway(kube-promethueus不包含,需要单独部署)+grafana全家桶，同时包含<a class="link" href="https://github.com/kubernetes-monitoring/kubernetes-mixin"  target="_blank" rel="noopener"
     >kubernetes-mixin</a>的一整套报警规则和node-exporter，kube-state-metrics等一系列metrics exporter。区别在于helm chart由社区维护，而kube-promethues由coreos维护。这里我们将以kube-prometheus为例，简要说明配置和使用方式。</p>
 <p>首先是部署，还是非常简单的，我们先将kube-prometheus的仓库clone下来</p>
-<pre tabindex="0"><code>git clone https://github.com/coreos/kube-prometheus.git
-</code></pre><p>然后根据官方文档操作即可</p>
-<pre tabindex="0"><code>$ kubectl create -f manifests/
-
-# It can take a few seconds for the above &#39;create manifests&#39; command to fully create the following resources, so verify the resources are ready before proceeding.
-$ until kubectl get customresourcedefinitions servicemonitors.monitoring.coreos.com ; do date; sleep 1; echo &#34;&#34;; done
-$ until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo &#34;&#34;; done
-
-$ kubectl apply -f manifests/ # This command sometimes may need to be done twice (to workaround a race condition).
-</code></pre><p>这里将自动为我们部署prometheus，alertmanager和grafana。我们接下来可以通过port-forward也可以通过ingress将服务暴露出来</p>
-<pre tabindex="0"><code>Prometheus
-
-$ kubectl --namespace monitoring port-forward svc/prometheus-k8s 9090
-
-Then access via http://localhost:9090
-
-Grafana
-
-$ kubectl --namespace monitoring port-forward svc/grafana 3000
-
-Then access via http://localhost:3000 and use the default grafana user:password of admin:admin.
-
-Alert Manager
-
-$ kubectl --namespace monitoring port-forward svc/alertmanager-main 9093
-
-Then access via http://localhost:9093
-</code></pre><p>或者编写ingress</p>
-<pre tabindex="0"><code># ingress-monitor.yaml
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: monitoring-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: &#34;false&#34;
-  namespace: monitoring
-spec:
-  rules:
-  - host: k8s-prometheus.calmkart.com
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: prometheus-k8s
-          servicePort: 9090
-  - host: k8s-grafana.calmkart.com
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: grafana
-          servicePort: 3000
-  - host: k8s-alertmanager.calmkart.com
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: alertmanager-main
-          servicePort: 9093
-
-# kubectl apply -f ingress-monitor.yaml
-</code></pre><p>然后我们就可以访问到prometheus,alertmanager和grafana的服务页面了 <a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/08/prometheus.jpg"  target="_blank" rel="noopener"
-    ><img src="images/prometheus.jpg" alt="" />
-</a></p>
-<p><a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/08/alert-manager.jpg"  target="_blank" rel="noopener"
-    ><img src="images/alert-manager.jpg" alt="" />
-</a></p>
-<p><a class="link" href="http://www.calmkart.com/wp-content/uploads/2019/08/grafana.jpg"  target="_blank" rel="noopener"
-    ><img src="images/grafana.jpg" alt="" />
-</a></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git clone https://github.com/coreos/kube-prometheus.git
+</span></span></code></pre></div><p>然后根据官方文档操作即可</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ kubectl create -f manifests/
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># It can take a few seconds for the above &#39;create manifests&#39; command to fully create the following resources, so verify the resources are ready before proceeding.</span>
+</span></span><span class="line"><span class="cl">$ <span class="k">until</span> kubectl get customresourcedefinitions servicemonitors.monitoring.coreos.com <span class="p">;</span> <span class="k">do</span> date<span class="p">;</span> sleep 1<span class="p">;</span> <span class="nb">echo</span> <span class="s2">&#34;&#34;</span><span class="p">;</span> <span class="k">done</span>
+</span></span><span class="line"><span class="cl">$ <span class="k">until</span> kubectl get servicemonitors --all-namespaces <span class="p">;</span> <span class="k">do</span> date<span class="p">;</span> sleep 1<span class="p">;</span> <span class="nb">echo</span> <span class="s2">&#34;&#34;</span><span class="p">;</span> <span class="k">done</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kubectl apply -f manifests/ <span class="c1"># This command sometimes may need to be done twice (to workaround a race condition).</span>
+</span></span></code></pre></div><p>这里将自动为我们部署prometheus，alertmanager和grafana。我们接下来可以通过port-forward也可以通过ingress将服务暴露出来</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Prometheus
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kubectl --namespace monitoring port-forward svc/prometheus-k8s <span class="m">9090</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Then access via http://localhost:9090
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Grafana
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kubectl --namespace monitoring port-forward svc/grafana <span class="m">3000</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Then access via http://localhost:3000 and use the default grafana user:password of admin:admin.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Alert Manager
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kubectl --namespace monitoring port-forward svc/alertmanager-main <span class="m">9093</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Then access via http://localhost:9093
+</span></span></code></pre></div><p>或者编写ingress</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># ingress-monitor.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">extensions/v1beta1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Ingress</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">monitoring-ingress</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">nginx.ingress.kubernetes.io/ssl-redirect</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;false&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">monitoring</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">rules</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-prometheus.calmkart.com</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">http</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">paths</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">backend</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">serviceName</span><span class="p">:</span><span class="w"> </span><span class="l">prometheus-k8s</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">servicePort</span><span class="p">:</span><span class="w"> </span><span class="m">9090</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-grafana.calmkart.com</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">http</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">paths</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">backend</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">serviceName</span><span class="p">:</span><span class="w"> </span><span class="l">grafana</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">servicePort</span><span class="p">:</span><span class="w"> </span><span class="m">3000</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-alertmanager.calmkart.com</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">http</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">paths</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">backend</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">serviceName</span><span class="p">:</span><span class="w"> </span><span class="l">alertmanager-main</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">servicePort</span><span class="p">:</span><span class="w"> </span><span class="m">9093</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c"># kubectl apply -f ingress-monitor.yaml</span><span class="w">
+</span></span></span></code></pre></div><p>然后我们就可以访问到prometheus,alertmanager和grafana的服务页面了 <img src="images/prometheus.jpg" alt="" />
+</p>
+<p><img src="images/alert-manager.jpg" alt="" />
+</p>
+<p><img src="images/grafana.jpg" alt="" />
+</p>
 <p>这里prometheus已经集成了一些k8s相关的exporter和kubernetes-mixin的报警规则，我们可以从prometheus的status-&gt;rules和status-&gt;target中查看到。</p>
 <p>接下来，我们部署<a class="link" href="https://github.com/helm/charts/tree/master/stable/prometheus-pushgateway"  target="_blank" rel="noopener"
     >push-gateway</a></p>
-<pre tabindex="0"><code>#可以参考我这里NodePort的values参数,也可以自行设置
-# values.yaml
-
-# Default values for prometheus-pushgateway.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-image:
-  repository: prom/pushgateway
-  tag: v0.9.0
-  pullPolicy: IfNotPresent
-
-service:
-  type: NodePort
-  port: 9091
-  targetPort: 9091
-
-# Optional pod annotations
-podAnnotations: {}
-
-# Optional pod labels
-podLabels: {}
-
-# Optional service labels
-serviceLabels: {}
-
-# Optional serviceAccount labels
-serviceAccountLabels: {}
-
-# Optional additional arguments
-extraArgs: []
-
-# Optional additional environment variables
-extraVars: []
-
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after &#39;resources:&#39;.
-  # limits:
-  #   cpu: 200m
-  #    memory: 50Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 30Mi
-
-serviceAccount:
-  # Specifies whether a ServiceAccount should be created
-  create: true
-  # The name of the ServiceAccount to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name:
-
-## Configure ingress resource that allow you to access the
-## pushgateway installation. Set up the URL
-## ref: http://kubernetes.io/docs/user-guide/ingress/
-##
-ingress:
-  ## Enable Ingress.
-  ##
-  enabled: false
-
-    ## Annotations.
-    ##
-    # annotations:
-    #   kubernetes.io/ingress.class: nginx
-    #   kubernetes.io/tls-acme: &#39;true&#39;
-
-    ## Hostnames.
-    ## Must be provided if Ingress is enabled.
-    ##
-    # hosts:
-    #   - pushgateway.domain.com
-
-    ## TLS configuration.
-    ## Secrets must be manually created in the namespace.
-    ##
-    # tls:
-    #   - secretName: pushgateway-tls
-    #     hosts:
-    #       - pushgateway.domain.com
-
-tolerations: {}
-  # - effect: NoSchedule
-  #   operator: Exists
-
-## Node labels for pushgateway pod assignment
-## Ref: https://kubernetes.io/docs/user-guide/node-selection/
-##
-nodeSelector: {}
-
-replicaCount: 1
-
-## Affinity for pod assignment
-## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-affinity: {}
-
-# Enable this if you&#39;re using https://github.com/coreos/prometheus-operator
-serviceMonitor:
-  enabled: true
-  namespace: monitoring
-  # fallback to the prometheus default unless specified
-  # interval: 10s
-  ## Defaults to what&#39;s used if you follow CoreOS [Prometheus Install Instructions](https://github.com/helm/charts/tree/master/stable/prometheus-operator#tldr)
-  ## [Prometheus Selector Label](https://github.com/helm/charts/tree/master/stable/prometheus-operator#prometheus-operator-1)
-  ## [Kube Prometheus Selector Label](https://github.com/helm/charts/tree/master/stable/prometheus-operator#exporters)
-  selector:
-    prometheus: kube-prometheus
-  # Retain the job and instance labels of the metrics pushed to the Pushgateway
-  # [Scraping Pushgateway](https://github.com/prometheus/pushgateway#configure-the-pushgateway-as-a-target-to-scrape)
-  honorLabels: true
-
-# The values to set in the PodDisruptionBudget spec (minAvailable/maxUnavailable)
-# If not set then a PodDisruptionBudget will not be created
-podDisruptionBudget:
-
-# helm install --name push-gateway -f values.yaml stable/prometheus-pushgateway
-</code></pre><p>然后我们来试着接入内部和外部的prometheus监控target.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1">#可以参考我这里NodePort的values参数,也可以自行设置</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># values.yaml</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Default values for prometheus-pushgateway.</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># This is a YAML-formatted file.</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Declare variables to be passed into your templates.</span>
+</span></span><span class="line"><span class="cl">image:
+</span></span><span class="line"><span class="cl">  repository: prom/pushgateway
+</span></span><span class="line"><span class="cl">  tag: v0.9.0
+</span></span><span class="line"><span class="cl">  pullPolicy: IfNotPresent
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">service:
+</span></span><span class="line"><span class="cl">  type: NodePort
+</span></span><span class="line"><span class="cl">  port: <span class="m">9091</span>
+</span></span><span class="line"><span class="cl">  targetPort: <span class="m">9091</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Optional pod annotations</span>
+</span></span><span class="line"><span class="cl">podAnnotations: <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Optional pod labels</span>
+</span></span><span class="line"><span class="cl">podLabels: <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Optional service labels</span>
+</span></span><span class="line"><span class="cl">serviceLabels: <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Optional serviceAccount labels</span>
+</span></span><span class="line"><span class="cl">serviceAccountLabels: <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Optional additional arguments</span>
+</span></span><span class="line"><span class="cl">extraArgs: <span class="o">[]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Optional additional environment variables</span>
+</span></span><span class="line"><span class="cl">extraVars: <span class="o">[]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">resources: <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># We usually recommend not to specify default resources and to leave this as a conscious</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># choice for the user. This also increases chances charts run on environments with little</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># resources, such as Minikube. If you do want to specify resources, uncomment the following</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># lines, adjust them as necessary, and remove the curly braces after &#39;resources:&#39;.</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># limits:</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">#   cpu: 200m</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">#    memory: 50Mi</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># requests:</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">#   cpu: 100m</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">#   memory: 30Mi</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">serviceAccount:
+</span></span><span class="line"><span class="cl">  <span class="c1"># Specifies whether a ServiceAccount should be created</span>
+</span></span><span class="line"><span class="cl">  create: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># The name of the ServiceAccount to use.</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># If not set and create is true, a name is generated using the fullname template</span>
+</span></span><span class="line"><span class="cl">  name:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">## Configure ingress resource that allow you to access the</span>
+</span></span><span class="line"><span class="cl"><span class="c1">## pushgateway installation. Set up the URL</span>
+</span></span><span class="line"><span class="cl"><span class="c1">## ref: http://kubernetes.io/docs/user-guide/ingress/</span>
+</span></span><span class="line"><span class="cl"><span class="c1">##</span>
+</span></span><span class="line"><span class="cl">ingress:
+</span></span><span class="line"><span class="cl">  <span class="c1">## Enable Ingress.</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">##</span>
+</span></span><span class="line"><span class="cl">  enabled: <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">## Annotations.</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">##</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># annotations:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#   kubernetes.io/ingress.class: nginx</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#   kubernetes.io/tls-acme: &#39;true&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">## Hostnames.</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">## Must be provided if Ingress is enabled.</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">##</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># hosts:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#   - pushgateway.domain.com</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">## TLS configuration.</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">## Secrets must be manually created in the namespace.</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">##</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># tls:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#   - secretName: pushgateway-tls</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#     hosts:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#       - pushgateway.domain.com</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">tolerations: <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># - effect: NoSchedule</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">#   operator: Exists</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">## Node labels for pushgateway pod assignment</span>
+</span></span><span class="line"><span class="cl"><span class="c1">## Ref: https://kubernetes.io/docs/user-guide/node-selection/</span>
+</span></span><span class="line"><span class="cl"><span class="c1">##</span>
+</span></span><span class="line"><span class="cl">nodeSelector: <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">replicaCount: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">## Affinity for pod assignment</span>
+</span></span><span class="line"><span class="cl"><span class="c1">## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity</span>
+</span></span><span class="line"><span class="cl">affinity: <span class="o">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Enable this if you&#39;re using https://github.com/coreos/prometheus-operator</span>
+</span></span><span class="line"><span class="cl">serviceMonitor:
+</span></span><span class="line"><span class="cl">  enabled: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">  namespace: monitoring
+</span></span><span class="line"><span class="cl">  <span class="c1"># fallback to the prometheus default unless specified</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># interval: 10s</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">## Defaults to what&#39;s used if you follow CoreOS [Prometheus Install Instructions](https://github.com/helm/charts/tree/master/stable/prometheus-operator#tldr)</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">## [Prometheus Selector Label](https://github.com/helm/charts/tree/master/stable/prometheus-operator#prometheus-operator-1)</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">## [Kube Prometheus Selector Label](https://github.com/helm/charts/tree/master/stable/prometheus-operator#exporters)</span>
+</span></span><span class="line"><span class="cl">  selector:
+</span></span><span class="line"><span class="cl">    prometheus: kube-prometheus
+</span></span><span class="line"><span class="cl">  <span class="c1"># Retain the job and instance labels of the metrics pushed to the Pushgateway</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># [Scraping Pushgateway](https://github.com/prometheus/pushgateway#configure-the-pushgateway-as-a-target-to-scrape)</span>
+</span></span><span class="line"><span class="cl">  honorLabels: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># The values to set in the PodDisruptionBudget spec (minAvailable/maxUnavailable)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># If not set then a PodDisruptionBudget will not be created</span>
+</span></span><span class="line"><span class="cl">podDisruptionBudget:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># helm install --name push-gateway -f values.yaml stable/prometheus-pushgateway</span>
+</span></span></code></pre></div><p>然后我们来试着接入内部和外部的prometheus监控target.</p>
 <p>1.实现接入内部的target 无论是外部或内部的target都需要一个metrics-server目标，对于内部target而言，一般是一个服务，比如服务calm-server 在prometheus-operater的使用方式中，有一个crd叫serviceMonitor，我们创建一个新的serviceMonitor就创建了一个prometheus的target 我们首先查看monitoring命名空间中已有的serviceMonitor(既prometheus target)</p>
-<pre tabindex="0"><code>[xxx@xxxxx]# kubectl get servicemonitors.monitoring.coreos.com -n monitoring
-NAME                      AGE
-alertmanager              23d
-coredns                   23d
-grafana                   23d
-ingress-nginx             17d
-kube-apiserver            23d
-kube-controller-manager   23d
-kube-scheduler            23d
-kube-state-metrics        23d
-kubelet                   23d
-node-exporter             23d
-prometheus                23d
-prometheus-operator       23d
-prometheus-pushgateway    19d
-</code></pre><p>我们创建一个新的serviceMonitor,将calm-server的/metrics作为target # calm-server-serviceMonitor.yaml</p>
-<pre tabindex="0"><code>apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: calm-server-metrics
-  labels:
-    k8s-app: calm-server-metrics
-  namespace: monitoring
-spec:
-  namespaceSelector:
-    any: true
-  selector:
-    matchLabels:
-      app: calm-server
-  endpoints:
-  - port: web
-    interval: 10s
-    honorLabels: true
-
-# kubectl apply -f calm-server-serviceMonitor.yaml
-</code></pre><p>这里有几个需要注意的tips:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">[</span>xxx@xxxxx<span class="o">]</span><span class="c1"># kubectl get servicemonitors.monitoring.coreos.com -n monitoring</span>
+</span></span><span class="line"><span class="cl">NAME                      AGE
+</span></span><span class="line"><span class="cl">alertmanager              23d
+</span></span><span class="line"><span class="cl">coredns                   23d
+</span></span><span class="line"><span class="cl">grafana                   23d
+</span></span><span class="line"><span class="cl">ingress-nginx             17d
+</span></span><span class="line"><span class="cl">kube-apiserver            23d
+</span></span><span class="line"><span class="cl">kube-controller-manager   23d
+</span></span><span class="line"><span class="cl">kube-scheduler            23d
+</span></span><span class="line"><span class="cl">kube-state-metrics        23d
+</span></span><span class="line"><span class="cl">kubelet                   23d
+</span></span><span class="line"><span class="cl">node-exporter             23d
+</span></span><span class="line"><span class="cl">prometheus                23d
+</span></span><span class="line"><span class="cl">prometheus-operator       23d
+</span></span><span class="line"><span class="cl">prometheus-pushgateway    19d
+</span></span></code></pre></div><p>我们创建一个新的serviceMonitor,将calm-server的/metrics作为target # calm-server-serviceMonitor.yaml</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">monitoring.coreos.com/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ServiceMonitor</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">calm-server-metrics</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">k8s-app</span><span class="p">:</span><span class="w"> </span><span class="l">calm-server-metrics</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">monitoring</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespaceSelector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">any</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">calm-server</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">endpoints</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l">web</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l">10s</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">honorLabels</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c"># kubectl apply -f calm-server-serviceMonitor.yaml</span><span class="w">
+</span></span></span></code></pre></div><p>这里有几个需要注意的tips:</p>
 <p>1.如果service和prometheus不再同一个命名空间，需要设置namespaceSelector，可以单独设置需要搜索的namespace，也可以像上面那样设置为全局搜索。</p>
 <p>2.其次，endpoints中设置的port会按照interval设置的时间定时去:/metrics拉取数据，所以对应的服务需要提供相应的metrics(官方有非常多的exporter提供使用，可以参考<a class="link" href="https://prometheus.io/docs/instrumenting/exporters/"  target="_blank" rel="noopener"
     >https://prometheus.io/docs/instrumenting/exporters/</a>)</p>
 <p>我们接下来再查看所有serviceMonitor crd api对象，就会发现创建成功，同时prometheus的state-&gt;target中也会出现对应的target，我们也可以在prometheus中查询到对应的数据了。</p>
 <p>2.实现接入外部target 实现了接入内部的target，那么，k8s集群外部的服务想要接入该怎么办呢？当然还是通过监控k8s集群内service的方式，不是service对应的是一个外部的endpoint对象。下面我们将以calm-server服务为例，说明如何通过k8s的endpoint外部对象接入外部target监控。 首先我们创建一个endpoint对象</p>
-<pre tabindex="0"><code># calm-server-endpoint.yaml
-apiVersion: v1
-kind: Endpoints
-metadata:
-  name: calm-server-metrics
-subsets:
-  - addresses:
-    - ip: x.x.x.x
-    ports:
-    - name: metrics
-      port: xxxx
-      protocol: TCP
-# kubectl apply -f calm-server-endpoint.yaml
-</code></pre><p>我们将ip和port替换成我们的外部服务，apply后就创建了一个endpoint api对象，我们可以通过kubectl get endpoints查看</p>
-<pre tabindex="0"><code>[xxx@xxxxxxx]# kubectl get endpoints
-NAME                                  ENDPOINTS                                                           AGE
-calm-server-metrics                   10.41.13.17:6789                                                    19d
-kubernetes                            10.1.33.159:6443                                                    92d
-push-gateway-prometheus-pushgateway   10.240.224.15:9091                                                  19d
-</code></pre><p>这里需要注意的是,endpoint对象是不区分namespaces的 接着，我们创建一个service，service的选择器选择calm-server-metrics这个外部endpoint</p>
-<pre tabindex="0"><code># calm-server-metrics-service.yaml
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: calm-server-metrics
-  labels:
-    app: calm-server-metrics
-spec:
-  type: ExternalName
-  externalName: x.x.x.x
-  clusterIP: &#34;&#34;
-  ports:
-  - name: metrics
-    port: xxxx
-    protocol: TCP
-    targetPort: 6789
-
-# kubectl apply -f calm-server-metrics-service.yaml
-</code></pre><p>我们这个时候访问这个服务，就等于访问了外部的endpoint，既外部服务 我们就可以像上面创建内部服务的serviceMonitor一样，创建serviceMonitor api对象从而更新prometheus target列表了。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># calm-server-endpoint.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Endpoints</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">calm-server-metrics</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">subsets</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">addresses</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">ip</span><span class="p">:</span><span class="w"> </span><span class="l">x.x.x.x</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">metrics</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l">xxxx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l">TCP</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c"># kubectl apply -f calm-server-endpoint.yaml</span><span class="w">
+</span></span></span></code></pre></div><p>我们将ip和port替换成我们的外部服务，apply后就创建了一个endpoint api对象，我们可以通过kubectl get endpoints查看</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">[</span>xxx@xxxxxxx<span class="o">]</span><span class="c1"># kubectl get endpoints</span>
+</span></span><span class="line"><span class="cl">NAME                                  ENDPOINTS                                                           AGE
+</span></span><span class="line"><span class="cl">calm-server-metrics                   10.41.13.17:6789                                                    19d
+</span></span><span class="line"><span class="cl">kubernetes                            10.1.33.159:6443                                                    92d
+</span></span><span class="line"><span class="cl">push-gateway-prometheus-pushgateway   10.240.224.15:9091                                                  19d
+</span></span></code></pre></div><p>这里需要注意的是,endpoint对象是不区分namespaces的 接着，我们创建一个service，service的选择器选择calm-server-metrics这个外部endpoint</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># calm-server-metrics-service.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Service</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">calm-server-metrics</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">calm-server-metrics</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">ExternalName</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">externalName</span><span class="p">:</span><span class="w"> </span><span class="l">x.x.x.x</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">clusterIP</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">metrics</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l">xxxx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l">TCP</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="m">6789</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c"># kubectl apply -f calm-server-metrics-service.yaml</span><span class="w">
+</span></span></span></code></pre></div><p>我们这个时候访问这个服务，就等于访问了外部的endpoint，既外部服务 我们就可以像上面创建内部服务的serviceMonitor一样，创建serviceMonitor api对象从而更新prometheus target列表了。</p>
 <p>接下来我们会有一个问题，如何修改这一系列全家桶的配置呢?比如prometheus的配置，grafana的配置。比如我们需要修改smtp报警配置该怎么办呢？如果是非云原生环境，我们可以直接修改配置文件即可，但在云原生环境中不一样。</p>
 <p>kube-prometheus官方文档推荐的方式是使用<a class="link" href="https://jsonnet.org/"  target="_blank" rel="noopener"
     >jsonnet</a>对官方库做编译修改。那么如何直接通过修改yaml的方式修改配置文件呢？下面将分别介绍如何修改全家桶中的各个配置文件。</p>
 <p>1.首先是prometheus的alert rules，我们可以通过修改prometheus-rules.yaml文件修改。 2.其次是alertmanager的config,我们可以修改alertmanager-secret.yaml文件,注意，这是一个secret对象，内容经过了base64加密，我们应该先将内容解密再做修改，修改后再加密替换即可。 3.最后是grafana的配置修改，参考了grafana官方的docker image之后，我们可以先修改grafana-deployment.yaml文件，为其增加一个volume,配置如下</p>
-<pre tabindex="0"><code>apiVersion: apps/v1beta2
-kind: Deployment
-metadata:
-  labels:
-    app: grafana
-  name: grafana
-  namespace: monitoring
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: grafana
-  template:
-    metadata:
-      labels:
-        app: grafana
-    spec:
-      containers:
-      - image: grafana/grafana:6.2.2
-        name: grafana
-        ports:
-        - containerPort: 3000
-          name: http
-        readinessProbe:
-          httpGet:
-            path: /api/health
-            port: http
-        resources:
-          limits:
-            cpu: 200m
-            memory: 200Mi
-          requests:
-            cpu: 100m
-            memory: 100Mi
-        volumeMounts:
-        - mountPath: /var/lib/grafana
-          name: grafana-storage
-          readOnly: false
-        - mountPath: /etc/grafana/provisioning/datasources
-          name: grafana-datasources
-          readOnly: false
-        - mountPath: /etc/grafana/provisioning/dashboards
-          name: grafana-dashboards
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/apiserver
-          name: grafana-dashboard-apiserver
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/controller-manager
-          name: grafana-dashboard-controller-manager
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/k8s-cluster-rsrc-use
-          name: grafana-dashboard-k8s-cluster-rsrc-use
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/k8s-node-rsrc-use
-          name: grafana-dashboard-k8s-node-rsrc-use
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/k8s-resources-cluster
-          name: grafana-dashboard-k8s-resources-cluster
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/k8s-resources-namespace
-          name: grafana-dashboard-k8s-resources-namespace
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/k8s-resources-pod
-          name: grafana-dashboard-k8s-resources-pod
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/k8s-resources-workload
-          name: grafana-dashboard-k8s-resources-workload
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/k8s-resources-workloads-namespace
-          name: grafana-dashboard-k8s-resources-workloads-namespace
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/kubelet
-          name: grafana-dashboard-kubelet
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/nodes
-          name: grafana-dashboard-nodes
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/persistentvolumesusage
-          name: grafana-dashboard-persistentvolumesusage
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/pods
-          name: grafana-dashboard-pods
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/prometheus-remote-write
-          name: grafana-dashboard-prometheus-remote-write
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/prometheus
-          name: grafana-dashboard-prometheus
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/proxy
-          name: grafana-dashboard-proxy
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/scheduler
-          name: grafana-dashboard-scheduler
-          readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/statefulset
-          name: grafana-dashboard-statefulset
-          readOnly: false
-        - mountPath: /etc/grafana
-          name: config-custom
-      nodeSelector:
-        beta.kubernetes.io/os: linux
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 65534
-      serviceAccountName: grafana
-      volumes:
-      - emptyDir: {}
-        name: grafana-storage
-      - name: grafana-datasources
-        secret:
-          secretName: grafana-datasources
-      - configMap:
-          name: grafana-dashboards
-        name: grafana-dashboards
-      - configMap:
-          name: grafana-dashboard-apiserver
-        name: grafana-dashboard-apiserver
-      - configMap:
-          name: grafana-dashboard-controller-manager
-        name: grafana-dashboard-controller-manager
-      - configMap:
-          name: grafana-dashboard-k8s-cluster-rsrc-use
-        name: grafana-dashboard-k8s-cluster-rsrc-use
-      - configMap:
-          name: grafana-dashboard-k8s-node-rsrc-use
-        name: grafana-dashboard-k8s-node-rsrc-use
-      - configMap:
-          name: grafana-dashboard-k8s-resources-cluster
-        name: grafana-dashboard-k8s-resources-cluster
-      - configMap:
-          name: grafana-dashboard-k8s-resources-namespace
-        name: grafana-dashboard-k8s-resources-namespace
-      - configMap:
-          name: grafana-dashboard-k8s-resources-pod
-        name: grafana-dashboard-k8s-resources-pod
-      - configMap:
-          name: grafana-dashboard-k8s-resources-workload
-        name: grafana-dashboard-k8s-resources-workload
-      - configMap:
-          name: grafana-dashboard-k8s-resources-workloads-namespace
-        name: grafana-dashboard-k8s-resources-workloads-namespace
-      - configMap:
-          name: grafana-dashboard-kubelet
-        name: grafana-dashboard-kubelet
-      - configMap:
-          name: grafana-dashboard-nodes
-        name: grafana-dashboard-nodes
-      - configMap:
-          name: grafana-dashboard-persistentvolumesusage
-        name: grafana-dashboard-persistentvolumesusage
-      - configMap:
-          name: grafana-dashboard-pods
-        name: grafana-dashboard-pods
-      - configMap:
-          name: grafana-dashboard-prometheus-remote-write
-        name: grafana-dashboard-prometheus-remote-write
-      - configMap:
-          name: grafana-dashboard-prometheus
-        name: grafana-dashboard-prometheus
-      - configMap:
-          name: grafana-dashboard-proxy
-        name: grafana-dashboard-proxy
-      - configMap:
-          name: grafana-dashboard-scheduler
-        name: grafana-dashboard-scheduler
-      - configMap:
-          name: grafana-dashboard-statefulset
-        name: grafana-dashboard-statefulset
-      - configMap:
-          name: grafana-config
-        name: config-custom
-</code></pre><p>其实就是将一个叫grafana-config的configMap作为volumeMount到/etc/grafana下。 然后我们创建这个configMap</p>
-<pre tabindex="0"><code># grafana-configmap.yaml
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: grafana-config
-  namespace: monitoring
-data:
-  grafana.ini: |
-    [smtp]
-    enabled = true
-    host = smtp.calmkart.com:465
-    user = calmkart@calmkart.com
-    password = xxxxxxxxxx
-    skip_verify = false
-    from_address = calmkart@calmkart.com
-    from_name = grafana
-
-# kubectl apply -f grafana-configmap.yaml
-</code></pre><p>这样就可以替换掉默认的配置文件了。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">apps/v1beta2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Deployment</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">grafana</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">monitoring</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">grafana</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">grafana</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">grafana/grafana:6.2.2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">3000</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">http</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">readinessProbe</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">httpGet</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/api/health</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l">http</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">limits</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l">200m</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l">200Mi</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">requests</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l">100m</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l">100Mi</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">volumeMounts</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/var/lib/grafana</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-storage</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/etc/grafana/provisioning/datasources</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-datasources</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/etc/grafana/provisioning/dashboards</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboards</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/apiserver</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-apiserver</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/controller-manager</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-controller-manager</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/k8s-cluster-rsrc-use</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-cluster-rsrc-use</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/k8s-node-rsrc-use</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-node-rsrc-use</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/k8s-resources-cluster</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-cluster</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/k8s-resources-namespace</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-namespace</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/k8s-resources-pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/k8s-resources-workload</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-workload</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/k8s-resources-workloads-namespace</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-workloads-namespace</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/kubelet</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-kubelet</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/nodes</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-nodes</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/persistentvolumesusage</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-persistentvolumesusage</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/pods</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-pods</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/prometheus-remote-write</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-prometheus-remote-write</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/prometheus</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-prometheus</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/proxy</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-proxy</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/scheduler</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-scheduler</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/grafana-dashboard-definitions/0/statefulset</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-statefulset</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/etc/grafana</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">config-custom</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">nodeSelector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">beta.kubernetes.io/os</span><span class="p">:</span><span class="w"> </span><span class="l">linux</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">securityContext</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">runAsNonRoot</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">runAsUser</span><span class="p">:</span><span class="w"> </span><span class="m">65534</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">serviceAccountName</span><span class="p">:</span><span class="w"> </span><span class="l">grafana</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">emptyDir</span><span class="p">:</span><span class="w"> </span>{}<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-storage</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-datasources</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">secret</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">secretName</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-datasources</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboards</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboards</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-apiserver</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-apiserver</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-controller-manager</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-controller-manager</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-cluster-rsrc-use</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-cluster-rsrc-use</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-node-rsrc-use</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-node-rsrc-use</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-cluster</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-cluster</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-namespace</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-namespace</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-workload</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-workload</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-workloads-namespace</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-k8s-resources-workloads-namespace</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-kubelet</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-kubelet</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-nodes</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-nodes</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-persistentvolumesusage</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-persistentvolumesusage</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-pods</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-pods</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-prometheus-remote-write</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-prometheus-remote-write</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-prometheus</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-prometheus</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-proxy</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-proxy</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-scheduler</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-scheduler</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-statefulset</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-dashboard-statefulset</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-config</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">config-custom</span><span class="w">
+</span></span></span></code></pre></div><p>其实就是将一个叫grafana-config的configMap作为volumeMount到/etc/grafana下。 然后我们创建这个configMap</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># grafana-configmap.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ConfigMap</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">grafana-config</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">monitoring</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">data</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">grafana.ini</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">    [smtp]
+</span></span></span><span class="line"><span class="cl"><span class="sd">    enabled = true
+</span></span></span><span class="line"><span class="cl"><span class="sd">    host = smtp.calmkart.com:465
+</span></span></span><span class="line"><span class="cl"><span class="sd">    user = calmkart@calmkart.com
+</span></span></span><span class="line"><span class="cl"><span class="sd">    password = xxxxxxxxxx
+</span></span></span><span class="line"><span class="cl"><span class="sd">    skip_verify = false
+</span></span></span><span class="line"><span class="cl"><span class="sd">    from_address = calmkart@calmkart.com
+</span></span></span><span class="line"><span class="cl"><span class="sd">    from_name = grafana</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c"># kubectl apply -f grafana-configmap.yaml</span><span class="w">
+</span></span></span></code></pre></div><p>这样就可以替换掉默认的配置文件了。</p>
 <p>另外还有关于如何为grafana增加plugin等等话题，可以参考官方的相关资料。 就简单介绍到这里吧。</p>
+<div class="archived-comments">
+<h2>历史评论 (1 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>曰..曰</strong> (2019-08-26 19:35)</div>
+<div class="comment-body">牛逼的彭董，碾压我等底层劳苦大众，我是服的</div>
+</div>
+</div>
 </section>
 
 
@@ -692,6 +723,18 @@ data:
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -703,7 +746,7 @@ data:
     
 
 <aside class="related-content--wrapper">
-    <h2 class="section-title">Related content</h2>
+    <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
             
@@ -769,53 +812,16 @@ data:
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -826,8 +832,8 @@ data:
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

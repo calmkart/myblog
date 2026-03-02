@@ -1,6 +1,7 @@
 ---
 title: "琐事繁多是不是一定不好?"
 date: 2019-12-25
+description: "摘抄自 《SRE: Google运维解密》 字字珠玑。"
 categories: 
   - "计算机"
 tags: 
@@ -55,12 +56,12 @@ tags:
 
 如果我们都致力于每一周通过工程工作消除一点琐事，就可以持续性地整顿服务。我们就可以将更多的力量投入到扩大服务规模的工程工作上去，或者是进行下一代的服务的架构设计，又或者是建立一套跨SRE使用的工具链。让我们多创新，少干琐事吧！
 
----
+<div class="archived-comments">
 
-## 历史评论 (1 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **wallsis** (2020-03-12 11:40)
->
-> 大神，感觉您好久都没更新文章了，希望能看到您更多的技术分享，😆
+<h2>历史评论 (1 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>wallsis</strong> (2020-03-12 11:40)</div>
+<div class="comment-body">大神，感觉您好久都没更新文章了，希望能看到您更多的技术分享，😆</div>
+</div>
+</div>

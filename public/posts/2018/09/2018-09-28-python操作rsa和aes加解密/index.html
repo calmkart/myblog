@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="封装了一个python的操作rsa和aes的加解密类\n首先pip装库\npip install pycrypto 然后代码如下\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="封装了一个python的操作rsa和aes的加解密类 首先pip装库 然后代码如下">
 <title>python操作rsa和aes加解密</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="python操作rsa和aes加解密">
-<meta property='og:description' content="封装了一个python的操作rsa和aes的加解密类\n首先pip装库\npip install pycrypto 然后代码如下\n">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="python操作rsa和aes加解密">
+<meta property='og:description' content="封装了一个python的操作rsa和aes的加解密类 首先pip装库 然后代码如下">
 <meta property='og:url' content='http://localhost:1313/posts/2018/09/2018-09-28-python%E6%93%8D%E4%BD%9Crsa%E5%92%8Caes%E5%8A%A0%E8%A7%A3%E5%AF%86/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='aes' /><meta property='article:tag' content='python' /><meta property='article:tag' content='rsa' /><meta property='article:tag' content='加密' /><meta property='article:tag' content='密码' /><meta property='article:tag' content='解密' /><meta property='article:published_time' content='2018-09-28T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2018-09-28T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="python操作rsa和aes加解密">
-<meta name="twitter:description" content="封装了一个python的操作rsa和aes的加解密类\n首先pip装库\npip install pycrypto 然后代码如下\n">
+<meta name="twitter:description" content="封装了一个python的操作rsa和aes的加解密类 首先pip装库 然后代码如下">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -149,6 +157,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            封装了一个python的操作rsa和aes的加解密类 首先pip装库 然后代码如下
+        </h3>
+        
     </div>
 
     
@@ -167,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2018-09-28T00:00:00Z'>Friday, September 28, 2018</time>
+                <time class="article-time--published" datetime='2018-09-28T00:00:00Z'>2018年9月28日星期五</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 1 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -189,76 +215,76 @@
     
     <p>封装了一个python的操作rsa和aes的加解密类</p>
 <p>首先pip装库</p>
-<pre tabindex="0"><code>pip install pycrypto
-</code></pre><p>然后代码如下</p>
-<pre tabindex="0"><code># -*- coding:utf-8 -*-
-import base64
-from Crypto import Random
-from Crypto.Hash import SHA
-from Crypto.Cipher import PKCS1_v1_5 as Cipher_pkcs1_v1_5
-from Crypto.Signature import PKCS1_v1_5 as Signature_pkcs1_v1_5
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import AES
-from binascii import b2a_hex, a2b_hex
-
-#AES加解密,用于本地加密数据库密码和rsa private key
-aes_salt = &#34;opquweoijuqowieh&#34;
-class Aes():
-    
-    def __init__(self, key=aes_salt):
-        self.key = key
-        self.mode = AES.MODE_CBC
-
-    def encrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, b&#39;0000000000000000&#39;)
-        length = 16
-        count = len(text)
-        if count &lt; length: add = (length-count) text = text + (&#39;\0&#39; * add) elif count &gt; length:
-            add = (length-(count % length))
-            text = text + (&#39;\0&#39; * add)
-        self.ciphertext = cryptor.encrypt(text)
-        return b2a_hex(self.ciphertext)
-
-    def decrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, b&#39;0000000000000000&#39;)
-        plain_text = cryptor.decrypt(a2b_hex(text))
-        return plain_text.rstrip(&#39;\0&#39;)
-
-#rsa加解密,用于cookie的加解密
-class Rsa():
-    
-    def __init__(self):
-        self.random_generator = Random.new().read
-
-    def gen_rsa_keys(self):
-        rsa = RSA.generate(1024, self.random_generator)
-        private_pem = rsa.exportKey()
-        public_pem = rsa.publickey().exportKey()
-        return (private_pem, public_pem)
-
-    def crypto(self, public_key, text):
-        rsakey = RSA.importKey(public_key)
-        cipher = Cipher_pkcs1_v1_5.new(rsakey)
-        crypto_text = base64.b64encode(cipher.encrypt(text))
-        return crypto_text
-
-    def decrypt(self, private_key, text):
-        rsakey = RSA.importKey(private_key)
-        cipher = Cipher_pkcs1_v1_5.new(rsakey)
-        decrypt_text = cipher.decrypt(base64.b64decode(
-            text), self.random_generator)
-        return decrypt_text
-
-if __name__ == &#39;__main__&#39;:
-    rsa = Rsa()
-    aes = Aes()
-    (pri,pub)=rsa.gen_rsa_keys()
-    jm = rsa.crypto(pub, &#34;pengng|||||123908123.123123&#34;)
-    print rsa.decrypt(pri, jm)
-</code></pre><p>调用方法</p>
-<pre tabindex="0"><code>rsa = Rsa()
-aes = Aes()
-</code></pre><p>代码注释写得非常详细，细节就不赘述了，做个备忘</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">pip install pycrypto
+</span></span></code></pre></div><p>然后代码如下</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># -*- coding:utf-8 -*-</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">base64</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto</span> <span class="kn">import</span> <span class="n">Random</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Hash</span> <span class="kn">import</span> <span class="n">SHA</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Cipher</span> <span class="kn">import</span> <span class="n">PKCS1_v1_5</span> <span class="k">as</span> <span class="n">Cipher_pkcs1_v1_5</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Signature</span> <span class="kn">import</span> <span class="n">PKCS1_v1_5</span> <span class="k">as</span> <span class="n">Signature_pkcs1_v1_5</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.PublicKey</span> <span class="kn">import</span> <span class="n">RSA</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Cipher</span> <span class="kn">import</span> <span class="n">AES</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">binascii</span> <span class="kn">import</span> <span class="n">b2a_hex</span><span class="p">,</span> <span class="n">a2b_hex</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#AES加解密,用于本地加密数据库密码和rsa private key</span>
+</span></span><span class="line"><span class="cl"><span class="n">aes_salt</span> <span class="o">=</span> <span class="s2">&#34;opquweoijuqowieh&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Aes</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">aes_salt</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">AES</span><span class="o">.</span><span class="n">MODE_CBC</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cryptor</span> <span class="o">=</span> <span class="n">AES</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;0000000000000000&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">length</span> <span class="o">=</span> <span class="mi">16</span>
+</span></span><span class="line"><span class="cl">        <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">:</span> <span class="n">add</span> <span class="o">=</span> <span class="p">(</span><span class="n">length</span><span class="o">-</span><span class="n">count</span><span class="p">)</span> <span class="n">text</span> <span class="o">=</span> <span class="n">text</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="n">add</span><span class="p">)</span> <span class="k">elif</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="n">length</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">add</span> <span class="o">=</span> <span class="p">(</span><span class="n">length</span><span class="o">-</span><span class="p">(</span><span class="n">count</span> <span class="o">%</span> <span class="n">length</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="n">add</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">ciphertext</span> <span class="o">=</span> <span class="n">cryptor</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">b2a_hex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ciphertext</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cryptor</span> <span class="o">=</span> <span class="n">AES</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;0000000000000000&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">plain_text</span> <span class="o">=</span> <span class="n">cryptor</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">a2b_hex</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">plain_text</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#rsa加解密,用于cookie的加解密</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Rsa</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">random_generator</span> <span class="o">=</span> <span class="n">Random</span><span class="o">.</span><span class="n">new</span><span class="p">()</span><span class="o">.</span><span class="n">read</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">gen_rsa_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">rsa</span> <span class="o">=</span> <span class="n">RSA</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_generator</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">private_pem</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">exportKey</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="n">public_pem</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">publickey</span><span class="p">()</span><span class="o">.</span><span class="n">exportKey</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">(</span><span class="n">private_pem</span><span class="p">,</span> <span class="n">public_pem</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">crypto</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">public_key</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">rsakey</span> <span class="o">=</span> <span class="n">RSA</span><span class="o">.</span><span class="n">importKey</span><span class="p">(</span><span class="n">public_key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cipher</span> <span class="o">=</span> <span class="n">Cipher_pkcs1_v1_5</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">rsakey</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">crypto_text</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">crypto_text</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">private_key</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">rsakey</span> <span class="o">=</span> <span class="n">RSA</span><span class="o">.</span><span class="n">importKey</span><span class="p">(</span><span class="n">private_key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cipher</span> <span class="o">=</span> <span class="n">Cipher_pkcs1_v1_5</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">rsakey</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">decrypt_text</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">text</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_generator</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">decrypt_text</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">rsa</span> <span class="o">=</span> <span class="n">Rsa</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">aes</span> <span class="o">=</span> <span class="n">Aes</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">(</span><span class="n">pri</span><span class="p">,</span><span class="n">pub</span><span class="p">)</span><span class="o">=</span><span class="n">rsa</span><span class="o">.</span><span class="n">gen_rsa_keys</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">jm</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">crypto</span><span class="p">(</span><span class="n">pub</span><span class="p">,</span> <span class="s2">&#34;pengng|||||123908123.123123&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span> <span class="n">rsa</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pri</span><span class="p">,</span> <span class="n">jm</span><span class="p">)</span>
+</span></span></code></pre></div><p>调用方法</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">rsa</span> <span class="o">=</span> <span class="n">Rsa</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">aes</span> <span class="o">=</span> <span class="n">Aes</span><span class="p">()</span>
+</span></span></code></pre></div><p>代码注释写得非常详细，细节就不赘述了，做个备忘</p>
 </section>
 
 
@@ -281,6 +307,18 @@ aes = Aes()
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -292,7 +330,7 @@ aes = Aes()
     
 
 <aside class="related-content--wrapper">
-    <h2 class="section-title">Related content</h2>
+    <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
             
@@ -358,53 +396,16 @@ aes = Aes()
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -415,8 +416,8 @@ aes = Aes()
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

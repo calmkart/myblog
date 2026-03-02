@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="1.*args与**kwargs传参(不定长传参) 其中*args是列表传参,**kwargs是字典传参\n使用举例：\nfunction(fargs, *args, **kwargs) 可以用function(1)，function([1,2])，function({a:1})调用函数，都没问题。\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Python中*args与**kwargs传参(不定长传参)、生成器、Map/Filter/Reduce、装饰器等进阶知识点的读书笔记。">
 <title>《Python进阶》读书笔记(1)</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="《Python进阶》读书笔记(1)">
-<meta property='og:description' content="1.*args与**kwargs传参(不定长传参) 其中*args是列表传参,**kwargs是字典传参\n使用举例：\nfunction(fargs, *args, **kwargs) 可以用function(1)，function([1,2])，function({a:1})调用函数，都没问题。\n">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="《Python进阶》读书笔记(1)">
+<meta property='og:description' content="Python中*args与**kwargs传参(不定长传参)、生成器、Map/Filter/Reduce、装饰器等进阶知识点的读书笔记。">
 <meta property='og:url' content='http://localhost:1313/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='python' /><meta property='article:published_time' content='2017-11-15T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2017-11-15T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="《Python进阶》读书笔记(1)">
-<meta name="twitter:description" content="1.*args与**kwargs传参(不定长传参) 其中*args是列表传参,**kwargs是字典传参\n使用举例：\nfunction(fargs, *args, **kwargs) 可以用function(1)，function([1,2])，function({a:1})调用函数，都没问题。\n">
+<meta name="twitter:description" content="Python中*args与**kwargs传参(不定长传参)、生成器、Map/Filter/Reduce、装饰器等进阶知识点的读书笔记。">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -123,7 +131,55 @@
     </ol>
 </aside>
 
-    
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ol>
+    <li>
+      <ol>
+        <li>
+          <ol>
+            <li><a href="#1args与kwargs传参不定长传参"><strong>1.*args与**kwargs传参(不定长传参)</strong></a></li>
+            <li><a href="#2生成器yield"><strong>2.生成器yield</strong></a></li>
+            <li><a href="#3匿名函数"><strong>3.匿名函数</strong></a></li>
+            <li><a href="#4map"><strong>4.map()</strong></a></li>
+            <li><a href="#5filter">5.filter()</a></li>
+            <li><a href="#6reduce">6.reduce()</a></li>
+            <li><a href="#7set">7.set</a></li>
+            <li><a href="#8三元运算符">8.三元运算符</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
 
             <main class="main full-width">
     <article class="main-article">
@@ -156,6 +212,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            Python中*args与**kwargs传参(不定长传参)、生成器、Map/Filter/Reduce、装饰器等进阶知识点的读书笔记。
+        </h3>
+        
     </div>
 
     
@@ -174,10 +234,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2017-11-15T00:00:00Z'>Wednesday, November 15, 2017</time>
+                <time class="article-time--published" datetime='2017-11-15T00:00:00Z'>2017年11月15日星期三</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -190,6 +264,39 @@
 </header>
 
     
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ol>
+    <li>
+      <ol>
+        <li>
+          <ol>
+            <li><a href="#1args与kwargs传参不定长传参"><strong>1.*args与**kwargs传参(不定长传参)</strong></a></li>
+            <li><a href="#2生成器yield"><strong>2.生成器yield</strong></a></li>
+            <li><a href="#3匿名函数"><strong>3.匿名函数</strong></a></li>
+            <li><a href="#4map"><strong>4.map()</strong></a></li>
+            <li><a href="#5filter">5.filter()</a></li>
+            <li><a href="#6reduce">6.reduce()</a></li>
+            <li><a href="#7set">7.set</a></li>
+            <li><a href="#8三元运算符">8.三元运算符</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+
+            </nav>
+        </details>
+    </aside>
+    
 
     <section class="article-content">
     
@@ -197,57 +304,57 @@
     <h4 id="1args与kwargs传参不定长传参"><strong>1.*args与**kwargs传参(不定长传参)</strong>
 </h4><p>其中*args是列表传参,**kwargs是字典传参</p>
 <p>使用举例：</p>
-<pre tabindex="0"><code>function(fargs, *args, **kwargs)
-</code></pre><p>可以用function(1)，function([1,2])，function({a:1})调用函数，都没问题。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">function</span><span class="p">(</span><span class="n">fargs</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span></span></code></pre></div><p>可以用function(1)，function([1,2])，function({a:1})调用函数，都没问题。</p>
 <h4 id="2生成器yield"><strong>2.生成器yield</strong>
 </h4><p>可理解为只能被迭代一次的迭代器，可以节省内存</p>
 <p>使用举例：</p>
-<pre tabindex="0"><code>def generation_function():
-    for i in range(10):
-        yield i
-
-for item in generation_function():
-#generation_function是生成器，可被迭代的
-    print item
-#输出是0-&gt;9，但并不需要建立一个list，节省了内存
-</code></pre><h4 id="3匿名函数"><strong>3.匿名函数</strong>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">generation_function</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">yield</span> <span class="n">i</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">generation_function</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#generation_function是生成器，可被迭代的</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span> <span class="n">item</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#输出是0-&gt;9，但并不需要建立一个list，节省了内存</span>
+</span></span></code></pre></div><h4 id="3匿名函数"><strong>3.匿名函数</strong>
 </h4><p>lambda，可减少无需重复函数</p>
 <p>格式：lambda 参数:操作</p>
 <p>使用举例：</p>
-<pre tabindex="0"><code>lambda x : x+1
-</code></pre><h4 id="4map"><strong>4.map()</strong>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span>
+</span></span></code></pre></div><h4 id="4map"><strong>4.map()</strong>
 </h4><p>将function应用于后面参数的所有LIST元素中，返回结果。(python2返回list,python3返回迭代器)</p>
-<pre tabindex="0"><code>map(function, list)
-</code></pre><p>也支持多参数:</p>
-<pre tabindex="0"><code>map(function, list1, list2, list3....)
-</code></pre><p>常结合lambda匿名函数一起使用</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">map</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+</span></span></code></pre></div><p>也支持多参数:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">map</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">list1</span><span class="p">,</span> <span class="n">list2</span><span class="p">,</span> <span class="n">list3</span><span class="o">....</span><span class="p">)</span>
+</span></span></code></pre></div><p>常结合lambda匿名函数一起使用</p>
 <p>使用举例：</p>
-<pre tabindex="0"><code>items=[1,2,3,4,5]
-print map(lambda x : x**2, items)
-</code></pre><p>输出[1,4,9,16,25]</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">items</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">items</span><span class="p">)</span>
+</span></span></code></pre></div><p>输出[1,4,9,16,25]</p>
 <p>map的本质既将一个函数映射到若干列表的所有元素上。</p>
 <h4 id="5filter">5.filter()
 </h4><p>过滤list中的元素，返回符合条件元素的list</p>
 <p>使用举例：</p>
-<pre tabindex="0"><code>number_list = range(-5,5)
-less_than_zero = filter(lambda x : x&lt;0, number_list)
-</code></pre><p>输出[-5,-4,-3,-2,-1]</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">number_list</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">less_than_zero</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="n">x</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="n">number_list</span><span class="p">)</span>
+</span></span></code></pre></div><p>输出[-5,-4,-3,-2,-1]</p>
 <h4 id="6reduce">6.reduce()
-</h4><pre tabindex="0"><code>from functools import reduce)
-product = reduce((lambda x,y:x*y),[1,2,3,4])
-</code></pre><p>输出24</p>
+</h4><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">product</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">((</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">),[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+</span></span></code></pre></div><p>输出24</p>
 <h4 id="7set">7.set
 </h4><p>集合既不能包含重复值(其他行为与list相似)</p>
 <p>语法：set(list)</p>
 <p>交集：</p>
-<pre tabindex="0"><code>print (set1.intersection(set2))
-</code></pre><p>差集：</p>
-<pre tabindex="0"><code>print (set1.difference(set2))
-</code></pre><h4 id="8三元运算符">8.三元运算符
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span> <span class="p">(</span><span class="n">set1</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">set2</span><span class="p">))</span>
+</span></span></code></pre></div><p>差集：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span> <span class="p">(</span><span class="n">set1</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">set2</span><span class="p">))</span>
+</span></span></code></pre></div><h4 id="8三元运算符">8.三元运算符
 </h4><p>使用举例：</p>
-<pre tabindex="0"><code>is_fat = True
-state = &#34;fat&#34; if is_fat else &#34;not fat&#34;
-</code></pre><p> </p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">is_fat</span> <span class="o">=</span> <span class="kc">True</span>
+</span></span><span class="line"><span class="cl"><span class="n">state</span> <span class="o">=</span> <span class="s2">&#34;fat&#34;</span> <span class="k">if</span> <span class="n">is_fat</span> <span class="k">else</span> <span class="s2">&#34;not fat&#34;</span>
+</span></span></code></pre></div><p> </p>
 <p><a class="link" href="http://www.calmkart.com/?p=139"  target="_blank" rel="noopener"
     >《Python进阶》读书笔记(2)</a> <a class="link" href="http://www.calmkart.com/?p=150"  target="_blank" rel="noopener"
     >《Python进阶》读书笔记(3)</a></p>
@@ -263,6 +370,18 @@ state = &#34;fat&#34; if is_fat else &#34;not fat&#34;
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -274,7 +393,7 @@ state = &#34;fat&#34; if is_fat else &#34;not fat&#34;
     
 
 <aside class="related-content--wrapper">
-    <h2 class="section-title">Related content</h2>
+    <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
             
@@ -340,53 +459,16 @@ state = &#34;fat&#34; if is_fat else &#34;not fat&#34;
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -397,8 +479,8 @@ state = &#34;fat&#34; if is_fat else &#34;not fat&#34;
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

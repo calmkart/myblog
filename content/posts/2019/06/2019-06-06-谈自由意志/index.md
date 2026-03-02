@@ -1,6 +1,7 @@
 ---
 title: "谈自由意志"
 date: 2019-06-06
+description: "此文写于一年半到两年前，写了一半就停住，存过草稿就不想发了。过了这么久，对一些东西的看法也发生了变化，现在回头看看过去写的东西，觉得挺有趣的，不妨发出来吧。(较初稿有微调) 关于自由意志的存在问题，是哲学的一个基本命题。 何谓自由意志..."
 categories: 
   - "杂谈"
 tags: 
@@ -54,16 +55,16 @@ tags:
 
 未完，也许待续(文中休谟部分摘抄了一些邓晓芒教授谈纯粹理性批判的演讲,标注下)....
 
----
+<div class="archived-comments">
 
-## 历史评论 (2 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **huan** (2019-06-12 10:58)
->
-> 康德的有点难理解
-
-  > ↳ **lsprit** (2019-06-12 12:12)
-  >
-  > 康德的还好吧，叔本华的一些观点倒是很有见地，尤其是生存意志轮，确实很牛逼
+<h2>历史评论 (2 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>huan</strong> (2019-06-12 10:58)</div>
+<div class="comment-body">康德的有点难理解</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>lsprit</strong> (2019-06-12 12:12)</div>
+<div class="comment-body">康德的还好吧，叔本华的一些观点倒是很有见地，尤其是生存意志轮，确实很牛逼</div>
+</div>
+</div>

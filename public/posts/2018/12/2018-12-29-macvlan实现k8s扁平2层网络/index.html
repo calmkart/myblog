@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="最近有一批旧服务器待用，没有用iaas，打算把docker当vm来用，还想采用k8s的编排方案。这样用户就可以很方便的通过ip直连docker，就像虚拟机一样。\n原生的docker网络方案是不行的，于是采用了macvlan网络插件实现了k8s扁平二层网络。下面记录一下实现过程。\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="最近有一批旧服务器待用，没有用iaas，打算把docker当vm来用，还想采用k8s的编排方案。这样用户就可以很方便的通过ip直连docker，就像虚拟机一样。 原生的docker网络方案是不行的...">
 <title>macvlan实现k8s扁平2层网络</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="macvlan实现k8s扁平2层网络">
-<meta property='og:description' content="最近有一批旧服务器待用，没有用iaas，打算把docker当vm来用，还想采用k8s的编排方案。这样用户就可以很方便的通过ip直连docker，就像虚拟机一样。\n原生的docker网络方案是不行的，于是采用了macvlan网络插件实现了k8s扁平二层网络。下面记录一下实现过程。\n">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="macvlan实现k8s扁平2层网络">
+<meta property='og:description' content="最近有一批旧服务器待用，没有用iaas，打算把docker当vm来用，还想采用k8s的编排方案。这样用户就可以很方便的通过ip直连docker，就像虚拟机一样。 原生的docker网络方案是不行的...">
 <meta property='og:url' content='http://localhost:1313/posts/2018/12/2018-12-29-macvlan%E5%AE%9E%E7%8E%B0k8s%E6%89%81%E5%B9%B32%E5%B1%82%E7%BD%91%E7%BB%9C/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:published_time' content='2018-12-29T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2018-12-29T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="macvlan实现k8s扁平2层网络">
-<meta name="twitter:description" content="最近有一批旧服务器待用，没有用iaas，打算把docker当vm来用，还想采用k8s的编排方案。这样用户就可以很方便的通过ip直连docker，就像虚拟机一样。\n原生的docker网络方案是不行的，于是采用了macvlan网络插件实现了k8s扁平二层网络。下面记录一下实现过程。\n">
+<meta name="twitter:description" content="最近有一批旧服务器待用，没有用iaas，打算把docker当vm来用，还想采用k8s的编排方案。这样用户就可以很方便的通过ip直连docker，就像虚拟机一样。 原生的docker网络方案是不行的...">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -131,12 +139,27 @@
 
     <div class="article-details">
     
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/" style="background-color: hsl(208, 60%, 84%); color: hsl(208, 60%, 15%);">
+                计算机
+            </a>
+        
+    </header>
+    
 
     <div class="article-title-wrapper">
         <h2 class="article-title">
             <a href="/posts/2018/12/2018-12-29-macvlan%E5%AE%9E%E7%8E%B0k8s%E6%89%81%E5%B9%B32%E5%B1%82%E7%BD%91%E7%BB%9C/">macvlan实现k8s扁平2层网络</a>
         </h2>
     
+        
+        <h3 class="article-subtitle">
+            最近有一批旧服务器待用，没有用iaas，打算把docker当vm来用，还想采用k8s的编排方案。这样用户就可以很方便的通过ip直连docker，就像虚拟机一样。 原生的docker网络方案是不行的...
+        </h3>
         
     </div>
 
@@ -156,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2018-12-29T00:00:00Z'>Saturday, December 29, 2018</time>
+                <time class="article-time--published" datetime='2018-12-29T00:00:00Z'>2018年12月29日星期六</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 4 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -179,169 +216,233 @@
     <p>最近有一批旧服务器待用，没有用iaas，打算把docker当vm来用，还想采用k8s的编排方案。这样用户就可以很方便的通过ip直连docker，就像虚拟机一样。</p>
 <p>原生的docker网络方案是不行的，于是采用了macvlan网络插件实现了k8s扁平二层网络。下面记录一下实现过程。</p>
 <p>首先肯定是装docker了</p>
-<pre tabindex="0"><code>#卸载旧的docker
-yum remove -y docker
-#这里我是用自己搭的私人仓库和自定义的docker安装包,各位可酌情
-yum install -y docker-ce.x86_64
-systemctl start docker
-systemctl enable docker
-</code></pre><p>关闭防火墙,关闭swap</p>
-<pre tabindex="0"><code>systemctl stop firewalld
-systemctl disable firewalld
-setenforce 0
-sed -i &#39;s/^SELINUX=enforcing$/SELINUX=permissive/&#39; /etc/selinux/config
-swapoff -a
-</code></pre><p>配置k8s国内源,设置系统bridge参数</p>
-<pre tabindex="0"><code># 添加kubenetes源
-cat &lt; /etc/yum.repos.d/kubernetes.repo
-[kubernetes]
-name=Kubernetes
-baseurl=http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
-enabled=1
-gpgcheck=0
-repo_gpgcheck=0
-gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
-        http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
-EOF
-#调系统参数
-cat &lt;  /etc/sysctl.d/k8s.conf
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-EOF
-sysctl --system
-</code></pre><p>用国内源下载k8s相关镜像，重新打tag成k8s.gcr.io(就算可以翻墙，这一步也可以加速很多)</p>
-<pre tabindex="0"><code>#docker镜像换国内
-cat &lt;  ~/get_image.sh
-#!/bin/bash
-images=(
-    kube-apiserver:v1.13.1
-    kube-controller-manager:v1.13.1
-    kube-scheduler:v1.13.1
-    kube-proxy:v1.13.1
-    pause:3.1
-    etcd:3.2.24
-    coredns:1.2.6
-)
-
-for imageName in ${images[@]} ; do
-    docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/$imageName
-    docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/$imageName k8s.gcr.io/$imageName
-done
-EOF
-
-#下载镜像
-bash ~/get_image.sh
-</code></pre><p>下载cni网络插件包 <a class="link" href="https://github.com/containernetworking/plugins/releases"  target="_blank" rel="noopener"
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1">#卸载旧的docker</span>
+</span></span><span class="line"><span class="cl">yum remove -y docker
+</span></span><span class="line"><span class="cl"><span class="c1">#这里我是用自己搭的私人仓库和自定义的docker安装包,各位可酌情</span>
+</span></span><span class="line"><span class="cl">yum install -y docker-ce.x86_64
+</span></span><span class="line"><span class="cl">systemctl start docker
+</span></span><span class="line"><span class="cl">systemctl <span class="nb">enable</span> docker
+</span></span></code></pre></div><p>关闭防火墙,关闭swap</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">systemctl stop firewalld
+</span></span><span class="line"><span class="cl">systemctl disable firewalld
+</span></span><span class="line"><span class="cl">setenforce <span class="m">0</span>
+</span></span><span class="line"><span class="cl">sed -i <span class="s1">&#39;s/^SELINUX=enforcing$/SELINUX=permissive/&#39;</span> /etc/selinux/config
+</span></span><span class="line"><span class="cl">swapoff -a
+</span></span></code></pre></div><p>配置k8s国内源,设置系统bridge参数</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1"># 添加kubenetes源</span>
+</span></span><span class="line"><span class="cl"><span class="na">cat &lt; /etc/yum.repos.d/kubernetes.repo</span>
+</span></span><span class="line"><span class="cl"><span class="k">[kubernetes]</span>
+</span></span><span class="line"><span class="cl"><span class="na">name</span><span class="o">=</span><span class="s">Kubernetes</span>
+</span></span><span class="line"><span class="cl"><span class="na">baseurl</span><span class="o">=</span><span class="s">http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64</span>
+</span></span><span class="line"><span class="cl"><span class="na">enabled</span><span class="o">=</span><span class="s">1</span>
+</span></span><span class="line"><span class="cl"><span class="na">gpgcheck</span><span class="o">=</span><span class="s">0</span>
+</span></span><span class="line"><span class="cl"><span class="na">repo_gpgcheck</span><span class="o">=</span><span class="s">0</span>
+</span></span><span class="line"><span class="cl"><span class="na">gpgkey</span><span class="o">=</span><span class="s">http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
+</span></span></span><span class="line"><span class="cl"><span class="s">        http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg</span>
+</span></span><span class="line"><span class="cl"><span class="na">EOF</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#调系统参数</span>
+</span></span><span class="line"><span class="cl"><span class="na">cat &lt;  /etc/sysctl.d/k8s.conf</span>
+</span></span><span class="line"><span class="cl"><span class="na">net.bridge.bridge-nf-call-ip6tables</span> <span class="o">=</span> <span class="s">1</span>
+</span></span><span class="line"><span class="cl"><span class="na">net.bridge.bridge-nf-call-iptables</span> <span class="o">=</span> <span class="s">1</span>
+</span></span><span class="line"><span class="cl"><span class="na">EOF</span>
+</span></span><span class="line"><span class="cl"><span class="na">sysctl --system</span>
+</span></span></code></pre></div><p>用国内源下载k8s相关镜像，重新打tag成k8s.gcr.io(就算可以翻墙，这一步也可以加速很多)</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1">#docker镜像换国内</span>
+</span></span><span class="line"><span class="cl">cat &lt;  ~/get_image.sh
+</span></span><span class="line"><span class="cl"><span class="c1">#!/bin/bash</span>
+</span></span><span class="line"><span class="cl"><span class="nv">images</span><span class="o">=(</span>
+</span></span><span class="line"><span class="cl">    kube-apiserver:v1.13.1
+</span></span><span class="line"><span class="cl">    kube-controller-manager:v1.13.1
+</span></span><span class="line"><span class="cl">    kube-scheduler:v1.13.1
+</span></span><span class="line"><span class="cl">    kube-proxy:v1.13.1
+</span></span><span class="line"><span class="cl">    pause:3.1
+</span></span><span class="line"><span class="cl">    etcd:3.2.24
+</span></span><span class="line"><span class="cl">    coredns:1.2.6
+</span></span><span class="line"><span class="cl"><span class="o">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> imageName in <span class="si">${</span><span class="nv">images</span><span class="p">[@]</span><span class="si">}</span> <span class="p">;</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">    docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/<span class="nv">$imageName</span>
+</span></span><span class="line"><span class="cl">    docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/<span class="nv">$imageName</span> k8s.gcr.io/<span class="nv">$imageName</span>
+</span></span><span class="line"><span class="cl"><span class="k">done</span>
+</span></span><span class="line"><span class="cl">EOF
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#下载镜像</span>
+</span></span><span class="line"><span class="cl">bash ~/get_image.sh
+</span></span></code></pre></div><p>下载cni网络插件包 <a class="link" href="https://github.com/containernetworking/plugins/releases"  target="_blank" rel="noopener"
     >https://github.com/containernetworking/plugins/releases</a> 当前0.7.4版下载地址是 <a class="link" href="https://github.com/containernetworking/plugins/releases/download/v0.7.4/cni-plugins-amd64-v0.7.4.tgz"  target="_blank" rel="noopener"
     >https://github.com/containernetworking/plugins/releases/download/v0.7.4/cni-plugins-amd64-v0.7.4.tgz</a></p>
-<pre tabindex="0"><code>mkdir -p /opt/cni/bin/
-cd /opt/cni/bin
-wget https://github.com/containernetworking/plugins/releases/download/v0.7.4/cni-plugins-amd64-v0.7.4.tgz
-tar xzvf cni-plugins-amd64-v0.7.4.tgz
-</code></pre><p>安装k8s全家桶</p>
-<pre tabindex="0"><code>yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
-systemctl enable kubelet &amp;&amp; systemctl start kubelet
-</code></pre><p>kubeadm做k8s初始化,记录node用来join的token连接(当然用crt也行)</p>
-<pre tabindex="0"><code>kubeadm init
-</code></pre><p>最后配置网络插件macvlan</p>
-<pre tabindex="0"><code>mkdir -p /etc/cni/net.d
-vim /etc/cni/net.d/10-macvlan.conf
-#用host-local的配法,各配置项很简单不详述
-{
-&#34;name&#34;: &#34;macvlannet&#34;,
-&#34;type&#34;: &#34;macvlan&#34;,
-&#34;master&#34;: &#34;br0&#34;,
-&#34;ipam&#34;: {
-&#34;type&#34;: &#34;host-local&#34;,
-&#34;subnet&#34;: &#34;10.52.101.0/24&#34;,
-&#34;rangeStart&#34;: &#34;10.52.101.40&#34;,
-&#34;rangeEnd&#34;: &#34;10.52.101.250&#34;,
-&#34;gateway&#34;: &#34;10.52.101.254&#34;,
-&#34;routes&#34;: [
-{ &#34;dst&#34;: &#34;0.0.0.0/0&#34; }
-]
-}
-}
-#用dhcp的配法
-{
-&#34;name&#34;: &#34;macvlannet&#34;,
-&#34;type&#34;: &#34;macvlan&#34;,
-&#34;master&#34;: &#34;br0&#34;,
-&#34;ipam&#34;: {
-&#34;type&#34;: &#34;dhcp&#34;,
-}
-}
-
-#特别贴士----&gt;在使用DHCP插件之前，需要先启动dhcp daemon
-/opt/cni/bin/dhcp daemon &amp;
-</code></pre><p>看下主节点是否ok</p>
-<pre tabindex="0"><code>#先参考官方文档配下环境变量啥的
-#To make kubectl work for your non-root user, run these commands, which are also part of the kubeadm init output:
-
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
-#Alternatively, if you are the root user, you can run:
-
-export KUBECONFIG=/etc/kubernetes/admin.conf
-
-#查看主节点是否ready
-kubectl get nodes 
-#查看各个pods情况
-kubectl get pods --all-namespaces
-#如果有问题,就用describe自己查查吧,一般都不难解决
-kubectl describe pod
-</code></pre><p>让master也可以运行pod</p>
-<pre tabindex="0"><code>kubectl taint nodes --all node-role.kubernetes.io/master-
-</code></pre><p>然后随便弄个pod试试管用了没</p>
-<pre tabindex="0"><code>#编辑yaml
-vim pod-macvlan.yaml
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-macvlan
-  labels:
-    app: web
-  annotations:
-    cni: &#34;macvlan&#34;
-spec:
-  containers:
-    - name: key-value-store
-      image: nginx:latest
-      imagePullPolicy: IfNotPresent
-      ports:
-        - containerPort: 6379
-#创建pod
-kubectl create -f pod-macvlan.yaml
-#查看下pod情况
-kubectl get pods -o wide
-</code></pre><p>一般情况下是没问题，pod已经和宿主机在同一个2层网络了，同2层的其他网络也可以到该pod直通。 这时候就可以直接把pod当vm用了,和桥接的vm几乎没啥区别。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">mkdir -p /opt/cni/bin/
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> /opt/cni/bin
+</span></span><span class="line"><span class="cl">wget https://github.com/containernetworking/plugins/releases/download/v0.7.4/cni-plugins-amd64-v0.7.4.tgz
+</span></span><span class="line"><span class="cl">tar xzvf cni-plugins-amd64-v0.7.4.tgz
+</span></span></code></pre></div><p>安装k8s全家桶</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">yum install -y kubelet kubeadm kubectl --disableexcludes<span class="o">=</span>kubernetes
+</span></span><span class="line"><span class="cl">systemctl <span class="nb">enable</span> kubelet <span class="o">&amp;&amp;</span> systemctl start kubelet
+</span></span></code></pre></div><p>kubeadm做k8s初始化,记录node用来join的token连接(当然用crt也行)</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="l">kubeadm init</span><span class="w">
+</span></span></span></code></pre></div><p>最后配置网络插件macvlan</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">mkdir -p /etc/cni/net.d
+</span></span><span class="line"><span class="cl">vim /etc/cni/net.d/10-macvlan.conf
+</span></span><span class="line"><span class="cl"><span class="c1">#用host-local的配法,各配置项很简单不详述</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;name&#34;</span>: <span class="s2">&#34;macvlannet&#34;</span>,
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;type&#34;</span>: <span class="s2">&#34;macvlan&#34;</span>,
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;master&#34;</span>: <span class="s2">&#34;br0&#34;</span>,
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;ipam&#34;</span>: <span class="o">{</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;type&#34;</span>: <span class="s2">&#34;host-local&#34;</span>,
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;subnet&#34;</span>: <span class="s2">&#34;10.52.101.0/24&#34;</span>,
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;rangeStart&#34;</span>: <span class="s2">&#34;10.52.101.40&#34;</span>,
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;rangeEnd&#34;</span>: <span class="s2">&#34;10.52.101.250&#34;</span>,
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;gateway&#34;</span>: <span class="s2">&#34;10.52.101.254&#34;</span>,
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;routes&#34;</span>: <span class="o">[</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span> <span class="s2">&#34;dst&#34;</span>: <span class="s2">&#34;0.0.0.0/0&#34;</span> <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#用dhcp的配法</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;name&#34;</span>: <span class="s2">&#34;macvlannet&#34;</span>,
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;type&#34;</span>: <span class="s2">&#34;macvlan&#34;</span>,
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;master&#34;</span>: <span class="s2">&#34;br0&#34;</span>,
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;ipam&#34;</span>: <span class="o">{</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;type&#34;</span>: <span class="s2">&#34;dhcp&#34;</span>,
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#特别贴士----&gt;在使用DHCP插件之前，需要先启动dhcp daemon</span>
+</span></span><span class="line"><span class="cl">/opt/cni/bin/dhcp daemon <span class="p">&amp;</span>
+</span></span></code></pre></div><p>看下主节点是否ok</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1">#先参考官方文档配下环境变量啥的</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#To make kubectl work for your non-root user, run these commands, which are also part of the kubeadm init output:</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mkdir -p <span class="nv">$HOME</span>/.kube
+</span></span><span class="line"><span class="cl">sudo cp -i /etc/kubernetes/admin.conf <span class="nv">$HOME</span>/.kube/config
+</span></span><span class="line"><span class="cl">sudo chown <span class="k">$(</span>id -u<span class="k">)</span>:<span class="k">$(</span>id -g<span class="k">)</span> <span class="nv">$HOME</span>/.kube/config
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#Alternatively, if you are the root user, you can run:</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">KUBECONFIG</span><span class="o">=</span>/etc/kubernetes/admin.conf
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#查看主节点是否ready</span>
+</span></span><span class="line"><span class="cl">kubectl get nodes 
+</span></span><span class="line"><span class="cl"><span class="c1">#查看各个pods情况</span>
+</span></span><span class="line"><span class="cl">kubectl get pods --all-namespaces
+</span></span><span class="line"><span class="cl"><span class="c1">#如果有问题,就用describe自己查查吧,一般都不难解决</span>
+</span></span><span class="line"><span class="cl">kubectl describe pod
+</span></span></code></pre></div><p>让master也可以运行pod</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">kubectl taint nodes --all node-role.kubernetes.io/master-
+</span></span></code></pre></div><p>然后随便弄个pod试试管用了没</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c">#编辑yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">vim pod-macvlan.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx-macvlan</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">web</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">cni</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;macvlan&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">key-value-store</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx:latest</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">imagePullPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">IfNotPresent</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">6379</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c">#创建pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">kubectl create -f pod-macvlan.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c">#查看下pod情况</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">kubectl get pods -o wide</span><span class="w">
+</span></span></span></code></pre></div><p>一般情况下是没问题，pod已经和宿主机在同一个2层网络了，同2层的其他网络也可以到该pod直通。 这时候就可以直接把pod当vm用了,和桥接的vm几乎没啥区别。</p>
 <p>最后把其他机器作为node加入k8s集群中</p>
-<pre tabindex="0"><code>重复上面步骤
-除了kubeadm init 换成
-#举例
-kubeadm join 10.52.101.28:6443 --token b7eber.9e26oenyos7j17v8 --discovery-token-ca-cert-hash sha256:9faeb9f6ce6281d2ae149c9424ec34297e6809ce1f88c920281f1e5da8b1b1f8
-之外，其他不用变化啥。(确实多pull了几个kubeapi啥的镜像，不过无所谓了，不pull也行)
-</code></pre><p>最终结果 nodes <a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/12/nodes.jpg"  target="_blank" rel="noopener"
-    ><img src="images/nodes.jpg" alt="" />
-</a> pods <a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/12/pods.jpg"  target="_blank" rel="noopener"
-    ><img src="images/pods.jpg" alt="" />
-</a></p>
-<p>测试某一个pod <a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/12/some_pod.png"  target="_blank" rel="noopener"
-    ><img src="images/some_pod.png" alt="" />
-</a></p>
-<p>本机直接ip访问pod <a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/12/nginx_pod.jpg"  target="_blank" rel="noopener"
-    ><img src="images/nginx_pod.jpg" alt="" />
-</a></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="l">重复上面步骤</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">除了kubeadm init 换成</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c">#举例</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">kubeadm join 10.52.101.28:6443 --token b7eber.9e26oenyos7j17v8 --discovery-token-ca-cert-hash sha256:9faeb9f6ce6281d2ae149c9424ec34297e6809ce1f88c920281f1e5da8b1b1f8</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="l">之外，其他不用变化啥。(确实多pull了几个kubeapi啥的镜像，不过无所谓了，不pull也行)</span><span class="w">
+</span></span></span></code></pre></div><p>最终结果 nodes <img src="images/nodes.jpg" alt="" />
+ pods <img src="images/pods.jpg" alt="" />
+</p>
+<p>测试某一个pod <img src="images/some_pod.png" alt="" />
+</p>
+<p>本机直接ip访问pod <img src="images/nginx_pod.jpg" alt="" />
+</p>
 <p>ok,搞定,打完收工</p>
+<div class="archived-comments">
+<h2>历史评论 (13 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>huanguo</strong> (2019-01-10 20:22)</div>
+<div class="comment-body">给大佬点赞</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>( 曰..曰 )</strong> (2019-01-22 21:01)</div>
+<div class="comment-body">大佬，psc还缺保安吗？</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>1</strong> (2019-02-17 22:04)</div>
+<div class="comment-body">大佬，psc还缺保安吗？</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>wardenlym</strong> (2019-03-14 14:36)</div>
+<div class="comment-body">帮大忙了.jpg</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>wardenlym</strong> (2019-03-14 15:34)</div>
+<div class="comment-body">kubeadm init 时候不需要加任何参数吗？它是怎么能识别出来用的是macvlan的呢 请教</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-03-14 19:22)</div>
+<div class="comment-body">k8s的网络插件需要配置啊,要写配置文件.k8s会自己读.而且随时可以换的.</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>WEICHANG</strong> (2019-08-06 16:47)</div>
+<div class="comment-body">请问下，这个流程你那边能跑通吗？</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>bro</strong> (2019-03-15 10:40)</div>
+<div class="comment-body">请问下k8s网络插件可以热配置么，在不停服的情况下？</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-03-17 21:33)</div>
+<div class="comment-body">可以</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>carmer</strong> (2019-04-01 19:22)</div>
+<div class="comment-body">老哥哥，你有github地址么，让小弟star下啊</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-04-01 19:30)</div>
+<div class="comment-body">https://github.com/calmkart 欢迎关注，欢迎star</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>WEICHANG</strong> (2019-08-06 17:50)</div>
+<div class="comment-body">博主，我这边init初始化集群的时候，coredns节点起不来：0/1 nodes are available: 1 node(s) had taints that the pod didn't tolerate. reset了很多次都是这样。。。请问下有什么特别需要注意的地方吗。。。搞了两天了，绝望.jpg</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>calmkart</strong> (2019-08-09 15:25)</div>
+<div class="comment-body">你master节点有taints但是pods选择器没有tolerate导致调度器找不到可以调度的节点. 试着把master节点的污点去掉试试呢 kubectl taint nodes --all node-role.kubernetes.io/master-</div>
+</div>
+</div>
 </section>
 
 
     <footer class="article-footer">
     
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -355,53 +456,16 @@ kubeadm join 10.52.101.28:6443 --token b7eber.9e26oenyos7j17v8 --discovery-token
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -412,8 +476,8 @@ kubeadm join 10.52.101.28:6443 --token b7eber.9e26oenyos7j17v8 --discovery-token
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="本站phpMyAdmin测试地址：\nwww.calmkart.com/phpMyAdmin\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="本站phpMyAdmin测试地址： www.calmkart.com/phpMyAdmin">
 <title>用phpMyAdmin在线管理mysql数据库</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="用phpMyAdmin在线管理mysql数据库">
-<meta property='og:description' content="本站phpMyAdmin测试地址：\nwww.calmkart.com/phpMyAdmin\n">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="用phpMyAdmin在线管理mysql数据库">
+<meta property='og:description' content="本站phpMyAdmin测试地址： www.calmkart.com/phpMyAdmin">
 <meta property='og:url' content='http://localhost:1313/posts/2017/11/2017-11-20-%E7%94%A8phpmyadmin%E5%9C%A8%E7%BA%BF%E7%AE%A1%E7%90%86mysql%E6%95%B0%E6%8D%AE%E5%BA%93/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='mysql' /><meta property='article:tag' content='phpmyadmin' /><meta property='article:published_time' content='2017-11-20T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2017-11-20T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="用phpMyAdmin在线管理mysql数据库">
-<meta name="twitter:description" content="本站phpMyAdmin测试地址：\nwww.calmkart.com/phpMyAdmin\n">
+<meta name="twitter:description" content="本站phpMyAdmin测试地址： www.calmkart.com/phpMyAdmin">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -149,6 +157,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            本站phpMyAdmin测试地址： www.calmkart.com/phpMyAdmin
+        </h3>
+        
     </div>
 
     
@@ -167,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2017-11-20T00:00:00Z'>Monday, November 20, 2017</time>
+                <time class="article-time--published" datetime='2017-11-20T00:00:00Z'>2017年11月20日星期一</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 1 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -195,15 +221,15 @@
 <p>2.unzip解压，文件夹改名为phpMyAdmin</p>
 <p>3.把config.sample.inc.php复制一份为config.inc.php</p>
 <p>4.修改以下两处</p>
-<pre tabindex="0"><code>$cfg[‘Servers’][$i][‘controluser’] = ‘您的数据库名称’;
-$cfg[‘Servers’][$i][‘controlpass’] = ‘您的数据库密码’;
-</code></pre><p><strong>注意：</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="err">$</span><span class="n">cfg</span><span class="p">[</span><span class="err">‘</span><span class="n">Servers</span><span class="err">’</span><span class="p">][</span><span class="err">$</span><span class="n">i</span><span class="p">][</span><span class="err">‘</span><span class="n">controluser</span><span class="err">’</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">‘您的数据库名称’</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="err">$</span><span class="n">cfg</span><span class="p">[</span><span class="err">‘</span><span class="n">Servers</span><span class="err">’</span><span class="p">][</span><span class="err">$</span><span class="n">i</span><span class="p">][</span><span class="err">‘</span><span class="n">controlpass</span><span class="err">’</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">‘您的数据库密码’</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p><strong>注意：</strong></p>
 <p><strong>root用户要用sudo所以无权限登陆，这时候推荐专门设置一个phpmyadmin用户用于管理</strong></p>
-<pre tabindex="0"><code>mysql -uroot -p
-CREATE USER &#39;phpmyadmin&#39;@&#39;localhost&#39; IDENTIFIED BY &#39;some_pass&#39;;
-GRANT ALL PRIVILEGES ON *.* TO &#39;phpmyadmin&#39;@&#39;localhost&#39; WITH GRANT OPTION;
-FLUSH PRIVILEGES;
-</code></pre><p>5.把phpMyAdmin文件夹复制到nginx配置的server主目录，我这里是/var/www/html/</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">mysql</span><span class="w"> </span><span class="o">-</span><span class="n">uroot</span><span class="w"> </span><span class="o">-</span><span class="n">p</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">CREATE</span><span class="w"> </span><span class="k">USER</span><span class="w"> </span><span class="s1">&#39;phpmyadmin&#39;</span><span class="o">@</span><span class="s1">&#39;localhost&#39;</span><span class="w"> </span><span class="n">IDENTIFIED</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="s1">&#39;some_pass&#39;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">GRANT</span><span class="w"> </span><span class="k">ALL</span><span class="w"> </span><span class="k">PRIVILEGES</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="o">*</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="s1">&#39;phpmyadmin&#39;</span><span class="o">@</span><span class="s1">&#39;localhost&#39;</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="k">GRANT</span><span class="w"> </span><span class="k">OPTION</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">FLUSH</span><span class="w"> </span><span class="k">PRIVILEGES</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>5.把phpMyAdmin文件夹复制到nginx配置的server主目录，我这里是/var/www/html/</p>
 <p>6.访问http://域名/phpMyAdmin即可</p>
 </section>
 
@@ -219,6 +245,18 @@ FLUSH PRIVILEGES;
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -232,53 +270,16 @@ FLUSH PRIVILEGES;
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -289,8 +290,8 @@ FLUSH PRIVILEGES;
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

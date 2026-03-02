@@ -1,6 +1,7 @@
 ---
 title: "(转)字符串和编码"
 date: 2017-09-05
+description: "一篇关于PYTHON字符串和编码的文章，写的很好，原地址： https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001431..."
 categories: 
   - "计算机"
 tags: 
@@ -76,14 +77,14 @@ Unicode标准也在不断发展，但最常用的是用两个字节表示一个�
 
 在最新的Python 3版本中，字符串是以Unicode编码的，也就是说，Python的字符串支持多语言，例如：
 
-```
+```python
 >>> print('包含中文的str')
 包含中文的str
 ```
 
 对于单个字符的编码，Python提供了`ord()`函数获取字符的整数表示，`chr()`函数把编码转换为对应的字符：
 
-```
+```python
 >>> ord('A')
 65
 >>> ord('中')
@@ -96,7 +97,7 @@ Unicode标准也在不断发展，但最常用的是用两个字节表示一个�
 
 如果知道字符的整数编码，还可以用十六进制这么写`str`：
 
-```
+```python
 >>> '\u4e2d\u6587'
 '中文'
 ```
@@ -107,7 +108,7 @@ Unicode标准也在不断发展，但最常用的是用两个字节表示一个�
 
 Python对`bytes`类型的数据用带`b`前缀的单引号或双引号表示：
 
-```
+```python
 x = b'ABC'
 ```
 
@@ -115,7 +116,7 @@ x = b'ABC'
 
 以Unicode表示的`str`通过`encode()`方法可以编码为指定的`bytes`，例如：
 
-```
+```python
 >>> 'ABC'.encode('ascii')
 b'ABC'
 >>> '中文'.encode('utf-8')
@@ -132,7 +133,7 @@ UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-1: ordin
 
 反过来，如果我们从网络或磁盘上读取了字节流，那么读到的数据就是`bytes`。要把`bytes`变为`str`，就需要用`decode()`方法：
 
-```
+```python
 >>> b'ABC'.decode('ascii')
 'ABC'
 >>> b'\xe4\xb8\xad\xe6\x96\x87'.decode('utf-8')
@@ -141,7 +142,7 @@ UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-1: ordin
 
 要计算`str`包含多少个字符，可以用`len()`函数：
 
-```
+```python
 >>> len('ABC')
 3
 >>> len('中文')
@@ -150,7 +151,7 @@ UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-1: ordin
 
 `len()`函数计算的是`str`的字符数，如果换成`bytes`，`len()`函数就计算字节数：
 
-```
+```python
 >>> len(b'ABC')
 3
 >>> len(b'\xe4\xb8\xad\xe6\x96\x87')
@@ -165,7 +166,7 @@ UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-1: ordin
 
 由于Python源代码也是一个文本文件，所以，当你的源代码中包含中文的时候，在保存源代码时，就需要务必指定保存为UTF-8编码。当Python解释器读取源代码时，为了让它按UTF-8编码读取，我们通常在文件开头写上这两行：
 
-```
+```python
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 ```

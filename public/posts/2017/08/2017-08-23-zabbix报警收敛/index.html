@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="因zabbix可能同一段时间报警过多，接受消息时如果不做收敛可能出错也不容易审查，所以需要一个报警收敛机制。\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="因zabbix可能同一段时间报警过多，接受消息时如果不做收敛可能出错也不容易审查，所以需要一个报警收敛机制。">
 <title>zabbix报警收敛</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="zabbix报警收敛">
-<meta property='og:description' content="因zabbix可能同一段时间报警过多，接受消息时如果不做收敛可能出错也不容易审查，所以需要一个报警收敛机制。\n">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="zabbix报警收敛">
+<meta property='og:description' content="因zabbix可能同一段时间报警过多，接受消息时如果不做收敛可能出错也不容易审查，所以需要一个报警收敛机制。">
 <meta property='og:url' content='http://localhost:1313/posts/2017/08/2017-08-23-zabbix%E6%8A%A5%E8%AD%A6%E6%94%B6%E6%95%9B/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='python' /><meta property='article:tag' content='zabbix' /><meta property='article:tag' content='报警' /><meta property='article:published_time' content='2017-08-23T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2017-08-23T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="zabbix报警收敛">
-<meta name="twitter:description" content="因zabbix可能同一段时间报警过多，接受消息时如果不做收敛可能出错也不容易审查，所以需要一个报警收敛机制。\n">
+<meta name="twitter:description" content="因zabbix可能同一段时间报警过多，接受消息时如果不做收敛可能出错也不容易审查，所以需要一个报警收敛机制。">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -149,6 +157,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            因zabbix可能同一段时间报警过多，接受消息时如果不做收敛可能出错也不容易审查，所以需要一个报警收敛机制。
+        </h3>
+        
     </div>
 
     
@@ -167,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2017-08-23T00:00:00Z'>Wednesday, August 23, 2017</time>
+                <time class="article-time--published" datetime='2017-08-23T00:00:00Z'>2017年8月23日星期三</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -190,127 +216,135 @@
     <p>因zabbix可能同一段时间报警过多，接受消息时如果不做收敛可能出错也不容易审查，所以需要一个报警收敛机制。</p>
 <p>实验环境分为server端与client端： server端模拟收敛程序通过TCP SOCKET连接接受zabbix报警，做收敛处理并发送； client端模拟zabbix报警程序，通过TCP SOCKET连接发送模拟的zabbix报警给server;</p>
 <p>server端程序如下：</p>
-<pre tabindex="0"><code># -*- coding:utf-8 -*-
-from threading import Timer
-import urllib2
-import socket
-import threading
-import re
-
-#event_list为收敛类型数目列表
-#ip_list为IP收敛字典列表
-#summary为收敛类型说明列表
-#keyw为正则匹配元素
-
-class convergence(object):
-	event_list = [0,0,0,0]
-	summary = [&#39;获取uptime时间失败&#39;,&#39;SNMP_cant_respond_for_5minutes错误&#39;,&#39;OK错误&#39;,&#39;流量速率异常错误&#39;]
-	ip_list = [{},{},{},{}]
-	keyw = [&#39;获取uptime时间失败&#39;,&#39;SNMPcan\&#39;trespondfor5minutes&#39;,&#39;ok&#39;,&#39;流量速度异常&#39;]
-	t = None
-	
-	def convergence(self,event):
-		temp = self.keyword(event)
-		ip = self.findip(event)
-		if temp != 0:
-			#做报警IP收敛
-			if self.ip_list[temp-1].has_key(ip):
-				self.ip_list[temp-1][ip] = self.ip_list[temp-1][ip]+1
-			else:
-				self.ip_list[temp-1][ip] = 1
-			#做报警条目收敛
-			self.event_list[temp-1] = self.event_list[temp-1]+1
-			if self.t == None:
-				self.timer(event)
-			else:
-				pass
-		
-		else:
-			#按原格式发送
-			print event
-			pass
-
-	def send(self,event):
-		print &#39;目前的缓存区为&#39;+str(self.event_list)
-		if max(self.event_list) == 0:
-			pass
-		else:
-			for i in range(0,len(event_list)):
-				if self.event_list[i]==0:
-					pass
-				else:#发送收敛后的报警到指定位置
-					content = str(event_list[i]+&#39;次&#39;+self.summary[i]+&#39;(前20秒内)&#39;)
-					self.event_list[i] = 0
-					self.t = None
-					urllib2.urlopen(&#39;http://www.calmkart.com&#39;)
-					print content
-
-	def timer(self,event):#启动定时器
-		self.t = Timer(20,self.send,args=[event])
-		self.t.start()
-	
-	def keyword(self,event):
-		for i in range(0,len(self.keyw)):
-			if re.search(self.keyw[i],event,flags=re.IGNORECASE) != None:
-				return i+1
-		return 0
-	
-	def findip(self,event):
-		m = re.search(r&#39;(?&lt;![\.\d])(?:\d{1,3}\.){3}\d{1,3}(?![\.\d])&#39;,event)
-		if m is not None:
-			ip = m.group()
-			return str(ip)
-		return &#39;查不到IP&#39;
-
-test = convergence()
-
-#tcp测试,server端，接收
-host = &#39;0.0.0.0&#39;
-port = 9001
-s = socket.socket()
-s.bind((host,port))
-s.listen(5)
-
-while True:
-	c,addr = s.accept()
-	data = c.recv(1024)
-	test.convergence(data)
-	
-##udp测试,server端，接收
-#s= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#host = &#39;10.17.16.207&#39;
-#port = 9001
-#s.bind((host,port))
-#
-#while True:
-#	data,addr = s.recvfrom(2048)
-#	test.convergence(data)
-</code></pre><p> </p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># -*- coding:utf-8 -*-</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Timer</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">urllib2</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">socket</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">threading</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">re</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#event_list为收敛类型数目列表</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#ip_list为IP收敛字典列表</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#summary为收敛类型说明列表</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#keyw为正则匹配元素</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">convergence</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">	<span class="n">event_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">	<span class="n">summary</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;获取uptime时间失败&#39;</span><span class="p">,</span><span class="s1">&#39;SNMP_cant_respond_for_5minutes错误&#39;</span><span class="p">,</span><span class="s1">&#39;OK错误&#39;</span><span class="p">,</span><span class="s1">&#39;流量速率异常错误&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ip_list</span> <span class="o">=</span> <span class="p">[{},{},{},{}]</span>
+</span></span><span class="line"><span class="cl">	<span class="n">keyw</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;获取uptime时间失败&#39;</span><span class="p">,</span><span class="s1">&#39;SNMPcan</span><span class="se">\&#39;</span><span class="s1">trespondfor5minutes&#39;</span><span class="p">,</span><span class="s1">&#39;ok&#39;</span><span class="p">,</span><span class="s1">&#39;流量速度异常&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">	<span class="n">t</span> <span class="o">=</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">	<span class="k">def</span> <span class="nf">convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">event</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">		<span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyword</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="n">ip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findip</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="n">temp</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">			<span class="c1">#做报警IP收敛</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_list</span><span class="p">[</span><span class="n">temp</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">ip</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">				<span class="bp">self</span><span class="o">.</span><span class="n">ip_list</span><span class="p">[</span><span class="n">temp</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_list</span><span class="p">[</span><span class="n">temp</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">ip</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl">			<span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">				<span class="bp">self</span><span class="o">.</span><span class="n">ip_list</span><span class="p">[</span><span class="n">temp</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">			<span class="c1">#做报警条目收敛</span>
+</span></span><span class="line"><span class="cl">			<span class="bp">self</span><span class="o">.</span><span class="n">event_list</span><span class="p">[</span><span class="n">temp</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_list</span><span class="p">[</span><span class="n">temp</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">				<span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">				<span class="k">pass</span>
+</span></span><span class="line"><span class="cl">		
+</span></span><span class="line"><span class="cl">		<span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">			<span class="c1">#按原格式发送</span>
+</span></span><span class="line"><span class="cl">			<span class="nb">print</span> <span class="n">event</span>
+</span></span><span class="line"><span class="cl">			<span class="k">pass</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">event</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">		<span class="nb">print</span> <span class="s1">&#39;目前的缓存区为&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_list</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">			<span class="k">pass</span>
+</span></span><span class="line"><span class="cl">		<span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">			<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">event_list</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">				<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">					<span class="k">pass</span>
+</span></span><span class="line"><span class="cl">				<span class="k">else</span><span class="p">:</span><span class="c1">#发送收敛后的报警到指定位置</span>
+</span></span><span class="line"><span class="cl">					<span class="n">content</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">event_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;次&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;(前20秒内)&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">					<span class="bp">self</span><span class="o">.</span><span class="n">event_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">					<span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">					<span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s1">&#39;http://www.calmkart.com&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">					<span class="nb">print</span> <span class="n">content</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">def</span> <span class="nf">timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">event</span><span class="p">):</span><span class="c1">#启动定时器</span>
+</span></span><span class="line"><span class="cl">		<span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">event</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">		<span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">	<span class="k">def</span> <span class="nf">keyword</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">event</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keyw</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keyw</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">event</span><span class="p">,</span><span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">				<span class="k">return</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">	<span class="k">def</span> <span class="nf">findip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">event</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">		<span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?&lt;![\.\d])(?:\d{1,3}\.)</span><span class="si">{3}</span><span class="s1">\d{1,3}(?![\.\d])&#39;</span><span class="p">,</span><span class="n">event</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">			<span class="n">ip</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="s1">&#39;查不到IP&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">test</span> <span class="o">=</span> <span class="n">convergence</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#tcp测试,server端，接收</span>
+</span></span><span class="line"><span class="cl"><span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;0.0.0.0&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">port</span> <span class="o">=</span> <span class="mi">9001</span>
+</span></span><span class="line"><span class="cl"><span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">s</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">host</span><span class="p">,</span><span class="n">port</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">s</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">c</span><span class="p">,</span><span class="n">addr</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="n">data</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="n">test</span><span class="o">.</span><span class="n">convergence</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl"><span class="c1">##udp测试,server端，接收</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#s= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#host = &#39;10.17.16.207&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#port = 9001</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#s.bind((host,port))</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#while True:</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#	data,addr = s.recvfrom(2048)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#	test.convergence(data)</span>
+</span></span></code></pre></div><p> </p>
 <p>clent端程序如下：</p>
-<pre tabindex="0"><code># --- coding:utf-8 ---
-import random
-from multiprocessing.connection import Client
-
-str1 = [
-	&#39;192.168.0.1SNMP错误&#39;,
-        &#39;192.168.0.2SNMP错误&#39;,
-        &#39;192.168.0.100,OK&#39;,
-        &#39;192.168.0.101,ok&#39;,
-	&#39;192.168.0.102,流量速率异常&#39;,
-	&#39;192.168.0.103,流量速率异常&#39;,
-	&#39;192.168.0.104,获取uptime时间失败&#39;,
-	&#39;192.168.0.105,获取uptime时间失败&#39;
-] 
-address = (&#39;0.0.0.0&#39;,9001)
-
-for i in range(0,1000):
-	m = str1[random.randrange(0,11)]
-	conn = Client(address)
-	conn.send(m)
-	conn.close
-</code></pre><p>主要用到的工具是正则表达式做匹配</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># --- coding:utf-8 ---</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">random</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">multiprocessing.connection</span> <span class="kn">import</span> <span class="n">Client</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">str1</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">	<span class="s1">&#39;192.168.0.1SNMP错误&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;192.168.0.2SNMP错误&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;192.168.0.100,OK&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;192.168.0.101,ok&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="s1">&#39;192.168.0.102,流量速率异常&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="s1">&#39;192.168.0.103,流量速率异常&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="s1">&#39;192.168.0.104,获取uptime时间失败&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="s1">&#39;192.168.0.105,获取uptime时间失败&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">]</span> 
+</span></span><span class="line"><span class="cl"><span class="n">address</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span><span class="mi">9001</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">	<span class="n">m</span> <span class="o">=</span> <span class="n">str1</span><span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">11</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">	<span class="n">conn</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="n">conn</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="n">conn</span><span class="o">.</span><span class="n">close</span>
+</span></span></code></pre></div><p>主要用到的工具是正则表达式做匹配</p>
 <p>代码已上传至github,地址 <a class="link" href="https://github.com/calmkart/Zabbix_convergence"  target="_blank" rel="noopener"
     >https://github.com/calmkart/Zabbix_convergence</a></p>
+<div class="archived-comments">
+<h2>历史评论 (1 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>我有一个可爱的小椰子</strong> (2017-08-29 20:39)</div>
+<div class="comment-body">厉害了，过来学习一下</div>
+</div>
+</div>
 </section>
 
 
@@ -327,6 +361,18 @@ for i in range(0,1000):
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -338,7 +384,7 @@ for i in range(0,1000):
     
 
 <aside class="related-content--wrapper">
-    <h2 class="section-title">Related content</h2>
+    <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
             
@@ -371,53 +417,16 @@ for i in range(0,1000):
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -428,8 +437,8 @@ for i in range(0,1000):
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

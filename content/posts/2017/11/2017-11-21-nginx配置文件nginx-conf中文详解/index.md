@@ -1,13 +1,14 @@
 ---
 title: "nginx配置文件nginx.conf中文详解"
 date: 2017-11-21
+description: "Nginx配置文件nginx.conf的完整中文注释详解，涵盖全局配置、events、http、server、location等核心模块的参数说明。"
 categories: 
   - "计算机"
 tags: 
   - "nginx"
 ---
 
-```
+```nginx
 ######Nginx配置文件nginx.conf中文详解#####
 
 #定义Nginx运行的用户和用户组

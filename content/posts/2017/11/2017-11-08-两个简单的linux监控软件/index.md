@@ -1,6 +1,7 @@
 ---
 title: "两个简单的linux监控软件"
 date: 2017-11-08
+description: "除了zabbix，nagios这样重量型的监控软件之外，挑选了几个简单的linux监控软件，也还比较好用，记录一下"
 categories: 
   - "计算机"
 tags: 

@@ -1,6 +1,7 @@
 ---
 title: "一个简单的，支持自建词库的背英语单词网站"
 date: 2017-09-04
+description: "由于近来在学英语，需要背英语单词。但网上背英语单词的网站好像不花钱都不支持自建词库，所以就顺手自己写了一个简单而支持自建词库的背英语单词网站，自用。(www.calmkart.com/learn)"
 categories: 
   - "计算机"
 tags: 
@@ -32,16 +33,16 @@ tags:
 
 代码已上传github,地址：
 
-[https://github.com/calmkart/learn\_english](https://github.com/calmkart/learn_english)
+[https://github.com/calmkart/learn_english](https://github.com/calmkart/learn_english)
 
 自行使用时请先修改setting文件中的路径，用于与本地匹配。
 
----
+<div class="archived-comments">
 
-## 历史评论 (1 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **郭昊旻** (2017-09-08 15:54)
->
-> 我日，这个功能屌，强无敌，妈妈再也不用担心我的英语了。
+<h2>历史评论 (1 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>郭昊旻</strong> (2017-09-08 15:54)</div>
+<div class="comment-body">我日，这个功能屌，强无敌，妈妈再也不用担心我的英语了。</div>
+</div>
+</div>

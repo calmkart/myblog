@@ -1,6 +1,7 @@
 ---
 title: "WireGuard突破BeiJing GreatWall"
 date: 2019-04-01
+description: "有好几个月没有写blog了，原因也挺多的。首先过年嘛，一直有点懒散，然后整天写业务代码又无聊又忙，实际可记录的东西本来也不多，又懒的记。一些新工具啥的，感觉记了也没什么意义，反正都记脑子里了。最近读了一些经典框架源码，学了一些源码课程..."
 categories: 
   - "计算机"
 tags: 
@@ -27,7 +28,7 @@ wireguard是一种比较新的vpn，基于udp，速度可以说秒杀其他vpn(�
 
 首先配置服务端
 
-```
+```bash
 #推荐使用一键安装脚本,github地址
 https://github.com/l-n-s/wireguard-install
 #过程
@@ -61,7 +62,7 @@ wg showconf wg0
 
 服务端这就已经配置完毕了，接着配置客户端(客户端用的Tunsafe，下载在文末)
 
-```
+```ini
 #将客户端配置文件下载到自己的机器上(客户端),观察下配置文件的内容，其实也挺简单的，就是用rsa公私钥加密通信而已。
 #在客户端修改配置文件
 [Peer]
@@ -84,31 +85,30 @@ enjoy it
 
 附上tunsafe客户端，方便上不了tunsafe官网的朋友(记得先安装其中的ts环境)
 
-[TunSafe](http://www.calmkart.com/wp-content/uploads/2019/04/TunSafe.zip)
+TunSafe（客户端文件已不再提供下载）
 
----
+<div class="archived-comments">
 
-## 历史评论 (5 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **liuxing** (2019-04-10 16:10)
->
-> 大神，请问下苹果笔记本怎么用这个软件翻墙啊？
-
-  > ↳ **calmkart** (2019-04-14 11:21)
-  >
-  > 服务端配好了同样用tunsafe客户端就行了啊,tunsafe客户端有MAC版本的
-
-> **huan** (2019-04-29 17:01)
->
-> 学习了，幸好我远离帝都
-
-  > ↳ **calmkart** (2019-04-30 10:50)
-  >
-  > 安全王？贵司应该就是用的stunnel+sniproxy+dns劫持翻墙的,讲道理还是不太安全
-
-    > ↳ **huan** (2019-05-09 09:49)
-    >
-    > 没那么高端，直接是调整出口的路由到香港线路。
-    > 我最近都是v2ray，感觉也很稳，被封了就试下wireguard
+<h2>历史评论 (5 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>liuxing</strong> (2019-04-10 16:10)</div>
+<div class="comment-body">大神，请问下苹果笔记本怎么用这个软件翻墙啊？</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-04-14 11:21)</div>
+<div class="comment-body">服务端配好了同样用tunsafe客户端就行了啊,tunsafe客户端有MAC版本的</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>huan</strong> (2019-04-29 17:01)</div>
+<div class="comment-body">学习了，幸好我远离帝都</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-04-30 10:50)</div>
+<div class="comment-body">安全王？贵司应该就是用的stunnel+sniproxy+dns劫持翻墙的,讲道理还是不太安全</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>huan</strong> (2019-05-09 09:49)</div>
+<div class="comment-body">没那么高端，直接是调整出口的路由到香港线路。 我最近都是v2ray，感觉也很稳，被封了就试下wireguard</div>
+</div>
+</div>

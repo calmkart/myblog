@@ -1,6 +1,7 @@
 ---
 title: "django生成图片验证码"
 date: 2018-09-18
+description: "最近在做一个好玩的通用django单点登录系统，登录系统少不了验证码，参考了一下别人的做法和开源项目，总结一下。 结果如下："
 categories: 
   - "计算机"
 tags: 
@@ -19,9 +20,9 @@ tags:
 
 主要思路流程是，后端根据随机码绘图，然后做混淆(我这里几乎没做模糊之类的混淆)，最后将随机验证码写进后端session里，前端获取图像后，提交时与session里的验证码做比较。流程还是比较简单的，大致代码如下。
 
-1.captcha\_handle.py
+1.captcha_handle.py
 
-```
+```python
 captcha_handle.py
 #用于生成随机字符串以及生成验证码图片
 
@@ -74,7 +75,7 @@ if __name__ == '__main__':
 
 2.views.py
 
-```
+```python
 views.py
 #视图，生成验证码图片和code，返回图片，code存进session
 class get_captcha(View):
@@ -95,7 +96,7 @@ class get_captcha(View):
 
 3.login.html
 
-```
+```jsx
 {# html #}
 <div class="col-xs-4">
     <img id="captcha_img" src="{% url 'get_captcha' %}" onclick="refresh_captcha()" style="margin-top: 28px;">
@@ -115,14 +116,14 @@ class get_captcha(View):
 
 4.url.py
 
-```
+```python
 url(r'^get_captcha/$',cas_views.get_captcha.as_view(), name="get_captcha"),
 
 ```
 
 5.views.py
 
-```
+```python
 #校验验证码是否正确
 if request.session["captcha"].lower() != captcha.lower():
     return JsonResponse({"status":False, "msg":"验证码错误!"})

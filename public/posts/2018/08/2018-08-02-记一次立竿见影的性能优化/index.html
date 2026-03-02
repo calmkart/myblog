@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="通过一点细微代码的修改,将某系统首页载入时间缩短了10倍有余.\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="通过一点细微代码的修改,将某系统首页载入时间缩短了10倍有余.">
 <title>记一次立竿见影的性能优化</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="记一次立竿见影的性能优化">
-<meta property='og:description' content="通过一点细微代码的修改,将某系统首页载入时间缩短了10倍有余.\n">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="记一次立竿见影的性能优化">
+<meta property='og:description' content="通过一点细微代码的修改,将某系统首页载入时间缩短了10倍有余.">
 <meta property='og:url' content='http://localhost:1313/posts/2018/08/2018-08-02-%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%AB%8B%E7%AB%BF%E8%A7%81%E5%BD%B1%E7%9A%84%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='devops' /><meta property='article:tag' content='django' /><meta property='article:tag' content='guardian' /><meta property='article:tag' content='运维管理系统' /><meta property='article:published_time' content='2018-08-02T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2018-08-02T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="记一次立竿见影的性能优化">
-<meta name="twitter:description" content="通过一点细微代码的修改,将某系统首页载入时间缩短了10倍有余.\n">
+<meta name="twitter:description" content="通过一点细微代码的修改,将某系统首页载入时间缩短了10倍有余.">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -149,6 +157,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            通过一点细微代码的修改,将某系统首页载入时间缩短了10倍有余.
+        </h3>
+        
     </div>
 
     
@@ -167,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2018-08-02T00:00:00Z'>Thursday, August 2, 2018</time>
+                <time class="article-time--published" datetime='2018-08-02T00:00:00Z'>2018年8月2日星期四</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -189,124 +215,146 @@
     
     <p>通过一点细微代码的修改,将某系统首页载入时间缩短了10倍有余.</p>
 <p>系统首页大致这样</p>
-<p><a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/08/201882204014dama.png"  target="_blank" rel="noopener"
-    ><img src="images/201882204014dama.png" alt="" />
-</a></p>
+<p><img src="images/201882204014dama.png" alt="" />
+</p>
 <p>逻辑是读取后台的所有服务列表,判断用户是否有权限,有权限则交给前端用ztree显示,并可进行部署操作,但因为服务太多,遍历服务后判断用户是否有权限后台耗时太长,用chrome查了下,后台数据处理费时2000ms,这样首页就载入的太慢了.</p>
 <p>第一步,查代码,原始代码如下:</p>
-<pre tabindex="0"><code>@login_required
-def services(request):
-    user = request.user
-    _online_apps = App.objects.filter(app_env=&#39;online&#39;)
-    _test_apps = App.objects.filter(app_env=&#39;test&#39;)
-    _dev_apps = App.objects.filter(app_env=&#39;dev&#39;)
-
-    online_apps = [a for a in _online_apps if user.has_perm(&#39;deploy_perm&#39;, a) or is_admin_by_group(user.username)]
-    test_apps = [a for a in _test_apps if user.has_perm(&#39;deploy_perm&#39;, a) or is_admin_by_group(user.username)]
-    dev_apps = [a for a in _dev_apps if user.has_perm(&#39;deploy_perm&#39;, a) or is_admin_by_group(user.username)]
-
-    online_apps_name = [{&#39;name&#39;:app.app_name, &#39;id&#39;:app.id} for app in online_apps]
-    test_apps_name = [{&#39;name&#39;:app.app_name, &#39;id&#39;:app.id} for app in test_apps]
-    dev_apps_name = [{&#39;name&#39;:app.app_name, &#39;id&#39;:app.id} for app in dev_apps]
-    nodes = [
-                {&#39;name&#39;:&#39;online&#39;,
-                 &#39;open&#39;:&#39;true&#39;,
-                 &#39;children&#39;:online_apps_name
-                },
-                {&#39;name&#39;:&#39;test&#39;,
-                 &#39;open&#39;:&#39;false&#39;,
-                 &#39;children&#39;:test_apps_name
-                },
-                {&#39;name&#39;:&#39;dev&#39;,
-                 &#39;open&#39;:&#39;false&#39;,
-                 &#39;children&#39;:dev_apps_name
-                }
-    ];
-    return render(request, &#39;services/services.html&#39;, {&#39;nodes&#39;: json.dumps(nodes)})
-</code></pre><p>也没什么复杂的,就是django models + django-guardian权限控制,然后返回数据给ztree生成树结构.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nd">@login_required</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">services</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_online_apps</span> <span class="o">=</span> <span class="n">App</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">app_env</span><span class="o">=</span><span class="s1">&#39;online&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_test_apps</span> <span class="o">=</span> <span class="n">App</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">app_env</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_dev_apps</span> <span class="o">=</span> <span class="n">App</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">app_env</span><span class="o">=</span><span class="s1">&#39;dev&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">online_apps</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">_online_apps</span> <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">has_perm</span><span class="p">(</span><span class="s1">&#39;deploy_perm&#39;</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_admin_by_group</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">test_apps</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">_test_apps</span> <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">has_perm</span><span class="p">(</span><span class="s1">&#39;deploy_perm&#39;</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_admin_by_group</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dev_apps</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">_dev_apps</span> <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">has_perm</span><span class="p">(</span><span class="s1">&#39;deploy_perm&#39;</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_admin_by_group</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">online_apps_name</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="n">app</span><span class="o">.</span><span class="n">app_name</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span><span class="n">app</span><span class="o">.</span><span class="n">id</span><span class="p">}</span> <span class="k">for</span> <span class="n">app</span> <span class="ow">in</span> <span class="n">online_apps</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">test_apps_name</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="n">app</span><span class="o">.</span><span class="n">app_name</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span><span class="n">app</span><span class="o">.</span><span class="n">id</span><span class="p">}</span> <span class="k">for</span> <span class="n">app</span> <span class="ow">in</span> <span class="n">test_apps</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dev_apps_name</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="n">app</span><span class="o">.</span><span class="n">app_name</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span><span class="n">app</span><span class="o">.</span><span class="n">id</span><span class="p">}</span> <span class="k">for</span> <span class="n">app</span> <span class="ow">in</span> <span class="n">dev_apps</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="s1">&#39;online&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                 <span class="s1">&#39;open&#39;</span><span class="p">:</span><span class="s1">&#39;true&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                 <span class="s1">&#39;children&#39;</span><span class="p">:</span><span class="n">online_apps_name</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="s1">&#39;test&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                 <span class="s1">&#39;open&#39;</span><span class="p">:</span><span class="s1">&#39;false&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                 <span class="s1">&#39;children&#39;</span><span class="p">:</span><span class="n">test_apps_name</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="s1">&#39;dev&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                 <span class="s1">&#39;open&#39;</span><span class="p">:</span><span class="s1">&#39;false&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                 <span class="s1">&#39;children&#39;</span><span class="p">:</span><span class="n">dev_apps_name</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;services/services.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;nodes&#39;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">nodes</span><span class="p">)})</span>
+</span></span></code></pre></div><p>也没什么复杂的,就是django models + django-guardian权限控制,然后返回数据给ztree生成树结构.</p>
 <p>初步设想是因为列表生成式太多导致速度慢,写测试代码做测试</p>
-<pre tabindex="0"><code>python manage.py shell
-
-&gt;&gt;&gt; import time
-&gt;&gt;&gt; from django.contrib.auth.models import User
-&gt;&gt;&gt; from services.views import new_service
-&gt;&gt;&gt; def test(user):
-...     start = time.time()
-...     new_service(user)
-...     stop = time.time()
-...     print stop-start
-...
-&gt;&gt;&gt; pengng = User.objects.get(name=&#39;pengng&#39;)
-&gt;&gt;&gt; test(pengng)
-1.93502497673
-&gt;&gt;&gt; test(pengng)
-1.89282894135
-&gt;&gt;&gt; test(pengng)
-2.14076519012
-&gt;&gt;&gt; test(pengng)
-1.85515809059
-&gt;&gt;&gt; test(pengng)
-1.91108703613
-</code></pre><p>发现处理时间大致在1.8-1.9s之间,然后直接将上述原始代码第一步拆了出来</p>
-<pre tabindex="0"><code>#仅测试这一步
-online_apps = [a for a in _online_apps if user.has_perm(&#39;deploy_perm&#39;, a) or is_admin_by_group(user.username)]
-
-#发现时间在1.2秒左右
-&gt;&gt;&gt; test(pengng)
-1.25127100945
-&gt;&gt;&gt; test(pengng)
-1.27178192139
-&gt;&gt;&gt; test(pengng)
-1.22848701477
-&gt;&gt;&gt; test(pengng)
-1.25300002098
-</code></pre><p>继续分拆,发现是这个user.has_perm(&lsquo;deploy_perm&rsquo;,a)的guardian获取权限消耗了大量的时间 然后想起这个系统里权限都是以group来赋权的,获取用户对于服务的权限要先经过组再到服务,先遍历服务再单独查看用户是否有该组权限导致重复遍历太多,其实直接获取用户对应的所有拥有权限的服务对象即可(get_objects_for_user()方法),尝试修改代码</p>
-<pre tabindex="0"><code>@login_required
-def services(request):
-    user = request.user
-
-    if is_admin_by_group(user.username):
-        online_apps_name = [{&#39;name&#39;: a.app_name, &#39;id&#39;: a.id}
-                            for a in App.objects.filter(app_env=&#39;online&#39;)]
-        test_apps_name = [{&#39;name&#39;: a.app_name, &#39;id&#39;: a.id}
-                          for a in App.objects.filter(app_env=&#39;test&#39;)]
-        dev_apps_name = [{&#39;name&#39;: a.app_name, &#39;id&#39;: a.id}
-                         for a in App.objects.filter(app_env=&#39;dev&#39;)]
-    else:
-        online_apps_name = [{&#39;name&#39;: a.app_name, &#39;id&#39;: a.id} for a in get_objects_for_user(
-            user, &#39;deploy_perm&#39;, klass=App) if a.app_env == &#34;online&#34;]
-        test_apps_name = [{&#39;name&#39;: a.app_name, &#39;id&#39;: a.id} for a in get_objects_for_user(
-            user, &#39;deploy_perm&#39;, klass=App) if a.app_env == &#34;test&#34;]
-        dev_apps_name = [{&#39;name&#39;: a.app_name, &#39;id&#39;: a.id} for a in get_objects_for_user(
-            user, &#39;deploy_perm&#39;, klass=App) if a.app_env == &#34;dev&#34;]
-
-    nodes = [
-        {&#39;name&#39;: &#39;online&#39;,
-                 &#39;open&#39;: &#39;true&#39;,
-                 &#39;children&#39;: online_apps_name
-         },
-        {&#39;name&#39;: &#39;test&#39;,
-                 &#39;open&#39;: &#39;false&#39;,
-                 &#39;children&#39;: test_apps_name
-         },
-        {&#39;name&#39;: &#39;dev&#39;,
-                 &#39;open&#39;: &#39;false&#39;,
-                 &#39;children&#39;: dev_apps_name
-         }
-    ]
-    return render(request, &#39;services/services.html&#39;, {&#39;nodes&#39;: json.dumps(nodes)})
-</code></pre><p>然后重载文件</p>
-<pre tabindex="0"><code>&gt;&gt;&gt; reload(services.views)
-&lt;module &#39;services.views&#39; from &#39;/home/**/***/services/views.py&#39;&gt;
-&gt;&gt;&gt; test(pengng)
-0.0817279815674
-&gt;&gt;&gt; test(pengng)
-0.0788700580597
-&gt;&gt;&gt; test(pengng)
-0.0756318569183
-</code></pre><p>立竿见影,瞬间从2秒降低到了0.08秒左右 <a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/08/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_008058b2-bd81-4a9c-8442-63afc75ac870.png"  target="_blank" rel="noopener"
-    ><img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_008058b2-bd81-4a9c-8442-63afc75ac870.png" alt="" />
-</a>收工</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">python</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">shell</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">time</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">services.views</span> <span class="kn">import</span> <span class="n">new_service</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl"><span class="o">...</span>     <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="o">...</span>     <span class="n">new_service</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="o">...</span>     <span class="n">stop</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="o">...</span>     <span class="nb">print</span> <span class="n">stop</span><span class="o">-</span><span class="n">start</span>
+</span></span><span class="line"><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="n">pengng</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;pengng&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="n">test</span><span class="p">(</span><span class="n">pengng</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mf">1.93502497673</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="n">test</span><span class="p">(</span><span class="n">pengng</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mf">1.89282894135</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="n">test</span><span class="p">(</span><span class="n">pengng</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mf">2.14076519012</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="n">test</span><span class="p">(</span><span class="n">pengng</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mf">1.85515809059</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="n">test</span><span class="p">(</span><span class="n">pengng</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mf">1.91108703613</span>
+</span></span></code></pre></div><p>发现处理时间大致在1.8-1.9s之间,然后直接将上述原始代码第一步拆了出来</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1">#仅测试这一步</span>
+</span></span><span class="line"><span class="cl"><span class="n">online_apps</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">_online_apps</span> <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">has_perm</span><span class="p">(</span><span class="s1">&#39;deploy_perm&#39;</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_admin_by_group</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#发现时间在1.2秒左右</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="n">test</span><span class="p">(</span><span class="n">pengng</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mf">1.25127100945</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="n">test</span><span class="p">(</span><span class="n">pengng</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mf">1.27178192139</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="n">test</span><span class="p">(</span><span class="n">pengng</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mf">1.22848701477</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="n">test</span><span class="p">(</span><span class="n">pengng</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mf">1.25300002098</span>
+</span></span></code></pre></div><p>继续分拆,发现是这个user.has_perm(&lsquo;deploy_perm&rsquo;,a)的guardian获取权限消耗了大量的时间 然后想起这个系统里权限都是以group来赋权的,获取用户对于服务的权限要先经过组再到服务,先遍历服务再单独查看用户是否有该组权限导致重复遍历太多,其实直接获取用户对应的所有拥有权限的服务对象即可(get_objects_for_user()方法),尝试修改代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nd">@login_required</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">services</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">is_admin_by_group</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">online_apps_name</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">app_name</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">                            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">App</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">app_env</span><span class="o">=</span><span class="s1">&#39;online&#39;</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">test_apps_name</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">app_name</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">                          <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">App</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">app_env</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">dev_apps_name</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">app_name</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">                         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">App</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">app_env</span><span class="o">=</span><span class="s1">&#39;dev&#39;</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">online_apps_name</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">app_name</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">}</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">get_objects_for_user</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">user</span><span class="p">,</span> <span class="s1">&#39;deploy_perm&#39;</span><span class="p">,</span> <span class="n">klass</span><span class="o">=</span><span class="n">App</span><span class="p">)</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">app_env</span> <span class="o">==</span> <span class="s2">&#34;online&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">test_apps_name</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">app_name</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">}</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">get_objects_for_user</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">user</span><span class="p">,</span> <span class="s1">&#39;deploy_perm&#39;</span><span class="p">,</span> <span class="n">klass</span><span class="o">=</span><span class="n">App</span><span class="p">)</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">app_env</span> <span class="o">==</span> <span class="s2">&#34;test&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">dev_apps_name</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">app_name</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">}</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">get_objects_for_user</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">user</span><span class="p">,</span> <span class="s1">&#39;deploy_perm&#39;</span><span class="p">,</span> <span class="n">klass</span><span class="o">=</span><span class="n">App</span><span class="p">)</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">app_env</span> <span class="o">==</span> <span class="s2">&#34;dev&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;online&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                 <span class="s1">&#39;open&#39;</span><span class="p">:</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                 <span class="s1">&#39;children&#39;</span><span class="p">:</span> <span class="n">online_apps_name</span>
+</span></span><span class="line"><span class="cl">         <span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                 <span class="s1">&#39;open&#39;</span><span class="p">:</span> <span class="s1">&#39;false&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                 <span class="s1">&#39;children&#39;</span><span class="p">:</span> <span class="n">test_apps_name</span>
+</span></span><span class="line"><span class="cl">         <span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;dev&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                 <span class="s1">&#39;open&#39;</span><span class="p">:</span> <span class="s1">&#39;false&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                 <span class="s1">&#39;children&#39;</span><span class="p">:</span> <span class="n">dev_apps_name</span>
+</span></span><span class="line"><span class="cl">         <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;services/services.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;nodes&#39;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">nodes</span><span class="p">)})</span>
+</span></span></code></pre></div><p>然后重载文件</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="nx">reload</span><span class="p">(</span><span class="nx">services</span><span class="p">.</span><span class="nx">views</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">module</span> <span class="err">&#39;</span><span class="na">services.views</span><span class="err">&#39;</span> <span class="na">from</span> <span class="err">&#39;/</span><span class="na">home</span><span class="err">/**/***/</span><span class="na">services</span><span class="err">/</span><span class="na">views.py</span><span class="err">&#39;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="nx">test</span><span class="p">(</span><span class="nx">pengng</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mf">0.0817279815674</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="nx">test</span><span class="p">(</span><span class="nx">pengng</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mf">0.0788700580597</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="nx">test</span><span class="p">(</span><span class="nx">pengng</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mf">0.0756318569183</span>
+</span></span></code></pre></div><p>立竿见影,瞬间从2秒降低到了0.08秒左右 <img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_008058b2-bd81-4a9c-8442-63afc75ac870.png" alt="" />
+收工</p>
+<div class="archived-comments">
+<h2>历史评论 (5 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>安全黄</strong> (2018-08-06 11:56)</div>
+<div class="comment-body">给大佬递槟榔</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2018-08-13 15:03)</div>
+<div class="comment-body">安全王牛瘪！安全王请带我飞！</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>杨硕</strong> (2018-08-09 17:23)</div>
+<div class="comment-body">大哥喝冰可乐，psc快收了我啊</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2018-08-13 15:03)</div>
+<div class="comment-body">就等着xsc上市了</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>吃瓜群众</strong> (2018-11-07 10:31)</div>
+<div class="comment-body">您的文章写得真好，给大佬倒橙汁</div>
+</div>
+</div>
 </section>
 
 
@@ -325,6 +373,18 @@ def services(request):
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -336,7 +396,7 @@ def services(request):
     
 
 <aside class="related-content--wrapper">
-    <h2 class="section-title">Related content</h2>
+    <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
             
@@ -391,53 +451,16 @@ def services(request):
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -448,8 +471,8 @@ def services(request):
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

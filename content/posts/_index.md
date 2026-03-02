@@ -1,0 +1,4 @@
+---
+cascade:
+  readingTime: true
+---

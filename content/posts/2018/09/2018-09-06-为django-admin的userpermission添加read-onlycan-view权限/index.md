@@ -1,6 +1,7 @@
 ---
 title: "为django-admin的userpermission添加read only(can view)权限"
 date: 2018-09-06
+description: "为django-admin的User Permission添加Read-only(Can View)权限，解决默认只有增删改三种权限的问题。"
 categories: 
   - "计算机"
 tags: 
@@ -10,15 +11,15 @@ tags:
   - "运维开发"
 ---
 
-默认的django-admin中用户的models权限只有三个,分别是(Can change, Can add, Can delete),显然的,对于绝大部分crud工程师(^\_^)而言,一眼看过去就少了些什么,没错,少了很关键的Can view权限.
+默认的django-admin中用户的models权限只有三个,分别是(Can change, Can add, Can delete),显然的,对于绝大部分crud工程师(^_^)而言,一眼看过去就少了些什么,没错,少了很关键的Can view权限.
 
 当然django-admin的用户权限是可以自定义的,需要改permission的meta,这里不细述,发现一个简单好用的django app,可以直接添加Can view权限,美滋滋.
 
-最终效果如下 [![](images/B6CE8AA0-F925-4290-B2C0-E3C98ECF0C79.png)](http://www.calmkart.com/wp-content/uploads/2018/09/B6CE8AA0-F925-4290-B2C0-E3C98ECF0C79.png) <!--more-->
+最终效果如下 ![](images/B6CE8AA0-F925-4290-B2C0-E3C98ECF0C79.png) <!--more-->
 
 插件是: django-admin-view-permission 地址 [https://github.com/ctxis/django-admin-view-permission](https://github.com/ctxis/django-admin-view-permission) 使用方式及其简单
 
-```
+```bash
 #pip安装插件
 pip install django-admin-view-permission
 

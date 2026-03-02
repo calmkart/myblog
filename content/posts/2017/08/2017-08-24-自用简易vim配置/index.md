@@ -1,6 +1,7 @@
 ---
 title: "自用简易VIM配置"
 date: 2017-08-24
+description: "最常用到的编辑器VIM，记录一下自用简易配置方式，方便需要的时候使用。"
 categories: 
   - "计算机"
 tags: 
@@ -14,7 +15,7 @@ tags:
 
  
 
-```
+```bash
 cd
 ./.vimrc
 
@@ -22,7 +23,7 @@ cd
 
 ./.vimrc
 
-```
+```javascript
 "去掉vi的一致性"
 set nocompatible
 " 隐藏滚动条"
@@ -72,7 +73,7 @@ let g:airline_powerline_fonts = 1
 
 1.安装Vundle
 
-```
+```bash
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 
 ```
@@ -85,4 +86,4 @@ VIM下运行 :BundleInstall 进行安装插件 :BundleClean 卸载没有写在./
 
  
 
-配置已上传github: [https://github.com/calmkart/vim\_config](https://github.com/calmkart/vim_config)
+配置已上传github: [https://github.com/calmkart/vim_config](https://github.com/calmkart/vim_config)

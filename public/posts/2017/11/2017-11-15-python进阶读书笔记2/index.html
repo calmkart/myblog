@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="9.装饰器 既将函数传参给装饰器函数，在函数执行的上下文作某些通用操作。\n记得要用@wraps复制函数名称(__name__)，等等属性\n使用举例：\nfrom functools import wraps def requires_auth(f): @wraps(f) def decorated(*args, **kwargs): auth = request.authorization if not auth or not check_auth(auth.username, auth.password): #若未登录，返回401 authenticate() return f(*args, **kwargs) return decorated ">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Python进阶读书笔记第二部分：装饰器、全局变量与返回值、对象变动、容器类型等核心知识点。">
 <title>《Python进阶》读书笔记(2)</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="《Python进阶》读书笔记(2)">
-<meta property='og:description' content="9.装饰器 既将函数传参给装饰器函数，在函数执行的上下文作某些通用操作。\n记得要用@wraps复制函数名称(__name__)，等等属性\n使用举例：\nfrom functools import wraps def requires_auth(f): @wraps(f) def decorated(*args, **kwargs): auth = request.authorization if not auth or not check_auth(auth.username, auth.password): #若未登录，返回401 authenticate() return f(*args, **kwargs) return decorated ">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="《Python进阶》读书笔记(2)">
+<meta property='og:description' content="Python进阶读书笔记第二部分：装饰器、全局变量与返回值、对象变动、容器类型等核心知识点。">
 <meta property='og:url' content='http://localhost:1313/posts/2017/11/2017-11-15-python%E8%BF%9B%E9%98%B6%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='python' /><meta property='article:published_time' content='2017-11-15T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2017-11-15T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="《Python进阶》读书笔记(2)">
-<meta name="twitter:description" content="9.装饰器 既将函数传参给装饰器函数，在函数执行的上下文作某些通用操作。\n记得要用@wraps复制函数名称(__name__)，等等属性\n使用举例：\nfrom functools import wraps def requires_auth(f): @wraps(f) def decorated(*args, **kwargs): auth = request.authorization if not auth or not check_auth(auth.username, auth.password): #若未登录，返回401 authenticate() return f(*args, **kwargs) return decorated ">
+<meta name="twitter:description" content="Python进阶读书笔记第二部分：装饰器、全局变量与返回值、对象变动、容器类型等核心知识点。">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -123,7 +131,54 @@
     </ol>
 </aside>
 
-    
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ol>
+    <li>
+      <ol>
+        <li>
+          <ol>
+            <li><a href="#9装饰器">9.装饰器</a></li>
+            <li><a href="#10可变数据类型和不可变数据类型">10.可变数据类型和不可变数据类型</a></li>
+            <li><a href="#11slots">11.<strong>slots</strong></a></li>
+            <li><a href="#12容器collections">12.容器collections</a></li>
+            <li><a href="#13dir">13.dir()</a></li>
+            <li><a href="#14type和id">14.type()和id()</a></li>
+            <li><a href="#15推导式">15.推导式</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
 
             <main class="main full-width">
     <article class="main-article">
@@ -156,6 +211,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            Python进阶读书笔记第二部分：装饰器、全局变量与返回值、对象变动、容器类型等核心知识点。
+        </h3>
+        
     </div>
 
     
@@ -174,10 +233,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2017-11-15T00:00:00Z'>Wednesday, November 15, 2017</time>
+                <time class="article-time--published" datetime='2017-11-15T00:00:00Z'>2017年11月15日星期三</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -190,86 +263,118 @@
 </header>
 
     
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ol>
+    <li>
+      <ol>
+        <li>
+          <ol>
+            <li><a href="#9装饰器">9.装饰器</a></li>
+            <li><a href="#10可变数据类型和不可变数据类型">10.可变数据类型和不可变数据类型</a></li>
+            <li><a href="#11slots">11.<strong>slots</strong></a></li>
+            <li><a href="#12容器collections">12.容器collections</a></li>
+            <li><a href="#13dir">13.dir()</a></li>
+            <li><a href="#14type和id">14.type()和id()</a></li>
+            <li><a href="#15推导式">15.推导式</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+
+            </nav>
+        </details>
+    </aside>
+    
 
     <section class="article-content">
     
     
     <h4 id="9装饰器">9.装饰器
 </h4><p>既将函数传参给装饰器函数，在函数执行的上下文作某些通用操作。</p>
-<p>记得要用@wraps复制函数名称(__name__)，等等属性</p>
+<p>记得要用@wraps复制函数名称(<strong>name</strong>)，等等属性</p>
 <p>使用举例：</p>
-<pre tabindex="0"><code>from functools import wraps
-
-def requires_auth(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        auth = request.authorization
-        if not auth or not check_auth(auth.username, auth.password):
-            #若未登录，返回401
-            authenticate()
-        return f(*args, **kwargs)
-    return decorated
-</code></pre><h4 id="10可变数据类型和不可变数据类型">10.可变数据类型和不可变数据类型
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">requires_auth</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="nd">@wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">decorated</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">auth</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">authorization</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="ow">not</span> <span class="n">auth</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">check_auth</span><span class="p">(</span><span class="n">auth</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">auth</span><span class="o">.</span><span class="n">password</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">#若未登录，返回401</span>
+</span></span><span class="line"><span class="cl">            <span class="n">authenticate</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">decorated</span>
+</span></span></code></pre></div><h4 id="10可变数据类型和不可变数据类型">10.可变数据类型和不可变数据类型
 </h4><p>可变数据类型：list,dict</p>
 <p>不可变数据类型：int,float,string,tuple</p>
 <p>可变不可变，指的是变量指向的值：可变，就是说可以改变指向的值而地址不变。不可变，就是说改变变量的值必然改变地址。</p>
 <p>python中的赋值(=)，就是左侧得到右侧内存的引用。</p>
 <p>举例说明：</p>
-<pre tabindex="0"><code>a = [1]
-print a  #----&gt;[1]
-b = a
-b.append(2)
-print a #-----&gt;[1,2]
-</code></pre><p>因为list为可变数据类型，而a和b指向同一片内存。当对b做+=操作时，只是向后扩充内存内容，而不会修改内存位置。所以a也改变了。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span> <span class="n">a</span>  <span class="c1">#----&gt;[1]</span>
+</span></span><span class="line"><span class="cl"><span class="n">b</span> <span class="o">=</span> <span class="n">a</span>
+</span></span><span class="line"><span class="cl"><span class="n">b</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span> <span class="n">a</span> <span class="c1">#-----&gt;[1,2]</span>
+</span></span></code></pre></div><p>因为list为可变数据类型，而a和b指向同一片内存。当对b做+=操作时，只是向后扩充内存内容，而不会修改内存位置。所以a也改变了。</p>
 <p>同时要注意，python函数被定义时，默认参数只会被计算一次，不会每次都计算。所以，默认参数最好不要用可变数据类型，就算要用，也要注意在之后不要对其做修改。</p>
-<h4 id="11__slots__">11.__slots__
+<h4 id="11slots">11.<strong>slots</strong>
 </h4><p>在类的定义中使用__slots__=[&ldquo;name&rdquo;,&ldquo;age&rdquo;]，则只有__slots__这个set中的属性可以被分配内存，不在其中的不可被分配内存。</p>
 <h4 id="12容器collections">12.容器collections
 </h4><p>1.defaultdict</p>
 <p>调用不存在的key时，会用默认的工厂方法作为key默认值.</p>
 <p>举例说明：</p>
-<pre tabindex="0"><code>from collections import defaultdic
-
-favourite_colors = defaultdict(list)
-for name,color in colors:
-    favourite_colors[name].append(color)
-    #默认用name这个list作为KEY
-</code></pre><p>2.counter计数器</p>
-<pre tabindex="0"><code>from collections import counter
-c= counter(...)#为内部元素计数
-favs = counter(name for name,color in colors)
-#为name计数,以dict返回
-</code></pre><p>3.deque双向链表</p>
-<pre tabindex="0"><code>from collections import deque
-</code></pre><p>4.namedtuple命名元组</p>
-<pre tabindex="0"><code>from collections import namedtuple
-
-animal = namedtuple(&#39;animal&#39;, &#39;name age type&#39;)
-perry = animal(name=&#34;perry&#34;, age=31, type=&#34;cat&#34;)
-#可以访问perry.name这样访问属性
-print perry.name
-#输出perry
-#可将命名元组转换为dict，用_asdict()方法
-perry._asdict()
-</code></pre><h4 id="13dir">13.dir()
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdic</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">favourite_colors</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">name</span><span class="p">,</span><span class="n">color</span> <span class="ow">in</span> <span class="n">colors</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">favourite_colors</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#默认用name这个list作为KEY</span>
+</span></span></code></pre></div><p>2.counter计数器</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">counter</span>
+</span></span><span class="line"><span class="cl"><span class="n">c</span><span class="o">=</span> <span class="n">counter</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="c1">#为内部元素计数</span>
+</span></span><span class="line"><span class="cl"><span class="n">favs</span> <span class="o">=</span> <span class="n">counter</span><span class="p">(</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span><span class="n">color</span> <span class="ow">in</span> <span class="n">colors</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#为name计数,以dict返回</span>
+</span></span></code></pre></div><p>3.deque双向链表</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+</span></span></code></pre></div><p>4.namedtuple命名元组</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">animal</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;animal&#39;</span><span class="p">,</span> <span class="s1">&#39;name age type&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">perry</span> <span class="o">=</span> <span class="n">animal</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;perry&#34;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">31</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&#34;cat&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#可以访问perry.name这样访问属性</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span> <span class="n">perry</span><span class="o">.</span><span class="n">name</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#输出perry</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#可将命名元组转换为dict，用_asdict()方法</span>
+</span></span><span class="line"><span class="cl"><span class="n">perry</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span>
+</span></span></code></pre></div><h4 id="13dir">13.dir()
 </h4><p>返回对象所有属性和方法</p>
 <p>举例：</p>
-<pre tabindex="0"><code>a = [1,2,3]
-print dir(a)
-</code></pre><h4 id="14type和id">14.type()和id()
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span> <span class="nb">dir</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</span></span></code></pre></div><h4 id="14type和id">14.type()和id()
 </h4><p>type()返回对象类型，id()返回不同种类对象唯一ID</p>
 <h4 id="15推导式">15.推导式
 </h4><p>1.列表推导式</p>
 <p>通过for和if生成list</p>
 <p>举例说明：</p>
-<pre tabindex="0"><code>m=[i for i in range(30) if i%3 is 0]
-#------------这是list-----这是条件-----
-</code></pre><p>语法：</p>
-<pre tabindex="0"><code>variable = [out_exp for out_exp in input_list if out_exp==2]
-#----------------------------------这是list------这是条件----
-</code></pre><p>2.字典推导式</p>
-<pre tabindex="0"><code>dict = {v:k for k,v in some_dict.items()}
-</code></pre><p> </p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">m</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="mi">3</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#------------这是list-----这是条件-----</span>
+</span></span></code></pre></div><p>语法：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">variable</span> <span class="o">=</span> <span class="p">[</span><span class="n">out_exp</span> <span class="k">for</span> <span class="n">out_exp</span> <span class="ow">in</span> <span class="n">input_list</span> <span class="k">if</span> <span class="n">out_exp</span><span class="o">==</span><span class="mi">2</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#----------------------------------这是list------这是条件----</span>
+</span></span></code></pre></div><p>2.字典推导式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">some_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+</span></span></code></pre></div><p> </p>
 <p><a class="link" href="http://www.calmkart.com/?p=124"  target="_blank" rel="noopener"
     >《Python进阶》读书笔记(1)</a> <a class="link" href="http://www.calmkart.com/?p=150"  target="_blank" rel="noopener"
     >《Python进阶》读书笔记(3)</a></p>
@@ -285,6 +390,18 @@ print dir(a)
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -296,7 +413,7 @@ print dir(a)
     
 
 <aside class="related-content--wrapper">
-    <h2 class="section-title">Related content</h2>
+    <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
             
@@ -362,53 +479,16 @@ print dir(a)
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -419,8 +499,8 @@ print dir(a)
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

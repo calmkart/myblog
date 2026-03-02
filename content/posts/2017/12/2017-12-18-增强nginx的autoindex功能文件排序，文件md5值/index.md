@@ -1,6 +1,7 @@
 ---
 title: "增强nginx的autoindex功能(文件排序，文件MD5值)"
 date: 2017-12-18
+description: "原始的nginx文件服务器autoindex功能非常单一，也不够美观，连按时间或者文件大小排序功能都没有，所以通过nginx插件和修改源码的方式为其增加了一些新的功能。 最终效果如下："
 categories: 
   - "计算机"
 tags: 
@@ -11,7 +12,7 @@ tags:
 
 ![](images/zzxg-1.jpg) <!--more--> 用到的插件为file-md5和ngx-fancyindex，nginx版本是1.6.2
 
-```
+```bash
 git clone https://github.com/cfsego/file-md5.git
 git clone https://github.com/aperezdc/ngx-fancyindex.git
 wget https://github.com/nginx/nginx/archive/release-1.6.2.tar.gz
@@ -19,7 +20,7 @@ wget https://github.com/nginx/nginx/archive/release-1.6.2.tar.gz
 
 修改/ngx-fancyindex/template.h文件
 
-```
+```jsx
 //插入script
 "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js\">"
 "</script>"
@@ -35,7 +36,7 @@ wget https://github.com/nginx/nginx/archive/release-1.6.2.tar.gz
 
 接着执行
 
-```
+```bash
 cd ./nginx-release-1.6.2
 ./auto/configure --prefix=/usr/local/nginx --with-pcre --with-http_stub_status_module --with-http_ssl_module --with-http_gzip_static_module --add-module=../file-md5-master --add-module=../ngx-fancyindex
 make
@@ -43,7 +44,7 @@ make
 
 然后修改nginx配置文件
 
-```
+```nginx
 vi /etc/nginx/site-enable/default
 ###########################
 更多fancyindex插件配置选项参考
@@ -63,13 +64,13 @@ location / {
 
 在需要分享的路径创建文件./static/md5.js，测试机中是/var/www/
 
-```
+```bash
 mkdir /var/www/static
 vi /var/www/static/md5.js
 
 ```
 
-```
+```javascript
 $(document).ready(function(){
 	var current_index = 1;
 	function get_md5(){
@@ -100,7 +101,7 @@ $(document).ready(function(){
 
 然后在nginx-release-1.6.2目录下
 
-```
+```bash
 killall nginx
 cd ./objs
 ./nginx -c /etc/nginx/nginx.conf
@@ -119,8 +120,8 @@ file-md5模块是第三方模块，必须通过手动编译安装。 功能是�
 
 因为ajax是异步的，所以无法通过普通的for循环或者赋值给全局变量的方式运行，所以要用递归+回调函数的方式，才能达成正确的效果。
 
-设置递归终止条件current\_index==$("tr").length，循环遍历所有的文件连接，提取http头中的md5值写入页面中即可。
+设置递归终止条件current_index==$("tr").length，循环遍历所有的文件连接，提取http头中的md5值写入页面中即可。
 
 但性能还是有些问题的，有些大文件的计算比较浪费时间。这里已经将ajax的请求type换成了HEAD类型，因为不再请求文件主体，所以请求速度是GET类型的10倍以上。
 
-所有文件git地址： [https://github.com/calmkart/nginx\_autoindex-](https://github.com/calmkart/nginx_autoindex-) 编译好的nginx可执行文件： [https://github.com/calmkart/nginx\_autoindex-/archive/0.1.tar.gz](https://github.com/calmkart/nginx_autoindex-/archive/0.1.tar.gz)
+所有文件git地址： [https://github.com/calmkart/nginx_autoindex-](https://github.com/calmkart/nginx_autoindex-) 编译好的nginx可执行文件： [https://github.com/calmkart/nginx_autoindex-/archive/0.1.tar.gz](https://github.com/calmkart/nginx_autoindex-/archive/0.1.tar.gz)

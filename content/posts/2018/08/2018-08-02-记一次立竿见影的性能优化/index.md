@@ -1,6 +1,7 @@
 ---
 title: "记一次立竿见影的性能优化"
 date: 2018-08-02
+description: "通过一点细微代码的修改,将某系统首页载入时间缩短了10倍有余."
 categories: 
   - "计算机"
 tags: 
@@ -14,13 +15,13 @@ tags:
 
 系统首页大致这样
 
-[![](images/201882204014dama.png)](http://www.calmkart.com/wp-content/uploads/2018/08/201882204014dama.png)
+![](images/201882204014dama.png)
 
 逻辑是读取后台的所有服务列表,判断用户是否有权限,有权限则交给前端用ztree显示,并可进行部署操作,但因为服务太多,遍历服务后判断用户是否有权限后台耗时太长,用chrome查了下,后台数据处理费时2000ms,这样首页就载入的太慢了.
 
 第一步,查代码,原始代码如下:
 
-```
+```python
 @login_required
 def services(request):
     user = request.user
@@ -57,7 +58,7 @@ def services(request):
 
 初步设想是因为列表生成式太多导致速度慢,写测试代码做测试
 
-```
+```python
 python manage.py shell
 
 >>> import time
@@ -85,7 +86,7 @@ python manage.py shell
 
 发现处理时间大致在1.8-1.9s之间,然后直接将上述原始代码第一步拆了出来
 
-```
+```python
 #仅测试这一步
 online_apps = [a for a in _online_apps if user.has_perm('deploy_perm', a) or is_admin_by_group(user.username)]
 
@@ -101,9 +102,9 @@ online_apps = [a for a in _online_apps if user.has_perm('deploy_perm', a) or is_
 
 ```
 
-继续分拆,发现是这个user.has\_perm('deploy\_perm',a)的guardian获取权限消耗了大量的时间 然后想起这个系统里权限都是以group来赋权的,获取用户对于服务的权限要先经过组再到服务,先遍历服务再单独查看用户是否有该组权限导致重复遍历太多,其实直接获取用户对应的所有拥有权限的服务对象即可(get\_objects\_for\_user()方法),尝试修改代码
+继续分拆,发现是这个user.has_perm('deploy_perm',a)的guardian获取权限消耗了大量的时间 然后想起这个系统里权限都是以group来赋权的,获取用户对于服务的权限要先经过组再到服务,先遍历服务再单独查看用户是否有该组权限导致重复遍历太多,其实直接获取用户对应的所有拥有权限的服务对象即可(get_objects_for_user()方法),尝试修改代码
 
-```
+```python
 @login_required
 def services(request):
     user = request.user
@@ -143,7 +144,7 @@ def services(request):
 
 然后重载文件
 
-```
+```jsx
 >>> reload(services.views)
 <module 'services.views' from '/home/**/***/services/views.py'>
 >>> test(pengng)
@@ -155,30 +156,30 @@ def services(request):
 
 ```
 
-立竿见影,瞬间从2秒降低到了0.08秒左右 [![](images/企业微信截图_008058b2-bd81-4a9c-8442-63afc75ac870.png)](http://www.calmkart.com/wp-content/uploads/2018/08/企业微信截图_008058b2-bd81-4a9c-8442-63afc75ac870.png)收工
+立竿见影,瞬间从2秒降低到了0.08秒左右 ![](images/企业微信截图_008058b2-bd81-4a9c-8442-63afc75ac870.png)收工
 
----
+<div class="archived-comments">
 
-## 历史评论 (5 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **安全黄** (2018-08-06 11:56)
->
-> 给大佬递槟榔
-
-  > ↳ **calmkart** (2018-08-13 15:03)
-  >
-  > 安全王牛瘪！安全王请带我飞！
-
-> **杨硕** (2018-08-09 17:23)
->
-> 大哥喝冰可乐，psc快收了我啊
-
-  > ↳ **calmkart** (2018-08-13 15:03)
-  >
-  > 就等着xsc上市了
-
-> **吃瓜群众** (2018-11-07 10:31)
->
-> 您的文章写得真好，给大佬倒橙汁
+<h2>历史评论 (5 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>安全黄</strong> (2018-08-06 11:56)</div>
+<div class="comment-body">给大佬递槟榔</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2018-08-13 15:03)</div>
+<div class="comment-body">安全王牛瘪！安全王请带我飞！</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>杨硕</strong> (2018-08-09 17:23)</div>
+<div class="comment-body">大哥喝冰可乐，psc快收了我啊</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2018-08-13 15:03)</div>
+<div class="comment-body">就等着xsc上市了</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>吃瓜群众</strong> (2018-11-07 10:31)</div>
+<div class="comment-body">您的文章写得真好，给大佬倒橙汁</div>
+</div>
+</div>

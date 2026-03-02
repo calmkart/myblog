@@ -10,6 +10,6 @@
             <link>http://localhost:1313/posts/2019/09/2019-09-25-kubetnetes-contribution-github-workflow/</link>
             <pubDate>Wed, 25 Sep 2019 00:00:00 +0000</pubDate>
             <guid>http://localhost:1313/posts/2019/09/2019-09-25-kubetnetes-contribution-github-workflow/</guid>
-            <description>&lt;p&gt;转一下kubernetes contribution的github workflow，不仅用在k8s里，也可以用在其他各个开源项目上，贴图备忘，无内容&lt;/p&gt;&#xA;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.calmkart.com/wp-content/uploads/2019/09/git_workflow.png&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;&lt;img src=&#34;images/git_workflow.png&#34; alt=&#34;&#34; /&gt;&#xA;&lt;/a&gt;&lt;/p&gt;&#xA;</description>
+            <description>&lt;p&gt;转一下kubernetes contribution的github workflow，不仅用在k8s里，也可以用在其他各个开源项目上，贴图备忘，无内容&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;images/git_workflow.png&#34; alt=&#34;&#34; /&gt;&#xA;&lt;/p&gt;</description>
         </item></channel>
 </rss>

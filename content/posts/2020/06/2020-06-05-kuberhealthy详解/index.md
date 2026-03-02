@@ -1,6 +1,14 @@
 ---
 title: "kuberhealthy详解"
 date: 2020-06-05
+description: "是什么 官方的介绍中是这样说的 An operator for synthetic monitoring on Kubernetes __ 也就是一个用于在k8s集群中运行各种健康检查并上报集群巡检状态的operator 流程逻辑..."
+categories: 
+  - "计算机"
+tags: 
+  - "kubernetes"
+  - "k8s"
+  - "云原生"
+  - "监控"
 ---
 
 ## 是什么
@@ -40,14 +48,14 @@ kuberhealthy支持多种巡检结果输出，如`khstate` cr对象就是用来�
     git clone https://github.com/Comcast/kuberhealthy.git
     cd kuberhealthy
     kubectl apply -f deploy/kuberhealthy.yaml
-    ```
+```
     
 
 我们将创建一个replicas为2的kuberhealthy deployment。(实际工作的只有一个pod，另一个为保证高可用，kuberhealthy会进行选主操作，但过程实际上有bug)
 
 同时kuberhealthy还将为我们创建一堆khcheck巡检全家桶(其实很多都是我们不需要的)，我们可以通过
 
-```
+```bash
 kubectl get khchecks -n kuberhealthy
 ```
 
@@ -290,7 +298,7 @@ push:
     ],
     "OK": false
     }
-    ```
+```
     
 
 ## kuberhealthy代码详解
@@ -299,7 +307,7 @@ push:
 
 _不重要的目录和文件已省略_
 
-```
+```yaml
 ./
 ├── clients # 这里存放其他语言编写自定义巡检的client库(目前只有js)
 ├── cmd # 存放若干巡检用例代码，其中kuberhealthy子目录为核心代码主目录
@@ -665,7 +673,7 @@ _这里用了waitgroup等待pod创建和结束完毕，却因为逻辑复杂，w
 
 ### 流程图
 
-![流程图](images/流程图.png)
+<!-- 图片已丢失: 流程图.png -->
 
 ## Kuberhealthy的缺点
 

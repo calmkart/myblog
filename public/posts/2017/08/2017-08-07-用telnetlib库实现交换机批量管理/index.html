@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python telnetlib库实现了交换机的批量管理(交换机型号为思科2960x)\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python...">
 <title>用telnetlib库实现交换机批量管理</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="用telnetlib库实现交换机批量管理">
-<meta property='og:description' content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python telnetlib库实现了交换机的批量管理(交换机型号为思科2960x)\n">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="用telnetlib库实现交换机批量管理">
+<meta property='og:description' content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python...">
 <meta property='og:url' content='http://localhost:1313/posts/2017/08/2017-08-07-%E7%94%A8telnetlib%E5%BA%93%E5%AE%9E%E7%8E%B0%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%89%B9%E9%87%8F%E7%AE%A1%E7%90%86/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='python' /><meta property='article:tag' content='telnetlib' /><meta property='article:published_time' content='2017-08-07T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2017-08-07T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="用telnetlib库实现交换机批量管理">
-<meta name="twitter:description" content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python telnetlib库实现了交换机的批量管理(交换机型号为思科2960x)\n">
+<meta name="twitter:description" content="在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python...">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -149,6 +157,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python...
+        </h3>
+        
     </div>
 
     
@@ -167,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2017-08-07T00:00:00Z'>Monday, August 7, 2017</time>
+                <time class="article-time--published" datetime='2017-08-07T00:00:00Z'>2017年8月7日星期一</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -189,73 +215,73 @@
     
     <p>在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python telnetlib库实现了交换机的批量管理(交换机型号为思科2960x)</p>
 <p>实现代码如下： switch_telnet.py</p>
-<pre tabindex="0"><code>#encoding=utf-8
-import sys
-import telnetlib
-import time
-
-def tel(ip,user,password):
-    tn = telnetlib.Telnet(ip,port=23)
-    tn.read_until(&#39;Verification\r\n\r\nUsername: &#39;)
-    tn.write(user+&#39;\n&#39;)
-#   tn.set_debuglevel(2)
-    #password
-    tn.read_until(&#39;Password: &#39;)
-    tn.write(password+&#39;\n&#39;)
-    #login fail
-    if tn.read_some()==&#39;\r\nPassword: &#39;:
-        print &#39;\033[1;31;40m&#39;+ip+&#39;\033[0m&#39;+&#39;     password is wrong,login false!&#39;
-        tn.close()
-        return 1
-    #login successs
-    tn.write(&#39;enable\n&#39;)
-    #password
-    tn.read_until(&#39;Password: &#39;)
-    tn.write(password+&#39;\n&#39;)
-    #enable susccess set terimal length
-    tn.read_until(&#39;Switch#&#39;)
-    tn.write(&#39;ter len 0\n&#39;)
-    time.sleep(1)
-    if tn.read_some()==&#39;ter len 0\r\nSwitch#&#39;:
-        print ip+&#39;     telnet login susccess&#39;
-        return tn
-    print ip+&#39;     terminal length 0 false!&#39;
-    return 1
-
-def comm(tn,ip,cmd):
-    tn.write(cmd+&#39;\n&#39;)
-    time.sleep(.2)
-    result = tn.read_very_eager()
-    print (&#39;\033[1;31;40m&#39;+ip+&#39;\033[0m&#39;+&#39;   &#39;+result)
-
-ip_list = []
-user_list = []
-password_list = []
-tn = []
-ip_fp = open(&#39;ip_list&#39;,&#39;r&#39;)
-ip_fs = ip_fp.read()
-ip_fp.close()
-fa = ip_fs.split(&#39;\n&#39;)
-
-for i in range(0,len(fa)-1):
-    f_res = fa[i].split(&#39;,&#39;)
-    ip_list.append(f_res[0])
-    user_list.append(f_res[1])
-    password_list.append(f_res[2])
-
-for i in range(0,len(fa)-1):
-    tn.append(tel(ip_list[i],user_list[i],password_list[i]))
-
-while 1:
-    cmd = raw_input(&#34;input the command: &#34;)
-    if cmd == &#39;quit&#39;:
-        for i in range(0,len(fa)-1):
-            tn[i].write(&#39;quit\n&#39;)
-        break
-
-    for i in range(0,len(fa)-1):
-        comm(tn[i],ip_list[i],cmd+&#39;\n&#39;)
-</code></pre><p>脚本详解：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1">#encoding=utf-8</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">sys</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">telnetlib</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">time</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">tel</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span><span class="n">user</span><span class="p">,</span><span class="n">password</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tn</span> <span class="o">=</span> <span class="n">telnetlib</span><span class="o">.</span><span class="n">Telnet</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">23</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tn</span><span class="o">.</span><span class="n">read_until</span><span class="p">(</span><span class="s1">&#39;Verification</span><span class="se">\r\n\r\n</span><span class="s1">Username: &#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">user</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#   tn.set_debuglevel(2)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#password</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tn</span><span class="o">.</span><span class="n">read_until</span><span class="p">(</span><span class="s1">&#39;Password: &#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">password</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#login fail</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">tn</span><span class="o">.</span><span class="n">read_some</span><span class="p">()</span><span class="o">==</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">Password: &#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[1;31;40m&#39;</span><span class="o">+</span><span class="n">ip</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span><span class="o">+</span><span class="s1">&#39;     password is wrong,login false!&#39;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">tn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#login successs</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;enable</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#password</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tn</span><span class="o">.</span><span class="n">read_until</span><span class="p">(</span><span class="s1">&#39;Password: &#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">password</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#enable susccess set terimal length</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tn</span><span class="o">.</span><span class="n">read_until</span><span class="p">(</span><span class="s1">&#39;Switch#&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ter len 0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">tn</span><span class="o">.</span><span class="n">read_some</span><span class="p">()</span><span class="o">==</span><span class="s1">&#39;ter len 0</span><span class="se">\r\n</span><span class="s1">Switch#&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span> <span class="n">ip</span><span class="o">+</span><span class="s1">&#39;     telnet login susccess&#39;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">tn</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span> <span class="n">ip</span><span class="o">+</span><span class="s1">&#39;     terminal length 0 false!&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">comm</span><span class="p">(</span><span class="n">tn</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">cmd</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cmd</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">result</span> <span class="o">=</span> <span class="n">tn</span><span class="o">.</span><span class="n">read_very_eager</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[1;31;40m&#39;</span><span class="o">+</span><span class="n">ip</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span><span class="o">+</span><span class="s1">&#39;   &#39;</span><span class="o">+</span><span class="n">result</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">ip_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">user_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">password_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">tn</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">ip_fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;ip_list&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">ip_fs</span> <span class="o">=</span> <span class="n">ip_fp</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">ip_fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">fa</span> <span class="o">=</span> <span class="n">ip_fs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">fa</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">f_res</span> <span class="o">=</span> <span class="n">fa</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ip_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f_res</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">user_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f_res</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">password_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f_res</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">fa</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tn</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tel</span><span class="p">(</span><span class="n">ip_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">user_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">password_list</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cmd</span> <span class="o">=</span> <span class="n">raw_input</span><span class="p">(</span><span class="s2">&#34;input the command: &#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">cmd</span> <span class="o">==</span> <span class="s1">&#39;quit&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">fa</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="n">tn</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;quit</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">fa</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">comm</span><span class="p">(</span><span class="n">tn</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">ip_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">cmd</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span></code></pre></div><p>脚本详解：</p>
 <p>主要使用了python的telnetlib库，下面概述常见的几个方法。</p>
 <p>telnetlib.Telnet([host[, port[, timeout]]]) 此方法返回一个client对象，可操作</p>
 <p>Telnet.read_until(expected[, timeout]) 此方法阻塞读取缓存区输出，匹配expected才继续</p>
@@ -267,9 +293,9 @@ while 1:
 <p> </p>
 <p>操作指南：</p>
 <p>使用时在同路径下编辑ip_list文件，格式为ip,username,password既可，一个交换机占一行，如下例：</p>
-<pre tabindex="0"><code>10.32.19.9,cisco,123456
-10.32.19.10,cisco,654321
-</code></pre><p>运行 python ./switch_telnet.py</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">10.32.19.9,cisco,123456
+</span></span><span class="line"><span class="cl">10.32.19.10,cisco,654321
+</span></span></code></pre></div><p>运行 python ./switch_telnet.py</p>
 <p><img src="images/TdCoxrKTPjmnsPncPk6g.png" alt="" />
 </p>
 <p>显示所有交换机IP的登陆情况，然后输入命令交互即可（类似ansible）</p>
@@ -295,6 +321,18 @@ while 1:
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -308,53 +346,16 @@ while 1:
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -365,8 +366,8 @@ while 1:
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

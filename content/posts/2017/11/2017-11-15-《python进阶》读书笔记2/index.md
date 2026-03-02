@@ -1,6 +1,7 @@
 ---
 title: "《Python进阶》读书笔记(2)"
 date: 2017-11-15
+description: "Python进阶读书笔记第二部分：装饰器、全局变量与返回值、对象变动、容器类型等核心知识点。"
 categories: 
   - "计算机"
   - "读书笔记"
@@ -12,11 +13,11 @@ tags:
 
 既将函数传参给装饰器函数，在函数执行的上下文作某些通用操作。
 
-记得要用@wraps复制函数名称(\_\_name\_\_)，等等属性
+记得要用@wraps复制函数名称(__name__)，等等属性
 
 使用举例：
 
-```
+```python
 from functools import wraps
 
 def requires_auth(f):
@@ -44,7 +45,7 @@ python中的赋值(=)，就是左侧得到右侧内存的引用。
 
 举例说明：
 
-```
+```python
 a = [1]
 print a  #---->[1]
 b = a
@@ -56,9 +57,9 @@ print a #----->[1,2]
 
 同时要注意，python函数被定义时，默认参数只会被计算一次，不会每次都计算。所以，默认参数最好不要用可变数据类型，就算要用，也要注意在之后不要对其做修改。
 
-#### 11.\_\_slots\_\_
+#### 11.__slots__
 
-在类的定义中使用\_\_slots\_\_=\["name","age"\]，则只有\_\_slots\_\_这个set中的属性可以被分配内存，不在其中的不可被分配内存。
+在类的定义中使用__slots__=\["name","age"\]，则只有__slots__这个set中的属性可以被分配内存，不在其中的不可被分配内存。
 
 #### 12.容器collections
 
@@ -68,7 +69,7 @@ print a #----->[1,2]
 
 举例说明：
 
-```
+```python
 from collections import defaultdic
 
 favourite_colors = defaultdict(list)
@@ -79,7 +80,7 @@ for name,color in colors:
 
 2.counter计数器
 
-```
+```python
 from collections import counter
 c= counter(...)#为内部元素计数
 favs = counter(name for name,color in colors)
@@ -88,13 +89,13 @@ favs = counter(name for name,color in colors)
 
 3.deque双向链表
 
-```
+```python
 from collections import deque
 ```
 
 4.namedtuple命名元组
 
-```
+```python
 from collections import namedtuple
 
 animal = namedtuple('animal', 'name age type')
@@ -112,7 +113,7 @@ perry._asdict()
 
 举例：
 
-```
+```python
 a = [1,2,3]
 print dir(a)
 ```
@@ -129,21 +130,21 @@ type()返回对象类型，id()返回不同种类对象唯一ID
 
 举例说明：
 
-```
+```python
 m=[i for i in range(30) if i%3 is 0]
 #------------这是list-----这是条件-----
 ```
 
 语法：
 
-```
+```python
 variable = [out_exp for out_exp in input_list if out_exp==2]
 #----------------------------------这是list------这是条件----
 ```
 
 2.字典推导式
 
-```
+```python
 dict = {v:k for k,v in some_dict.items()}
 ```
 

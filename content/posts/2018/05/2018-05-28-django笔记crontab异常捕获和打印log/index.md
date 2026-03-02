@@ -1,6 +1,9 @@
 ---
 title: "[django笔记]crontab,异常捕获和打印log"
 date: 2018-05-28
+description: "记录一些django常见功能的用法。 这次主要关注点是crontab定时任务,django/python的异常捕获,以及django/python的打印log功能"
+categories:
+  - "计算机"
 ---
 
 记录一些django常见功能的用法。 这次主要关注点是crontab定时任务,django/python的异常捕获,以及django/python的打印log功能 <!--more-->
@@ -9,13 +12,13 @@ date: 2018-05-28
 
 首先安装djanto-crontab模块
 
-```
+```bash
 pip install django-crontab
 ```
 
 然后在django项目的settings.py里添加django-crontab模块
 
-```
+```python
 INSTALLED_APPS = [
     ...,
     'django_crontab',
@@ -26,7 +29,7 @@ INSTALLED_APPS = [
 
 接着在settings.py里添加定时任务
 
-```
+```python
 CRONJOBS = [
     ('0 12 1 * *', 'app.views.cron.cron1'),
     ('0 12 * * 1-5', 'app.views.cron.cron2'),
@@ -37,7 +40,7 @@ CRONJOBS = [
 
 然后常见的执行命令如下:
 
-```
+```bash
 #查看定时任务
 python manage.py crontab show
 
@@ -58,7 +61,7 @@ _**特别注意:crontab的log地址一定要写绝对路径**_
 
 ###### 1.基础语法
 
-```
+```python
 try:
     pass
 except:
@@ -84,19 +87,19 @@ Exception
 
 语法:
 
-```
+```python
 except Exception:
 ```
 
 或者:
 
-```
+```python
 except Exception as e:
 ```
 
 ###### 4.traceback获取异常详情
 
-```
+```python
 import traceback
 
 #返回错误字符串
@@ -112,12 +115,12 @@ logging.getLogger().error(traceback.format_exc())
 
 ...
 
----
+<div class="archived-comments">
 
-## 历史评论 (1 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **吴伟康** (2018-06-08 17:24)
->
-> 楼主你好，请问下如果异常没有被捕获，例如忘记定义这种类型的异常，该怎么避免这种情况的报错啊，不胜感激
+<h2>历史评论 (1 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>吴伟康</strong> (2018-06-08 17:24)</div>
+<div class="comment-body">楼主你好，请问下如果异常没有被捕获，例如忘记定义这种类型的异常，该怎么避免这种情况的报错啊，不胜感激</div>
+</div>
+</div>

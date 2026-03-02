@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="salt的webui,官方的是halite,但已经被放弃了，不维护很久了 尝试过其他几个star比较的开源实现,比如saltpad,但要么就是bug满天飞,要么就是技能栈不符难以二次开发 最后发现了一个开源实现叫saltshaker的不错,最终效果如下 ">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="salt的webui,官方的是halite,但已经被放弃了，不维护很久了 尝试过其他几个star比较的开源实现,比如saltpad,但要么就是bug满天飞,要么就是技能栈不符难以二次开发 最后发现了一个开源实现叫saltshaker的不错...">
 <title>saltshaker--一个salt的webui</title>
 
 
@@ -12,13 +12,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="saltshaker--一个salt的webui">
-<meta property='og:description' content="salt的webui,官方的是halite,但已经被放弃了，不维护很久了 尝试过其他几个star比较的开源实现,比如saltpad,但要么就是bug满天飞,要么就是技能栈不符难以二次开发 最后发现了一个开源实现叫saltshaker的不错,最终效果如下 ">
+<link rel="stylesheet" href="/scss/style.min.eb0e51a77f68dafef5d85f2239a5cde23a9e1de6744ef63e1d1885407cf6c5d6.css"><meta property='og:title' content="saltshaker--一个salt的webui">
+<meta property='og:description' content="salt的webui,官方的是halite,但已经被放弃了，不维护很久了 尝试过其他几个star比较的开源实现,比如saltpad,但要么就是bug满天飞,要么就是技能栈不符难以二次开发 最后发现了一个开源实现叫saltshaker的不错...">
 <meta property='og:url' content='http://localhost:1313/posts/2018/07/2018-07-06-saltshaker-%E4%B8%80%E4%B8%AAsalt%E7%9A%84webui/'>
 <meta property='og:site_name' content='cAlm的个人Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='django' /><meta property='article:tag' content='salt' /><meta property='article:tag' content='saltstack' /><meta property='article:published_time' content='2018-07-06T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2018-07-06T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="saltshaker--一个salt的webui">
-<meta name="twitter:description" content="salt的webui,官方的是halite,但已经被放弃了，不维护很久了 尝试过其他几个star比较的开源实现,比如saltpad,但要么就是bug满天飞,要么就是技能栈不符难以二次开发 最后发现了一个开源实现叫saltshaker的不错,最终效果如下 ">
+<meta name="twitter:description" content="salt的webui,官方的是halite,但已经被放弃了，不维护很久了 尝试过其他几个star比较的开源实现,比如saltpad,但要么就是bug满天飞,要么就是技能栈不符难以二次开发 最后发现了一个开源实现叫saltshaker的不错...">
     </head>
     <body class="
     article-page
@@ -45,8 +45,8 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
         </span>
@@ -88,6 +88,14 @@
         
         
         <li >
+            <a href='/search' >
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
             <a href='/about' >
                 
                 <span>关于</span>
@@ -115,7 +123,7 @@
 
 
 
-                        <span>Dark Mode</span>
+                        <span>暗色模式</span>
                     </li>
                 
             </ol>
@@ -149,6 +157,10 @@
         </h2>
     
         
+        <h3 class="article-subtitle">
+            salt的webui,官方的是halite,但已经被放弃了，不维护很久了 尝试过其他几个star比较的开源实现,比如saltpad,但要么就是bug满天飞,要么就是技能栈不符难以二次开发 最后发现了一个开源实现叫saltshaker的不错...
+        </h3>
+        
     </div>
 
     
@@ -167,10 +179,24 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2018-07-06T00:00:00Z'>Friday, July 6, 2018</time>
+                <time class="article-time--published" datetime='2018-07-06T00:00:00Z'>2018年7月6日星期五</time>
             </div>
         
 
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
         
     </footer>
     
@@ -187,47 +213,46 @@
     <section class="article-content">
     
     
-    <p>salt的webui,官方的是halite,但已经被放弃了，不维护很久了 尝试过其他几个star比较的开源实现,比如saltpad,但要么就是bug满天飞,要么就是技能栈不符难以二次开发 最后发现了一个开源实现叫saltshaker的不错,最终效果如下 <a class="link" href="http://www.calmkart.com/wp-content/uploads/2018/07/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_82481f1c-b153-4fb5-928f-2b98163e9635.png"  target="_blank" rel="noopener"
-    ><img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_82481f1c-b153-4fb5-928f-2b98163e9635.png" alt="" />
-</a></p>
+    <p>salt的webui,官方的是halite,但已经被放弃了，不维护很久了 尝试过其他几个star比较的开源实现,比如saltpad,但要么就是bug满天飞,要么就是技能栈不符难以二次开发 最后发现了一个开源实现叫saltshaker的不错,最终效果如下 <img src="images/%e4%bc%81%e4%b8%9a%e5%be%ae%e4%bf%a1%e6%88%aa%e5%9b%be_82481f1c-b153-4fb5-928f-2b98163e9635.png" alt="" />
+</p>
 <p>官方项目地址 <a class="link" href="https://github.com/yueyongyue/saltshaker"  target="_blank" rel="noopener"
     >https://github.com/yueyongyue/saltshaker</a> 部署文档见 install.txt</p>
 <p>大致总结过程如下,非详情.</p>
-<pre tabindex="0"><code>git clone https://github.com/yueyongyue/saltshaker.git
-pip install virtualenv
-virtualenv env
-source env/bin/activate
-yum install salt-api.noarch
-
-salt-api --version
-pip install cherrypy==3.8.0
-useradd -M -s /sbin/nologin admin
-passwd admin
-vim /etc/salt/master.d/saltapi.conf
-systemctl restart salt-master.service
-systemctl restart salt-api.service
-systemctl status salt-api.service
-systemctl status salt-master.service
-lsof -i:50075
-pip install Django==1.8.4
-pip install django-crontab
-
-yum install python-devel.x86_64
-yum install mysql-devel
-yum install MySQL-python
-yum install gcc
-
-pip install mysql-python
-
-查源码，改dashboard/views里index函数checkport的端口
-</code></pre><p>几个容易踩坑的地方:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git clone https://github.com/yueyongyue/saltshaker.git
+</span></span><span class="line"><span class="cl">pip install virtualenv
+</span></span><span class="line"><span class="cl">virtualenv env
+</span></span><span class="line"><span class="cl"><span class="nb">source</span> env/bin/activate
+</span></span><span class="line"><span class="cl">yum install salt-api.noarch
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">salt-api --version
+</span></span><span class="line"><span class="cl">pip install <span class="nv">cherrypy</span><span class="o">==</span>3.8.0
+</span></span><span class="line"><span class="cl">useradd -M -s /sbin/nologin admin
+</span></span><span class="line"><span class="cl">passwd admin
+</span></span><span class="line"><span class="cl">vim /etc/salt/master.d/saltapi.conf
+</span></span><span class="line"><span class="cl">systemctl restart salt-master.service
+</span></span><span class="line"><span class="cl">systemctl restart salt-api.service
+</span></span><span class="line"><span class="cl">systemctl status salt-api.service
+</span></span><span class="line"><span class="cl">systemctl status salt-master.service
+</span></span><span class="line"><span class="cl">lsof -i:50075
+</span></span><span class="line"><span class="cl">pip install <span class="nv">Django</span><span class="o">==</span>1.8.4
+</span></span><span class="line"><span class="cl">pip install django-crontab
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">yum install python-devel.x86_64
+</span></span><span class="line"><span class="cl">yum install mysql-devel
+</span></span><span class="line"><span class="cl">yum install MySQL-python
+</span></span><span class="line"><span class="cl">yum install gcc
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">pip install mysql-python
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">查源码，改dashboard/views里index函数checkport的端口
+</span></span></code></pre></div><p>几个容易踩坑的地方:</p>
 <p>1.centos7.4用pip安装mysql-python的时候，需要先安装python-devel,mysql-devel,MySQL-python,gcc,否则会报错</p>
 <p>2.supervisor要自己装，相关配置自己写一下，也容易</p>
 <p>3.如果salt-api等几个部件没有运行在默认端口，那么启动saltshaker后在首页会显示down的状态，需要修改dashboard/views.py里的index函数checkport里的端口号.</p>
 <p>4.如果salt-master版本比较高(大于2015.x)，官方yum源的salt-api就没有与之对应的版本了，需要自己下载salt-api的新包，我是自建的yum源，然后</p>
-<pre tabindex="0"><code>createrepo &lt;path&gt;
-createrepo --update &lt;path&gt; 
-</code></pre><p>更新仓库信息，安装最新的包</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">createrepo &lt;path&gt;
+</span></span><span class="line"><span class="cl">createrepo --update &lt;path&gt; 
+</span></span></code></pre></div><p>更新仓库信息，安装最新的包</p>
 <p>5.django crontab在settings.py里被注释掉了3个，得把注释去掉，然后把所有django crontab跑起来.</p>
 <p>最后，这个东西感觉也不是很完善好用，不过是django的，二次开发也很容易，有机会再自己来改改。</p>
 </section>
@@ -246,6 +271,18 @@ createrepo --update &lt;path&gt;
     </section>
 
 
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
     </footer>
 
 
@@ -257,7 +294,7 @@ createrepo --update &lt;path&gt;
     
 
 <aside class="related-content--wrapper">
-    <h2 class="section-title">Related content</h2>
+    <h2 class="section-title">相关文章</h2>
     <div class="related-content">
         <div class="flex article-list--tile">
             
@@ -323,53 +360,16 @@ createrepo --update &lt;path&gt;
      
     
         
-        <script src="//cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js"></script>
-<div id="tcomment"></div>
-<style>
-    .twikoo {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-    :root[data-scheme="dark"] {
-        --twikoo-body-text-color-main: rgba(255, 255, 255, 0.9);
-        --twikoo-body-text-color: rgba(255, 255, 255, 0.7);
-    }
-    .twikoo .el-input-group__prepend,
-    .twikoo .tk-action-icon,
-    .twikoo .tk-submit-action-icon,
-    .twikoo .tk-time,
-    .twikoo .tk-comments-no,
-    .twikoo .tk-comments-count {
-        color: var(--twikoo-body-text-color);
-    }
-    .twikoo .el-input__inner,
-    .twikoo .el-textarea__inner,
-    .twikoo .tk-preview-container,
-    .twikoo .tk-content,
-    .twikoo .tk-nick,
-    .twikoo .tk-send,
-    .twikoo .tk-comments-no,
-    .twikoo .el-input__count,
-    .twikoo .tk-submit-action-icon {
-        color: var(--twikoo-body-text-color-main)!important;
-    }
-    .twikoo .el-button{
-        color: var(--twikoo-body-text-color)!important;
-    }
-    .twikoo .el-input__count {
-        color: var(--twikoo-body-text-color) !important;
-    }
-    .OwO .OwO-body {
-        background-color: var(--body-background) !important;
-        color: var(--body-text-color) !important;
-    }
-</style><script>
-    twikoo.init({
-        envId: '',
-        el: '#tcomment',})
+        <div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+<script>
+  twikoo.init({
+    envId: '',
+    el: '#tcomment',
+    lang: 'zh-CN',
+  })
 </script>
+
     
 
     <footer class="site-footer">
@@ -380,8 +380,8 @@ createrepo --update &lt;path&gt;
     </section>
     
     <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
     </section>
 </footer>
 

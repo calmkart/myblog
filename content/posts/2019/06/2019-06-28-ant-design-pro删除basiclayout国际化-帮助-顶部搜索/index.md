@@ -1,6 +1,7 @@
 ---
 title: "Ant design pro删除BasicLayout国际化/帮助/顶部搜索"
 date: 2019-06-28
+description: "最近学了下react那一套东西，从react的官方文档和官方示例开始看起，感觉官方文档写得相当详实漂亮，由浅入深让人很容易接受。但想着国内可是有antd这么牛逼的轮子，作为react的UI组可是世界第二的存在(star数)..."
 categories: 
   - "计算机"
 tags: 
@@ -10,7 +11,7 @@ tags:
   - "前端"
 ---
 
-最近学了下react那一套东西，从react的官方文档和官方示例开始看起，感觉官方文档写得相当详实漂亮，由浅入深让人很容易接受。但想着国内可是有antd这么牛逼的轮子，作为react的UI组可是世界第二的存在(star数)，肯定要支持一下学学啦，然后开始了极让人自闭的ant design之旅。[![](images/zibi.jpg)](http://www.calmkart.com/wp-content/uploads/2019/06/zibi.jpg) <!--more--> 以前写前端都是用的传统的后端渲染template方式，用了大批的js插件，前端的东西就jquery一把梭，学react这样的框架的时候还是很有新鲜感的。ant design先走了一趟官方的实践文档，过程中跟着走了一趟umi和dva的文档，不能说很懂，但大致还是看的明白的，全家桶这样的东西好用的话也没什么问题，然后开始看antd pro这个官方的脚手架。
+最近学了下react那一套东西，从react的官方文档和官方示例开始看起，感觉官方文档写得相当详实漂亮，由浅入深让人很容易接受。但想着国内可是有antd这么牛逼的轮子，作为react的UI组可是世界第二的存在(star数)，肯定要支持一下学学啦，然后开始了极让人自闭的ant design之旅。![](images/zibi.jpg) <!--more--> 以前写前端都是用的传统的后端渲染template方式，用了大批的js插件，前端的东西就jquery一把梭，学react这样的框架的时候还是很有新鲜感的。ant design先走了一趟官方的实践文档，过程中跟着走了一趟umi和dva的文档，不能说很懂，但大致还是看的明白的，全家桶这样的东西好用的话也没什么问题，然后开始看antd pro这个官方的脚手架。
 
 这个时候突然想起以前还关注过同样是阿里出的icework飞冰，觉得说不定能提升开发效率，下了个玩玩，基本上没发现有什么卵用。而且不同文档和应用中光创建一个项目的方式就很五花八门了，antd官方实践文档一个样，antd pro一个样，icework飞冰一个样，用的组件也有些不同，但又有些一致的，总之整的人糊涂。我也是真心不懂国内搞这么多千奇百怪的前端工具干啥，最后还是用的antd pro官方文档的方式。
 
@@ -26,12 +27,12 @@ tags:
 
 一点初学者的小记录。
 
----
+<div class="archived-comments">
 
-## 历史评论 (1 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **carmer** (2019-06-29 11:06)
->
-> 楼主为啥不用flutter呢，貌似最近很火，大有一统天下之势
+<h2>历史评论 (1 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>carmer</strong> (2019-06-29 11:06)</div>
+<div class="comment-body">楼主为啥不用flutter呢，貌似最近很火，大有一统天下之势</div>
+</div>
+</div>

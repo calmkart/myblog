@@ -1,7 +1,9 @@
 baseURL: "https://www.calmkart.com/"
 languageCode: zh-cn
+defaultContentLanguage: zh
 title: cAlm的个人Blog
 theme: hugo-theme-stack
+hasCJKLanguage: true
 
 pagination:
   pagerSize: 10
@@ -9,14 +11,38 @@ pagination:
 params:
   mainSections:
     - posts
+  featuredImageField: image
   sidebar:
-    emoji: ""
+    emoji: "🖊️"
     subtitle: 随手记录些东西
+  article:
+    toc: true
+    readingTime: true
+    license:
+      enabled: true
+      default: "Licensed under CC BY-NC-SA 4.0"
+  widgets:
+    homepage:
+      - type: search
+      - type: archives
+        params:
+          limit: 10
+      - type: categories
+        params:
+          limit: 10
+      - type: tag-cloud
+        params:
+          limit: 20
+    page:
+      - type: toc
+  colorScheme:
+    toggle: true
+    default: auto
   comments:
     enabled: true
     provider: twikoo
-  twikoo:
-    envId: "calmblog.vercel.app"
+    twikoo:
+      envId: "calmblog.vercel.app"
 
 menu:
   main:
@@ -29,9 +55,27 @@ menu:
     - name: 分类
       url: /categories
       weight: 3
+    - name: 搜索
+      url: /search
+      weight: 4
     - name: 关于
       url: /about
-      weight: 4
+      weight: 5
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  tableOfContents:
+    endLevel: 4
+    ordered: true
+    startLevel: 2
+  highlight:
+    noClasses: false
+    codeFences: true
+    guessSyntax: true
+    lineNos: false
+    tabWidth: 4
 
 permalinks:
-#  posts: /:year/:month/:slug/  # 根据步骤4记录的URL结构调整
+#  posts: /:year/:month/:slug/

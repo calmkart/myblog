@@ -1,6 +1,7 @@
 ---
 title: "kubernetes集群中服务的负载均衡和外部发现"
 date: 2019-05-25
+description: "传统的负载均衡策略一般是: 客户端 -dns -4层库在均衡(HA) -7层负载均衡 -具体的后端服务 这种方式处理服务发现和动态配置比较难搞,比如后端服务动态扩缩容什么的。 一开始的做法肯定是OP人工维护7层负载均衡集群配置..."
 categories: 
   - "计算机"
 tags: 
@@ -30,7 +31,7 @@ nginx-ingress采用了nginx-lua模块实现upstream动态修正，无需reload n
 
 首先在上篇blog里我们已经有了一个k8s集群，然后我们创建ingress-nginx相关的api对象
 
-```
+```bash
 wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
 kubectl apply -f mandatory.yaml
 
@@ -43,7 +44,7 @@ nginx-ingress-controller-5694ccb578-hwj2j   1/1     Running   0          3h11m
 
 然后我们创建一个ingress的service，用ExternalIP的方式暴露给集群外部
 
-```
+```yaml
 vim externalIp-ingress-service.yaml
 
 apiVersion: v1
@@ -78,7 +79,7 @@ ingress-nginx   ClusterIP   10.96.139.222   10.1.33.159   80/TCP,443/TCP   3h12m
 
 接下来我们就可以创建具体的ingress对象了
 
-```
+```yaml
 vim rook-ceph-ingress.yaml
 
 apiVersion: extensions/v1beta1
@@ -114,7 +115,7 @@ rook-ceph-mon-c           ClusterIP   10.110.80.82             6789/TCP,3300/TCP
 
 然后我们查看一下ingress状态
 
-```
+```bash
 [root@xxxxxxxxxx ingress]# kubectl get ingress -n rook-ceph
 NAME                HOSTS                                ADDRESS       PORTS   AGE
 rook-ceph-ingress   k8s-ceph-dashboard.calmkart.com   10.1.33.159   80      170m
@@ -125,40 +126,40 @@ rook-ceph-ingress   k8s-ceph-dashboard.calmkart.com   10.1.33.159   80      170m
 
 搞定。
 
----
+<div class="archived-comments">
 
-## 历史评论 (8 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **duboops** (2019-05-25 18:19)
->
-> 楼主采用的K8s负载均衡策略在性能上会优于传统的均衡策略么？
-
-  > ↳ **calmkart** (2019-05-29 17:05)
-  >
-  > 我这个例子里基本上不会，因为实际上都是用的nginx作负载均衡.但在内部coredns的性能上可能会有一些提升.不过网络环境中的性能瓶颈一般不会出在负载均衡层.
-
-> **hukerlet** (2019-06-10 20:50)
->
-> 看了楼主的文章，感觉您从事的工作是做基础架构么，好些文章写的真好，感觉您对k8s研究的很透彻。小弟刚从事运维工作没多久，最近工作中用到了容器，但对这方面是一知半解，不知道您能否抽空写些docker方面的文章呢，感激不尽。
-
-  > ↳ **calmkart** (2019-06-11 11:05)
-  >
-  > 读书吧，入门《每天5分钟玩转docker》，进阶《Docker容器与容器云(第二版)》
-
-> **linda_zhang** (2019-06-27 16:20)
->
-> 博主好，我是互动出版的约稿编辑，有幸阅读到您博客上的文章，感觉您的文章内容偏向入记录整理在工作中碰到的案例，内容质量上挺不错的，要是加以整理想必质量会更胜一筹，不知道您有没有考虑过将博客文章再次归纳整理下，并新增相关章节，集结出版呢，互动出版社主要是面向广大互联网读者推出相关技术书籍，目前年发行册数超过百万，在互联网读者中有较大的影响力。期待博主拨冗回复，详叙具体事宜。我的邮箱：329647550#qq.com  (注：发送邮件时请将#号转为@)
-
-> **xiaohua** (2019-07-09 19:55)
->
-> 楼主，我有个问题想向您请教下，我个人想往某一个技术方向去发展，比如成为k8s专家、或者mysql专家，但是感觉只钻研一个方向会不会以后的路会很窄，不知道您怎么看。
-
-  > ↳ **calmkart** (2019-07-16 11:11)
-  >
-  > 看是哪种钻研了.讲道理一个某单方面的专家,其他方面也不会说完全不会.面学片精吧.
-
-    > ↳ **xiaohua** (2019-07-17 11:43)
-    >
-    > 嗯嗯，您说的对，我也觉得往专家发展应该触类旁通，精通一点，也要了解其他的，要不然就是空中楼阁了，谢谢您的建议
+<h2>历史评论 (8 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>duboops</strong> (2019-05-25 18:19)</div>
+<div class="comment-body">楼主采用的K8s负载均衡策略在性能上会优于传统的均衡策略么？</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-05-29 17:05)</div>
+<div class="comment-body">我这个例子里基本上不会，因为实际上都是用的nginx作负载均衡.但在内部coredns的性能上可能会有一些提升.不过网络环境中的性能瓶颈一般不会出在负载均衡层.</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>hukerlet</strong> (2019-06-10 20:50)</div>
+<div class="comment-body">看了楼主的文章，感觉您从事的工作是做基础架构么，好些文章写的真好，感觉您对k8s研究的很透彻。小弟刚从事运维工作没多久，最近工作中用到了容器，但对这方面是一知半解，不知道您能否抽空写些docker方面的文章呢，感激不尽。</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-06-11 11:05)</div>
+<div class="comment-body">读书吧，入门《每天5分钟玩转docker》，进阶《Docker容器与容器云(第二版)》</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>linda_zhang</strong> (2019-06-27 16:20)</div>
+<div class="comment-body">博主好，我是互动出版的约稿编辑，有幸阅读到您博客上的文章，感觉您的文章内容偏向入记录整理在工作中碰到的案例，内容质量上挺不错的，要是加以整理想必质量会更胜一筹，不知道您有没有考虑过将博客文章再次归纳整理下，并新增相关章节，集结出版呢，互动出版社主要是面向广大互联网读者推出相关技术书籍，目前年发行册数超过百万，在互联网读者中有较大的影响力。期待博主拨冗回复，详叙具体事宜。我的邮箱：329647550#qq.com  (注：发送邮件时请将#号转为@)</div>
+</div>
+<div class="comment-item">
+<div class="comment-meta"><strong>xiaohua</strong> (2019-07-09 19:55)</div>
+<div class="comment-body">楼主，我有个问题想向您请教下，我个人想往某一个技术方向去发展，比如成为k8s专家、或者mysql专家，但是感觉只钻研一个方向会不会以后的路会很窄，不知道您怎么看。</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2019-07-16 11:11)</div>
+<div class="comment-body">看是哪种钻研了.讲道理一个某单方面的专家,其他方面也不会说完全不会.面学片精吧.</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>xiaohua</strong> (2019-07-17 11:43)</div>
+<div class="comment-body">嗯嗯，您说的对，我也觉得往专家发展应该触类旁通，精通一点，也要了解其他的，要不然就是空中楼阁了，谢谢您的建议</div>
+</div>
+</div>

@@ -1,6 +1,7 @@
 ---
 title: "openstack部署指南(devstack/newton)"
 date: 2017-08-03
+description: "1.部署环境 本次openstack部署环境为三台服务器，系统统一为ubuntu16.04 server。三台服务器分别为R730，R720，R710，其中R730作为控制节点+网络节点+计算节点，R710与R720作为计算节点。"
 categories: 
   - "计算机"
 tags: 
@@ -41,7 +42,7 @@ R730： ![](images/1.png) R720： ![](images/2.png) R710： ![](images/3.png)
 
 Vi /etc/apt/sources.list
 
-```
+```bash
 deb http://mirrors.aliyun.com/ubuntu/ xenial main restricted universe multiverse
 deb http://mirrors.aliyun.com/ubuntu/ xenial-security main restricted universe multiverse
 deb http://mirrors.aliyun.com/ubuntu/ xenial-updates main restricted universe multiverse
@@ -58,7 +59,7 @@ Mkdir /root/.pip
 
 Vi /root/.pip/pip.conf
 
-```
+```ini
 [global]
 timeout = 60
 index-url = http://pypi.douban.com/simple
@@ -77,7 +78,7 @@ git clone [https://git.openstack.org/openstack-dev/devstack](https://git.opensta
 
 创建stack用户 Devstack/tools/create-stack-user.sh 添加权限 Vi /etc/sudoers
 
-```
+```bash
 # User privilege specification
 root    ALL=(ALL:ALL) ALL
 stack   ALL=(ALL:ALL) ALL
@@ -96,7 +97,7 @@ Vi local.conf 配置文件可选参数太多，不再列出，下附本次部署
 
 R730(控制节点)部署文件local.conf:
 
-```
+```bash
 [[local|localrc]]
  
 MULTI_HOST=true
@@ -142,7 +143,7 @@ SPICE_REPO=http://git.trystack.cn/git/spice/spice-html5.git
 
 R720(计算节点)部署文件local.conf:
 
-```
+```bash
 [[local|localrc]]
  
 MULTI_HOST=true
@@ -192,7 +193,7 @@ SPICE_REPO=http://git.trystack.cn/git/spice/spice-html5.git
 
 R710(计算节点)部署文件local.conf:
 
-```
+```bash
 [[local|localrc]]
  
 MULTI_HOST=true
@@ -245,7 +246,7 @@ SPICE_REPO=http://git.trystack.cn/git/spice/spice-html5.git
 
 首先在R730控制节点运行 ./stack.sh 等待部署完成，差不多2钟头内就会完成
 
-然后把外网网卡eno2绑定到外部网络网桥br-ex上，把eno2的ip交给br-ex网桥。接着把/etc/neutron/l3\_agent.ini中external\_network\_bridge选项改为br-ex。 同时，修改/etc/neutron/plugins/ml2/ml2\_conf.ini文件，把br-ex对应的项目选择正确，同时记录flat\_networks的名称，与下面的外网网桥对应，此名称即为horizon中FLAT网络类型的物理网络名称，一定不可填错。最后通过screen -x stack进入neutron服务，重启之，即可。
+然后把外网网卡eno2绑定到外部网络网桥br-ex上，把eno2的ip交给br-ex网桥。接着把/etc/neutron/l3_agent.ini中external_network_bridge选项改为br-ex。 同时，修改/etc/neutron/plugins/ml2/ml2_conf.ini文件，把br-ex对应的项目选择正确，同时记录flat_networks的名称，与下面的外网网桥对应，此名称即为horizon中FLAT网络类型的物理网络名称，一定不可填错。最后通过screen -x stack进入neutron服务，重启之，即可。
 
 然后在R710和R720计算节点运行 ./stack.sh 既可（计算节点部署时间在30分钟以内，可随时按上述操作步骤新增计算节点）
 
@@ -283,23 +284,18 @@ SPICE_REPO=http://git.trystack.cn/git/spice/spice-html5.git
 
 ## 7.解决devstack部署openstack默认配额问题
 
-可直接修改/etc/nova/nova.conf配置文件中的默认选择（如 quota\_instances=10），然后重启nova服务 也可以直接修改 source openrc admin admin 查看租户配额 Nova quota-defaults --tenant 租户名 改变租户配额(举例改变实例数量) Nova quota-update --instance 999 租户名
+可直接修改/etc/nova/nova.conf配置文件中的默认选择（如 quota_instances=10），然后重启nova服务 也可以直接修改 source openrc admin admin 查看租户配额 Nova quota-defaults --tenant 租户名 改变租户配额(举例改变实例数量) Nova quota-update --instance 999 租户名
 
----
+<div class="archived-comments">
 
-## 历史评论 (2 条)
-
-*以下评论来自原 WordPress 站点，仅作存档展示。*
-
-> **whut_wu** (2017-08-15 17:19)
->
-> 博主你好，感觉你的博客访问速度很快，延时也下，请问是自己搭建的服务器还是买的虚拟主机啊？能推荐一下买的哪家吗，谢谢
-
-  > ↳ **calmkart** (2017-08-16 09:31)
-  >
-  > 我在
-  > https://www.vultr.com/
-  > 买的服务器
-  > https://www.vultrvps.com/test-server
-  > 这里可以先测试下速度，我个人用的洛杉矶的服务器
-  > 支付可以使用paypal，挺方便的
+<h2>历史评论 (2 条)</h2>
+<p class="comment-notice">以下评论来自原 WordPress 站点，仅作存档展示。</p>
+<div class="comment-item">
+<div class="comment-meta"><strong>whut_wu</strong> (2017-08-15 17:19)</div>
+<div class="comment-body">博主你好，感觉你的博客访问速度很快，延时也下，请问是自己搭建的服务器还是买的虚拟主机啊？能推荐一下买的哪家吗，谢谢</div>
+</div>
+<div class="comment-item comment-reply">
+<div class="comment-meta"><strong>calmkart</strong> (2017-08-16 09:31)</div>
+<div class="comment-body">我在 https://www.vultr.com/ 买的服务器 https://www.vultrvps.com/test-server 这里可以先测试下速度，我个人用的洛杉矶的服务器 支付可以使用paypal，挺方便的</div>
+</div>
+</div>

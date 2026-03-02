@@ -1,6 +1,7 @@
 ---
 title: "pppoe_server部署指南(ubuntu_server16.04)"
 date: 2017-08-03
+description: "服务器系统为ubuntu16.04 server"
 categories: 
   - "计算机"
 tags: 
@@ -23,7 +24,7 @@ Client2(WIN7)：单网卡，内网网卡（无法上外网，IP169.254.39.53/16�
 
 Vi  /etc/apt/source.list
 
-```
+```bash
 #deb cdrom:[Ubuntu 16.04 LTS _Xenial Xerus_ - Release amd64 (20160420.1)]/ xenial main restricted 
 deb-src http://archive.ubuntu.com/ubuntu xenial main restricted #Added by software-properties 
 deb http://mirrors.aliyun.com/ubuntu/ xenial main restricted 
@@ -51,7 +52,7 @@ Apt-get upgrade
 
 ## 2.下载安装rp-pppoe
 
-```
+```bash
 Wget https://www.roaringpenguin.com/files/download/rp-pppoe-3.12.tar.gz
 Tar xzvf rp-pppoe-3.12.tar.gz
 Chown -R root:root /rp-pppoe-3.12/
@@ -69,7 +70,7 @@ Apt-get install ppp
 
 先卸载重装一遍ppp(如果已经预装)用以还原设置
 
-```
+```bash
 Apt-get purge ppp
 Apt-get install ppp
 
@@ -79,7 +80,7 @@ Apt-get install ppp
 
 Vi  /etc/ppp/options
 
-```
+```bash
 Ms-dns 10.32.64.33
 Ms-dns 10.32.64.34
 Asyncmap 0
@@ -100,7 +101,7 @@ Noipx
 
 Vi  /etc/ppp/pppoe-server-options
 
-```
+```bash
 Auth
 Require-chap
 
@@ -110,7 +111,7 @@ Require-chap
 
 Vi  /etc/ppp/chap-secrets
 
-```
+```bash
 # client server secret  IP address
 “test” * “test” *
 
@@ -120,7 +121,7 @@ Vi  /etc/ppp/chap-secrets
 
 ## 4.启动PPPOE服务
 
-```
+```bash
 Pppoe-server -I enp0s3 -L 172.168.0.1 -R 172.168.0.100 -N 10
 
 ```
@@ -131,14 +132,14 @@ Pppoe-server -I enp0s3 -L 172.168.0.1 -R 172.168.0.100 -N 10
 
 Vi /etc/sysctl.conf
 
-```
+```bash
 Net.ipv4.ip_forward = 1
 
 ```
 
 Sysctl -p 然后设置iptables伪装
 
-```
+```bash
 Iptables -t nat -A POSTROUTING -s 172.168.0.0/24 -o enp0s8 -j MASQUERADE
 
 ```

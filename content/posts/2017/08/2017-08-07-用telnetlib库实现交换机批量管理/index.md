@@ -1,6 +1,7 @@
 ---
 title: "用telnetlib库实现交换机批量管理"
 date: 2017-08-07
+description: "在日常工作中，有时候会遇到需要批量操作多台交换机的情况。而交换机普遍是采用定制系统，默认是telnet登陆，即使换成ssh登陆也无法使用ansible进行统一管理，所以通过python..."
 categories: 
   - "计算机"
 tags: 
@@ -12,9 +13,9 @@ tags:
 
 <!--more-->
 
-实现代码如下： switch\_telnet.py
+实现代码如下： switch_telnet.py
 
-```
+```python
 #encoding=utf-8
 import sys
 import telnetlib
@@ -90,13 +91,13 @@ while 1:
 
 telnetlib.Telnet(\[host\[, port\[, timeout\]\]\]) 此方法返回一个client对象，可操作
 
-Telnet.read\_until(expected\[, timeout\]) 此方法阻塞读取缓存区输出，匹配expected才继续
+Telnet.read_until(expected\[, timeout\]) 此方法阻塞读取缓存区输出，匹配expected才继续
 
-Telnet.read\_all() 读取所有输出，读取到结束符或者连接中断
+Telnet.read_all() 读取所有输出，读取到结束符或者连接中断
 
-Telnet.read\_some() 读取至少一个输出
+Telnet.read_some() 读取至少一个输出
 
-Telnet.read\_very\_eager() 读取尽量多的输出，但记得要time.sleep()一定时间，不然会因为来不及读取所有数据导致数据丢失
+Telnet.read_very_eager() 读取尽量多的输出，但记得要time.sleep()一定时间，不然会因为来不及读取所有数据导致数据丢失
 
 Telnet.write(buffer) 向client对象写入数据，记得换行符\\n
 
@@ -106,15 +107,15 @@ Telnet.close() 关闭连接
 
 操作指南：
 
-使用时在同路径下编辑ip\_list文件，格式为ip,username,password既可，一个交换机占一行，如下例：
+使用时在同路径下编辑ip_list文件，格式为ip,username,password既可，一个交换机占一行，如下例：
 
-```
+```text
 10.32.19.9,cisco,123456
 10.32.19.10,cisco,654321
 
 ```
 
-运行 python ./switch\_telnet.py
+运行 python ./switch_telnet.py
 
 ![](images/TdCoxrKTPjmnsPncPk6g.png)
 
@@ -130,4 +131,4 @@ Telnet.close() 关闭连接
 
 同类可用库还有pexpect，非常强大 如果是SSH登陆的交换机，可以使用netmiko，还可以用fabric批量管理，不再赘述
 
-项目源码已上传github [https://github.com/calmkart/switch\_telnet](https://github.com/calmkart/switch_telnet)
+项目源码已上传github [https://github.com/calmkart/switch_telnet](https://github.com/calmkart/switch_telnet)

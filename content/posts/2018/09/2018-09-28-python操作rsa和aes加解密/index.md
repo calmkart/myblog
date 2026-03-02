@@ -1,6 +1,7 @@
 ---
 title: "python操作rsa和aes加解密"
 date: 2018-09-28
+description: "封装了一个python的操作rsa和aes的加解密类 首先pip装库 然后代码如下"
 categories: 
   - "计算机"
 tags: 
@@ -16,7 +17,7 @@ tags:
 
 首先pip装库
 
-```
+```bash
 pip install pycrypto
 ```
 
@@ -24,7 +25,7 @@ pip install pycrypto
 
  
 
-```
+```python
 # -*- coding:utf-8 -*-
 import base64
 from Crypto import Random
@@ -94,7 +95,7 @@ if __name__ == '__main__':
 
 调用方法
 
-```
+```python
 rsa = Rsa()
 aes = Aes()
 
