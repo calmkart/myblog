@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-        <title>Sre on cAlm的个人Blog</title>
+        <title>SRE on cAlm的个人Blog</title>
         <link>http://localhost:1313/tags/sre/</link>
-        <description>Recent content in Sre on cAlm的个人Blog</description>
+        <description>Recent content in SRE on cAlm的个人Blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <lastBuildDate>Sat, 05 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/sre/index.xml" rel="self" type="application/rss+xml" /><item>
